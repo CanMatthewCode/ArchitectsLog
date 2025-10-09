@@ -9,7 +9,7 @@ from pathlib import Path
 # Add src directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
 
-import architectsLog_db
+from architectsLog_db import get_connection, create_architect_table
 
 TEST_DB = 'test_architectsLog.db'
 
@@ -61,17 +61,27 @@ def test_architect_table_creation(test_conn):
 @pytest.fixture
 def table_info(test_conn):
 	"""Generic fixture that returns table info for a given table"""
-	def _get_table_info(table_name):
+	def _get_table_info(table_name, create_func):
+		"""
+		Create a table and return its column info
+
+		Args:
+			table_name: Name of the table to query
+			create_func: Function that creates the table
+		"""
 		cursor = test_conn.cursor()
+		create_func(cursor)
+		test_conn.commit()
 		cursor.execute(f"PRAGMA table_info({table_name})")
 		return cursor.fetchall()
+
 	return _get_table_info
 
 
 #test if architect table has correct column names
 def test_architect_table_column_names(table_info):
 	'''Test that the architect table has correct column names'''
-	column_names = [col[1] for col in table_info('architects')]
+	column_names = [col[1] for col in table_info('architects', create_architect_table)]
 
 	assert 'architect_id' in column_names
 	assert 'name' in column_names
@@ -84,7 +94,7 @@ def test_architect_table_column_names(table_info):
 #test if architect table has correct column types
 def test_architect_table_column_types(table_info):
 	'''Test that the architect table has correct column types'''
-	column_types = {col[1] : col[2] for col in table_info('architects')}
+	column_types = {col[1] : col[2] for col in table_info('architects', create_architect_table)}
 
 	assert column_types['architect_id'] == 'INTEGER'
 	assert column_types['name'] == 'TEXT'

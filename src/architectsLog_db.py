@@ -62,3 +62,12 @@ def create_project_table(cur: sqlite3.Cursor) -> None:
 		)
 	''')
 
+def create_phases_table(cur: sqlite3.Cursor) -> None:
+	"""Create Phases Table"""
+	cur.execute('''
+		CREATE TABLE IF NOT EXISTS phases (
+			phase_id INTEGER PRIMARY KEY AUTOINCREMENT,
+			room_phase TEXT NOT NULL,
+			phase_order INTEGER NOT NULL
+		)
+	''')

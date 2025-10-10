@@ -67,7 +67,16 @@ def create_phases_table(cur: sqlite3.Cursor) -> None:
 	cur.execute('''
 		CREATE TABLE IF NOT EXISTS phases (
 			phase_id INTEGER PRIMARY KEY AUTOINCREMENT,
-			room_phase TEXT NOT NULL,
+			project_phase TEXT NOT NULL,
 			phase_order INTEGER NOT NULL
+		)
+	''')
+
+def create_room_types_table(cur: sqlite3.Cursor) -> None:
+	"""Create Room_Types Table"""
+	cur.execute('''
+		CREATE TABLE IF NOT EXISTS room_types (
+			room_types_id INTEGER PRIMARY KEY AUTOINCREMENT,
+			room_types TEXT NOT NULL
 		)
 	''')

@@ -9,7 +9,7 @@ from pathlib import Path
 # Add src directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
 
-from architectsLog_db import get_connection, create_architect_table
+from architectsLog_db import get_connection, create_architect_table, create_project_table
 
 TEST_DB = 'test_architectsLog.db'
 
@@ -46,7 +46,7 @@ def test_foreign_keys_enabled(test_conn):
 
 #test if architect table was created
 def test_architect_table_creation(test_conn):
-	"""Test that the architect table is created"""
+	"""Test that the architects table is created"""
 	cursor = test_conn.cursor()
 	create_architect_table(cursor)
 
@@ -56,6 +56,15 @@ def test_architect_table_creation(test_conn):
 
 	assert result is not None, "architects table should exist"
 	assert result[0] == 'architects'
+
+#fest if project table was created
+def test_project_table_creation(test_conn):
+	"""Test that the projects table is created"""
+	cursor = test_conn.cursor()
+	create_project_table(cursor)
+
+	#query sqlite_master to check if the table exists
+	cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='projects'")
 
 #create a generic fixture so I can get table information for all table tests
 @pytest.fixture
@@ -78,9 +87,9 @@ def table_info(test_conn):
 	return _get_table_info
 
 
-#test if architect table has correct column names
+#test if architects table has correct column names
 def test_architect_table_column_names(table_info):
-	'''Test that the architect table has correct column names'''
+	"""Test that the architects table has correct column names"""
 	column_names = [col[1] for col in table_info('architects', create_architect_table)]
 
 	assert 'architect_id' in column_names
@@ -91,9 +100,9 @@ def test_architect_table_column_names(table_info):
 	assert 'company_name' in column_names
 	assert 'is_active' in column_names
 
-#test if architect table has correct column types
+#test if architects table has correct column types
 def test_architect_table_column_types(table_info):
-	'''Test that the architect table has correct column types'''
+	"""Test that the architects table has correct column types"""
 	column_types = {col[1] : col[2] for col in table_info('architects', create_architect_table)}
 
 	assert column_types['architect_id'] == 'INTEGER'
@@ -103,3 +112,30 @@ def test_architect_table_column_types(table_info):
 	assert column_types['email'] == 'TEXT'
 	assert column_types['company_name'] == 'TEXT'
 	assert column_types['is_active'] == 'INTEGER'
+
+
+#test if projects table has correct column names
+def test_project_table_column_names(table_info):
+	"""Test that the projects table has correct column names"""
+	column_names = [col[1] for col in table_info('projects', create_project_table)]
+
+	assert 'project_id' in column_names
+	assert 'project_name' in column_names
+	assert 'client_name' in column_names
+	assert 'client_address' in column_names
+	assert 'architect_id' in column_names
+	assert 'start_date' in column_names
+	assert 'status' in column_names
+
+#test if projects table has correct column types
+def test_project_table_column_types(table_info):
+	"""Test that the projects table has correct column types"""
+	column_types = {col[1] : col[2] for col in table_info('projects', create_project_table)}
+
+	assert column_types['project_id'] == 'INTEGER'
+	assert column_types['project_name'] == 'TEXT'
+	assert column_types['client_name'] == 'TEXT'
+	assert column_types['client_address'] == 'TEXT'
+	assert column_types['architect_id'] == 'INTEGER'
+	assert column_types['start_date'] == 'TEXT'
+	assert column_types['status'] == 'TEXT'

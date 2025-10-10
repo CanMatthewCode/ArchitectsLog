@@ -9,7 +9,7 @@ from pathlib import Path
 # Add src directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
 
-from architectsLog_db import get_connection, create_architect_table, create_project_table, create_phases_table
+from architectsLog_db import get_connection, create_architect_table, create_project_table, create_phases_table, create_room_types_table
 
 TEST_DB = 'test_architectsLog.db'
 
@@ -83,6 +83,20 @@ def test_phase_table_creation(test_conn):
 
 	assert result is not None, "phases table should exist"
 	assert result[0] == 'phases'
+
+#test if rooms_type table was created
+def test_room_types_table_creation(test_conn):
+	"""Test that the rooms_type table is created"""
+	cursor = test_conn.cursor()
+	create_room_types_table(cursor)
+
+	#query sqlite_master to check if the table exists
+	cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='room_types'")
+	result = cursor.fetchone()
+
+	assert result is not None, "room_types table should exist"
+	assert result[0] == 'room_types'
+
 
 #create a generic fixture so I can get table information for all table tests
 @pytest.fixture
@@ -164,14 +178,30 @@ def test_phases_table_column_names(table_info):
 	column_names = [col[1] for col in table_info('phases', create_phases_table)]
 
 	assert 'phase_id' in column_names
-	assert 'room_phase' in column_names
+	assert 'project_phase' in column_names
 	assert 'phase_order' in column_names
 
-#test if phses table has correct column types
+#test if phases table has correct column types
 def test_phase_table_column_types(table_info):
 	"""Test that the phases table has the correct column types"""
 	column_types = {col[1] : col[2] for col in table_info('phases', create_phases_table)}
 
 	assert column_types['phase_id'] == 'INTEGER'
-	assert column_types['room_phase'] == 'TEXT'
+	assert column_types['project_phase'] == 'TEXT'
 	assert column_types['phase_order'] == 'INTEGER'
+
+#test if the room_types table has correct column names
+def test_room_types_table_column_names(table_info):
+	"""Test that the room_types table has correct column names"""
+	column_names = [col[1] for col in table_info('room_types', create_room_types_table)]
+
+	assert 'room_types_id' in column_names
+	assert 'room_types' in column_names
+
+#test if the room_types table has correct column types
+def test_room_types_table_column_types(table_info):
+	"""Test that the room_types table has correct column types"""
+	column_types = {col[1] : col[2] for col in table_info('room_types', create_room_types_table)}
+
+	assert column_types['room_types_id'] == 'INTEGER'
+	assert column_types['room_types'] == 'TEXT'

@@ -47,4 +47,18 @@ def create_architect_table(cur: sqlite3.Cursor) -> None:
 		)
 	''')
 
-def create_
+def create_project_table(cur: sqlite3.Cursor) -> None:
+	"""Create Project's Table"""
+	cur.execute('''
+		CREATE TABLE IF NOT EXISTS projects (
+			project_id INTEGER PRIMARY KEY AUTOINCREMENT,
+			project_name TEXT NOT NULL,
+			client_name TEXT NOT NULL,
+			client_address TEXT NOT NULL UNIQUE,
+			architect_id INTEGER,
+			start_date TEXT NOT NULL,
+			status TEXT DEFAULT 'active',
+			FOREIGN KEY (architect_id) REFERENCES architects (architect_id)
+		)
+	''')
+

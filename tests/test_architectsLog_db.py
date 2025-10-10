@@ -9,7 +9,7 @@ from pathlib import Path
 # Add src directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
 
-from architectsLog_db import get_connection, create_architect_table, create_project_table
+from architectsLog_db import get_connection, create_architect_table, create_project_table, create_phases_table
 
 TEST_DB = 'test_architectsLog.db'
 
@@ -44,7 +44,8 @@ def test_foreign_keys_enabled(test_conn):
     result = cursor.fetchone()[0]
     assert result == 1, "Foreign keys should be enabled"
 
-#test if architect table was created
+
+#test if architects table was created
 def test_architect_table_creation(test_conn):
 	"""Test that the architects table is created"""
 	cursor = test_conn.cursor()
@@ -57,7 +58,7 @@ def test_architect_table_creation(test_conn):
 	assert result is not None, "architects table should exist"
 	assert result[0] == 'architects'
 
-#fest if project table was created
+#test if projects table was created
 def test_project_table_creation(test_conn):
 	"""Test that the projects table is created"""
 	cursor = test_conn.cursor()
@@ -65,6 +66,23 @@ def test_project_table_creation(test_conn):
 
 	#query sqlite_master to check if the table exists
 	cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='projects'")
+	result = cursor.fetchone()
+
+	assert result is not None, "projects table should exist"
+	assert result[0] == 'projects'
+
+#test if phases table was created
+def test_phase_table_creation(test_conn):
+	"""Test that the phases table is created"""
+	cursor = test_conn.cursor()
+	create_phases_table(cursor)
+
+	#query sqlite_master to check if the table exits
+	cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='phases'")
+	result = cursor.fetchone()
+
+	assert result is not None, "phases table should exist"
+	assert result[0] == 'phases'
 
 #create a generic fixture so I can get table information for all table tests
 @pytest.fixture
@@ -139,3 +157,21 @@ def test_project_table_column_types(table_info):
 	assert column_types['architect_id'] == 'INTEGER'
 	assert column_types['start_date'] == 'TEXT'
 	assert column_types['status'] == 'TEXT'
+
+#test if phases table has correct column names
+def test_phases_table_column_names(table_info):
+	"""Test that the phases table has correct column names"""
+	column_names = [col[1] for col in table_info('phases', create_phases_table)]
+
+	assert 'phase_id' in column_names
+	assert 'room_phase' in column_names
+	assert 'phase_order' in column_names
+
+#test if phses table has correct column types
+def test_phase_table_column_types(table_info):
+	"""Test that the phases table has the correct column types"""
+	column_types = {col[1] : col[2] for col in table_info('phases', create_phases_table)}
+
+	assert column_types['phase_id'] == 'INTEGER'
+	assert column_types['room_phase'] == 'TEXT'
+	assert column_types['phase_order'] == 'INTEGER'

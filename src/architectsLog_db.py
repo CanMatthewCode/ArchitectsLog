@@ -76,7 +76,19 @@ def create_room_types_table(cur: sqlite3.Cursor) -> None:
 	"""Create Room_Types Table"""
 	cur.execute('''
 		CREATE TABLE IF NOT EXISTS room_types (
-			room_types_id INTEGER PRIMARY KEY AUTOINCREMENT,
-			room_types TEXT NOT NULL
+			room_type_id INTEGER PRIMARY KEY AUTOINCREMENT,
+			room_name TEXT NOT NULL
+		)
+	''')
+
+def create_project_rooms_table(cur: sqlite3.Cursor) -> None:
+	"""Create Project_Rooms Table"""
+	cur.execute('''
+		CREATE TABLE IF NOT EXISTS project_rooms (
+			project_room_id INTEGER PRIMARY KEY AUTOINCREMENT,
+			room_type_id INTEGER NOT NULL,
+			project_id INTEGER NOT NULL,
+			FOREIGN KEY (room_type_id) REFERENCES room_types (room_type_id),
+			FOREIGN KEY (project_id) REFERENCES projects (project_id)
 		)
 	''')

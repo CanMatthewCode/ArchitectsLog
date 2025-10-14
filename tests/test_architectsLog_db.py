@@ -10,6 +10,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
 
 from architectsLog_db import get_connection, create_architect_table, create_project_table, create_phases_table, create_room_types_table, create_project_rooms_table
+from architectsLog_db import create_invoices_table, create_time_entries_table
 
 TEST_DB = 'test_architectsLog.db'
 
@@ -112,7 +113,34 @@ def test_project_rooms_table_creation(test_conn):
 	assert result is not None, "project_rooms table should exist"
 	assert result[0] == 'project_rooms' 
 
+#test if invoices table was created
+def test_create_invoices_table(test_conn):
+	"""Test that the invoices table is created"""
+	cursor = test_conn.cursor()
+	create_invoices_table(cursor)
 
+	#query sqlite_master to check if the table exists
+	cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='invoices'")
+	result = cursor.fetchone()
+
+	assert result is not None, "invoices table should exist"
+	assert result[0] == 'invoices'
+
+#test if time_entries table was created
+def test_create_time_entries_table(test_conn):
+	"""Test that the time_entries table is created"""
+	cursor = test_conn.cursor()
+	create_time_entries_table(cursor)
+
+	#query sqlite_master to check if time_entries table is created
+	cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='time_entries'")
+	result = cursor.fetchone()
+
+	assert result is not None, "time_entries table should exist"
+	assert result[0] == 'time_entries'	
+
+
+#	~~FIXTURE FOR GETTING TABLE INFORMATION~~
 
 #create a generic fixture so I can get table information for all table tests
 @pytest.fixture
@@ -241,3 +269,57 @@ def test_project_rooms_table_column_types(table_info):
 	assert column_types['project_room_id'] == 'INTEGER'
 	assert column_types['room_type_id'] == 'INTEGER'
 	assert column_types['project_id'] == 'INTEGER'
+
+#test if the invoices table has correct column names
+def test_create_invoices_table_column_names(table_info):
+	"""Test that the invoices table has correct column names"""
+	column_names = [col[1] for col in table_info('invoices', create_invoices_table)]
+
+	assert 'invoice_id' in column_names
+	assert 'project_id' in column_names
+	assert 'created_date' in column_names
+	assert 'invoice_number' in column_names
+	assert 'status' in column_names
+
+#test if the invoices table has correct column types
+def test_create_invoices_table_column_types(table_info):
+	"""Test that the invoices table has correct column types"""
+	column_types = {col[1] : col[2] for col in table_info('invoices', create_invoices_table)}
+
+	assert column_types['invoice_id'] == 'INTEGER'
+	assert column_types['project_id'] == 'INTEGER'
+	assert column_types['created_date'] == 'TEXT'
+	assert column_types['invoice_number'] == 'TEXT'
+	assert column_types['status'] == 'TEXT'
+
+#test if the time_entries table has correct column names
+def test_create_time_entries_table_names(table_info):
+	"""Test that the time_entries table has correct column names"""
+	column_names = [col[1] for col in table_info('time_entries', create_time_entries_table)]
+
+	assert 'entry_id' in column_names
+	assert 'project_id' in column_names
+	assert 'architect_id' in column_names
+	assert 'phase_id' in column_names
+	assert 'project_room_id' in column_names
+	assert 'start_time' in column_names
+	assert 'end_time' in column_names
+	assert 'duration_minutes' in column_names
+	assert 'invoice_id' in column_names
+	assert 'notes' in column_names
+
+	#test if the time_entries table has correct column types
+def test_create_time_entries_table_types(table_info):
+	"""Test that the time_entries table has correct column types"""
+	column_types = {col[1] : col[2] for col in table_info('time_entries', create_time_entries_table)}
+
+	assert column_types['entry_id'] == 'INTEGER'
+	assert column_types['project_id'] == 'INTEGER'
+	assert column_types['architect_id'] == 'INTEGER'
+	assert column_types['phase_id'] == 'INTEGER'
+	assert column_types['project_room_id'] == 'INTEGER'
+	assert column_types['start_time'] == 'TEXT'
+	assert column_types['end_time'] == 'TEXT'
+	assert column_types['duration_minutes'] == 'INTEGER'
+	assert column_types['invoice_id'] == 'INTEGER'
+	assert column_types['notes'] == 'TEXT'

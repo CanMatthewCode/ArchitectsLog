@@ -92,3 +92,38 @@ def create_project_rooms_table(cur: sqlite3.Cursor) -> None:
 			FOREIGN KEY (project_id) REFERENCES projects (project_id)
 		)
 	''')
+
+def create_invoices_table(cur: sqlite3.Cursor) -> None:
+	"""Create Invoices Table"""
+	cur.execute('''
+		CREATE TABLE IF NOT EXISTS invoices (
+			invoice_id INTEGER PRIMARY KEY AUTOINCREMENT,
+			project_id INTEGER NOT NULL,
+			created_date TEXT NOT NULL,
+			invoice_number TEXT,
+			status TEXT DEFAULT 'draft',
+			FOREIGN KEY (project_id) REFERENCES projects (project_id)
+		)
+	''')
+
+def create_time_entries_table(cur: sqlite3.Cursor) -> None:
+	"""Create Time_Entries Table"""
+	cur.execute('''
+		CREATE TABLE IF NOT EXISTS time_entries (
+			entry_id INTEGER PRIMARY KEY AUTOINCREMENT,
+			project_id INTEGER NOT NULL,
+			architect_id INTEGER NOT NULL,
+			phase_id INTEGER NOT NULL,
+			project_room_id INTEGER NOT NULL,
+			start_time TEXT NOT NULL,
+			end_time TEXT NOT NULL,
+			duration_minutes INTEGER NOT NULL,
+			invoice_id INTEGER,
+			notes TEXT,
+			FOREIGN KEY (project_id) REFERENCES projects (project_id),
+			FOREIGN KEY (architect_id) REFERENCES architects (architect_id),
+			FOREIGN KEY (phase_id) REFERENCES phases (phase_id),
+			FOREIGN KEY (project_room_id) REFERENCES project_rooms (project_room_id),
+			FOREIGN KEY (invoice_id) REFERENCES invoices (invoice_id)
+		)
+	''')

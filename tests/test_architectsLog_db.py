@@ -203,6 +203,7 @@ def test_project_table_column_names(table_info):
 	assert 'client_address' in column_names
 	assert 'architect_id' in column_names
 	assert 'start_date' in column_names
+	assert 'current_phase_id' in column_names
 	assert 'status' in column_names
 
 #test if projects table has correct column types
@@ -216,6 +217,7 @@ def test_project_table_column_types(table_info):
 	assert column_types['client_address'] == 'TEXT'
 	assert column_types['architect_id'] == 'INTEGER'
 	assert column_types['start_date'] == 'TEXT'
+	assert column_types['current_phase_id'] == 'INTEGER'
 	assert column_types['status'] == 'TEXT'
 
 #test if phases table has correct column names

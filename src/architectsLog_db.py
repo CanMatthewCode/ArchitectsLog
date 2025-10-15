@@ -57,8 +57,10 @@ def create_project_table(cur: sqlite3.Cursor) -> None:
 			client_address TEXT NOT NULL UNIQUE,
 			architect_id INTEGER,
 			start_date TEXT NOT NULL,
+			current_phase_id INTEGER NOT NULL,
 			status TEXT DEFAULT 'active',
 			FOREIGN KEY (architect_id) REFERENCES architects (architect_id)
+			FOREIGN KEY (current_phase_id) REFERENCES phases (phase_id)
 		)
 	''')
 

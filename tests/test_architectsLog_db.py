@@ -3,11 +3,6 @@
 import pytest
 import os
 import sqlite3
-import sys
-from pathlib import Path
-
-# Add src directory to path
-sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
 
 from architectsLog_db import get_connection, create_architect_table, create_project_table, create_phases_table, create_room_types_table, create_project_rooms_table
 from architectsLog_db import create_invoices_table, create_time_entries_table

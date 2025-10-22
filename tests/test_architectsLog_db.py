@@ -4,7 +4,7 @@ import pytest
 import os
 import sqlite3
 
-from architectsLog_db import get_connection, create_architect_table, create_project_table, create_phases_table, create_room_types_table, create_project_rooms_table
+from architectsLog_db import get_connection, create_architect_table, create_project_table, create_phases_table
 from architectsLog_db import create_invoices_table, create_time_entries_table
 
 TEST_DB = 'test_architectsLog.db'
@@ -56,6 +56,7 @@ def test_architect_table_creation(test_conn):
 	assert result is not None, "architects table should exist"
 	assert result[0] == 'architects'
 
+
 #test if projects table was created
 def test_project_table_creation(test_conn):
 	"""Test that the projects table is created"""
@@ -68,6 +69,7 @@ def test_project_table_creation(test_conn):
 
 	assert result is not None, "projects table should exist"
 	assert result[0] == 'projects'
+
 
 #test if phases table was created
 def test_phase_table_creation(test_conn):
@@ -82,31 +84,6 @@ def test_phase_table_creation(test_conn):
 	assert result is not None, "phases table should exist"
 	assert result[0] == 'phases'
 
-#test if rooms_type table was created
-def test_room_types_table_creation(test_conn):
-	"""Test that the rooms_type table is created"""
-	cursor = test_conn.cursor()
-	create_room_types_table(cursor)
-
-	#query sqlite_master to check if the table exists
-	cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='room_types'")
-	result = cursor.fetchone()
-
-	assert result is not None, "room_types table should exist"
-	assert result[0] == 'room_types'
-
-#test if project_rooms table was created
-def test_project_rooms_table_creation(test_conn):
-	"""Test that the project_rooms table is created"""
-	cursor = test_conn.cursor()
-	create_project_rooms_table(cursor)
-
-	#query sqlite_master to check if the table exists
-	cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='project_rooms'")
-	result = cursor.fetchone()
-
-	assert result is not None, "project_rooms table should exist"
-	assert result[0] == 'project_rooms' 
 
 #test if invoices table was created
 def test_create_invoices_table(test_conn):
@@ -120,6 +97,7 @@ def test_create_invoices_table(test_conn):
 
 	assert result is not None, "invoices table should exist"
 	assert result[0] == 'invoices'
+
 
 #test if time_entries table was created
 def test_create_time_entries_table(test_conn):
@@ -173,6 +151,7 @@ def test_architect_table_column_names(table_info):
 	assert 'company_name' in column_names
 	assert 'is_active' in column_names
 
+
 #test if architects table has correct column types
 def test_architect_table_column_types(table_info):
 	"""Test that the architects table has correct column types"""
@@ -201,6 +180,7 @@ def test_project_table_column_names(table_info):
 	assert 'current_phase_id' in column_names
 	assert 'status' in column_names
 
+
 #test if projects table has correct column types
 def test_project_table_column_types(table_info):
 	"""Test that the projects table has correct column types"""
@@ -215,6 +195,7 @@ def test_project_table_column_types(table_info):
 	assert column_types['current_phase_id'] == 'INTEGER'
 	assert column_types['status'] == 'TEXT'
 
+
 #test if phases table has correct column names
 def test_phases_table_column_names(table_info):
 	"""Test that the phases table has correct column names"""
@@ -223,6 +204,7 @@ def test_phases_table_column_names(table_info):
 	assert 'phase_id' in column_names
 	assert 'project_phase' in column_names
 	assert 'phase_order' in column_names
+
 
 #test if phases table has correct column types
 def test_phase_table_column_types(table_info):
@@ -233,41 +215,6 @@ def test_phase_table_column_types(table_info):
 	assert column_types['project_phase'] == 'TEXT'
 	assert column_types['phase_order'] == 'INTEGER'
 
-#test if the room_types table has correct column names
-def test_room_types_table_column_names(table_info):
-	"""Test that the room_types table has correct column names"""
-	column_names = [col[1] for col in table_info('room_types', create_room_types_table)]
-
-	assert 'room_type_id' in column_names
-	assert 'room_name' in column_names
-
-#test if the room_types table has correct column types
-def test_room_types_table_column_types(table_info):
-	"""Test that the room_types table has correct column types"""
-	column_types = {col[1] : col[2] for col in table_info('room_types', create_room_types_table)}
-
-	assert column_types['room_type_id'] == 'INTEGER'
-	assert column_types['room_name'] == 'TEXT'
-
-#test if the project_rooms table has correct column names
-def test_project_rooms_table_column_names(table_info):
-	"""Test that the project_rooms table has correct column names"""
-	column_names = [col[1] for col in table_info('project_rooms', create_project_rooms_table)]
-
-	assert 'project_room_id' in column_names
-	assert 'room_type_id' in column_names
-	assert 'room_name' in column_names
-	assert 'project_id' in column_names
-
-#test if the project_rooms table has correct column types
-def test_project_rooms_table_column_types(table_info):
-	"""Test that the project_rooms table has correct column types"""
-	column_types = {col[1] : col[2] for col in table_info('project_rooms', create_project_rooms_table)}
-
-	assert column_types['project_room_id'] == 'INTEGER'
-	assert column_types['room_type_id'] == 'INTEGER'
-	assert column_types['room_name'] == 'TEXT'
-	assert column_types['project_id'] == 'INTEGER'
 
 #test if the invoices table has correct column names
 def test_create_invoices_table_column_names(table_info):
@@ -280,6 +227,7 @@ def test_create_invoices_table_column_names(table_info):
 	assert 'invoice_number' in column_names
 	assert 'status' in column_names
 
+
 #test if the invoices table has correct column types
 def test_create_invoices_table_column_types(table_info):
 	"""Test that the invoices table has correct column types"""
@@ -291,32 +239,32 @@ def test_create_invoices_table_column_types(table_info):
 	assert column_types['invoice_number'] == 'TEXT'
 	assert column_types['status'] == 'TEXT'
 
+
 #test if the time_entries table has correct column names
 def test_create_time_entries_table_names(table_info):
 	"""Test that the time_entries table has correct column names"""
 	column_names = [col[1] for col in table_info('time_entries', create_time_entries_table)]
 
-	assert 'entry_id' in column_names
+	assert 'time_entry_id' in column_names
 	assert 'project_id' in column_names
 	assert 'architect_id' in column_names
 	assert 'phase_id' in column_names
-	assert 'project_room_id' in column_names
 	assert 'start_time' in column_names
 	assert 'end_time' in column_names
 	assert 'duration_minutes' in column_names
 	assert 'invoice_id' in column_names
 	assert 'notes' in column_names
 
-	#test if the time_entries table has correct column types
+
+#test if the time_entries table has correct column types
 def test_create_time_entries_table_types(table_info):
 	"""Test that the time_entries table has correct column types"""
 	column_types = {col[1] : col[2] for col in table_info('time_entries', create_time_entries_table)}
 
-	assert column_types['entry_id'] == 'INTEGER'
+	assert column_types['time_entry_id'] == 'INTEGER'
 	assert column_types['project_id'] == 'INTEGER'
 	assert column_types['architect_id'] == 'INTEGER'
 	assert column_types['phase_id'] == 'INTEGER'
-	assert column_types['project_room_id'] == 'INTEGER'
 	assert column_types['start_time'] == 'TEXT'
 	assert column_types['end_time'] == 'TEXT'
 	assert column_types['duration_minutes'] == 'INTEGER'

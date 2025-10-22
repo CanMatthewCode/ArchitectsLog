@@ -33,6 +33,9 @@ def get_db_connection(db_file: str | None = None) -> sqlite3.Connection:
     finally:
         conn.close()
 
+
+#	~~~TABLE CREATION FUNCTIONS~~~
+
 def create_architect_table(cur: sqlite3.Cursor) -> None:
 	"""Create Architect's Table"""
 	cur.execute('''
@@ -74,28 +77,6 @@ def create_phases_table(cur: sqlite3.Cursor) -> None:
 		)
 	''')
 
-def create_room_types_table(cur: sqlite3.Cursor) -> None:
-	"""Create Room_Types Table"""
-	cur.execute('''
-		CREATE TABLE IF NOT EXISTS room_types (
-			room_type_id INTEGER PRIMARY KEY AUTOINCREMENT,
-			room_name TEXT NOT NULL
-		)
-	''')
-
-def create_project_rooms_table(cur: sqlite3.Cursor) -> None:
-	"""Create Project_Rooms Table"""
-	cur.execute('''
-		CREATE TABLE IF NOT EXISTS project_rooms (
-			project_room_id INTEGER PRIMARY KEY AUTOINCREMENT,
-			room_type_id INTEGER NOT NULL,
-			room_name TEXT NOT NULL,
-			project_id INTEGER NOT NULL,
-			FOREIGN KEY (room_type_id) REFERENCES room_types (room_type_id),
-			FOREIGN KEY (project_id) REFERENCES projects (project_id)
-		)
-	''')
-
 def create_invoices_table(cur: sqlite3.Cursor) -> None:
 	"""Create Invoices Table"""
 	cur.execute('''
@@ -113,11 +94,10 @@ def create_time_entries_table(cur: sqlite3.Cursor) -> None:
 	"""Create Time_Entries Table"""
 	cur.execute('''
 		CREATE TABLE IF NOT EXISTS time_entries (
-			entry_id INTEGER PRIMARY KEY AUTOINCREMENT,
-			project_id INTEGER NOT NULL,
+			time_entry_id INTEGER PRIMARY KEY AUTOINCREMENT,
+			project_id INTEGER,
 			architect_id INTEGER NOT NULL,
 			phase_id INTEGER NOT NULL,
-			project_room_id INTEGER NOT NULL,
 			start_time TEXT NOT NULL,
 			end_time TEXT NOT NULL,
 			duration_minutes INTEGER NOT NULL,
@@ -126,7 +106,6 @@ def create_time_entries_table(cur: sqlite3.Cursor) -> None:
 			FOREIGN KEY (project_id) REFERENCES projects (project_id),
 			FOREIGN KEY (architect_id) REFERENCES architects (architect_id),
 			FOREIGN KEY (phase_id) REFERENCES phases (phase_id),
-			FOREIGN KEY (project_room_id) REFERENCES project_rooms (project_room_id),
 			FOREIGN KEY (invoice_id) REFERENCES invoices (invoice_id)
 		)
 	''')

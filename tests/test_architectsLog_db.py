@@ -256,6 +256,7 @@ def test_project_rooms_table_column_names(table_info):
 
 	assert 'project_room_id' in column_names
 	assert 'room_type_id' in column_names
+	assert 'room_name' in column_names
 	assert 'project_id' in column_names
 
 #test if the project_rooms table has correct column types
@@ -265,6 +266,7 @@ def test_project_rooms_table_column_types(table_info):
 
 	assert column_types['project_room_id'] == 'INTEGER'
 	assert column_types['room_type_id'] == 'INTEGER'
+	assert column_types['room_name'] == 'TEXT'
 	assert column_types['project_id'] == 'INTEGER'
 
 #test if the invoices table has correct column names

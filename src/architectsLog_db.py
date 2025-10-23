@@ -3,6 +3,8 @@
 import sqlite3
 import os
 from contextlib import contextmanager
+from architectsLog_classes import Architect, Project, Invoice, TimeEntry
+from architectsLog_constants import PHASES
 
 DB_FILE = 'architectsLog.db'
 
@@ -109,3 +111,22 @@ def create_time_entries_table(cur: sqlite3.Cursor) -> None:
 			FOREIGN KEY (invoice_id) REFERENCES invoices (invoice_id)
 		)
 	''')
+
+
+#	~~~TABLE INSERTION FUNCTIONS~~~
+
+def add_architect(architect: Architect, cur: sqlite3.Cursor) -> int:
+	"""Add an Architect object to the architects table"""
+	sql = "INSERT INTO architects (name, license_number, phone_number, email, company_name, is_active) \
+	VALUES(?, ?, ?, ?, ?, ?)"
+
+	architect_values = (architect.name, architect.license_number, architect.phone_number, architect.email, 
+		architect.company_name, architect.is_active)
+
+	cur.execute(sql, architect_values)
+	architect_id = cur.lastrowid
+	architect.architect_id = architect_id
+
+	return architect_id
+
+

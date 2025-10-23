@@ -6,6 +6,9 @@ import sqlite3
 
 from architectsLog_db import get_connection, create_architect_table, create_project_table, create_phases_table
 from architectsLog_db import create_invoices_table, create_time_entries_table
+from architectsLog_db import add_architect
+
+from architectsLog_classes import Architect, Project, Invoice, TimeEntry
 
 TEST_DB = 'test_architectsLog.db'
 
@@ -151,7 +154,6 @@ def test_architect_table_column_names(table_info):
 	assert 'company_name' in column_names
 	assert 'is_active' in column_names
 
-
 #test if architects table has correct column types
 def test_architect_table_column_types(table_info):
 	"""Test that the architects table has correct column types"""
@@ -180,7 +182,6 @@ def test_project_table_column_names(table_info):
 	assert 'current_phase_id' in column_names
 	assert 'status' in column_names
 
-
 #test if projects table has correct column types
 def test_project_table_column_types(table_info):
 	"""Test that the projects table has correct column types"""
@@ -205,7 +206,6 @@ def test_phases_table_column_names(table_info):
 	assert 'project_phase' in column_names
 	assert 'phase_order' in column_names
 
-
 #test if phases table has correct column types
 def test_phase_table_column_types(table_info):
 	"""Test that the phases table has the correct column types"""
@@ -226,7 +226,6 @@ def test_create_invoices_table_column_names(table_info):
 	assert 'created_date' in column_names
 	assert 'invoice_number' in column_names
 	assert 'status' in column_names
-
 
 #test if the invoices table has correct column types
 def test_create_invoices_table_column_types(table_info):
@@ -255,7 +254,6 @@ def test_create_time_entries_table_names(table_info):
 	assert 'invoice_id' in column_names
 	assert 'notes' in column_names
 
-
 #test if the time_entries table has correct column types
 def test_create_time_entries_table_types(table_info):
 	"""Test that the time_entries table has correct column types"""
@@ -270,3 +268,31 @@ def test_create_time_entries_table_types(table_info):
 	assert column_types['duration_minutes'] == 'INTEGER'
 	assert column_types['invoice_id'] == 'INTEGER'
 	assert column_types['notes'] == 'TEXT'
+
+
+#	~~~INSERT FUNCTIONS TESTS~~~
+
+#test if the add_architect function adds an architect to the architects table
+def test_add_architect(test_conn):
+	"""Test that the architects table has correctly added architect"""
+	#create cursor, create architect table, and commit it to the database
+	cur = test_conn.cursor()
+	create_architect_table(cur)
+	test_conn.commit()
+
+	testArchitect = Architect("Name", "LicenseNumber01", "123-456-7890", "email@domain.com", "MyCompany")
+	architect_id = add_architect(testArchitect, cur)
+	test_conn.commit()
+
+	#quiery information from newly added architect to ensure insertion
+	sql = "SELECT * FROM architects WHERE architect_id = ?"
+	cur.execute(sql, (architect_id,))
+	row = cur.fetchone()
+
+	assert row[0] == 1
+	assert row[1] == "Name"
+	assert row[2] == "LicenseNumber01"
+	assert row[3] == "123-456-7890"
+	assert row[4] == "email@domain.com"
+	assert row[5] == "MyCompany"
+	assert row[6] == 1

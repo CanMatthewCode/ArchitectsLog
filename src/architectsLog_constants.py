@@ -7,7 +7,8 @@ PHASES = {
 	3: "Construction Documents", 
 	4: "Bidding Negotiation", 
 	5: "Construction Administration",
-	6: "Interior Design"
-	7: "Business Development"
+	6: "Interior Design",
+	7: "Business Development",
 	8: "Administration"
 	}
+

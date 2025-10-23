@@ -289,10 +289,23 @@ def test_add_architect(test_conn):
 	cur.execute(sql, (architect_id,))
 	row = cur.fetchone()
 
-	assert row[0] == 1
-	assert row[1] == "Name"
-	assert row[2] == "LicenseNumber01"
-	assert row[3] == "123-456-7890"
-	assert row[4] == "email@domain.com"
-	assert row[5] == "MyCompany"
-	assert row[6] == 1
+	#test if row was created
+	assert row is not None
+
+	#unpack row for readability
+	arch_id, name, license, phone, email, company, is_active = row
+
+	#test table columns for correct insertion 
+	assert arch_id == 1
+	assert name == "Name"
+	assert license == "LicenseNumber01"
+	assert phone == "123-456-7890"
+	assert email == "email@domain.com"
+	assert company == "MyCompany"
+	assert is_active == 1
+
+	#test return of function
+	assert architect_id == 1
+
+	#test if architect object was updated with architect_id
+	assert testArchitect.architect_id == 1

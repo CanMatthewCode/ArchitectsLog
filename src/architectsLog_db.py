@@ -85,7 +85,7 @@ def create_invoices_table(cur: sqlite3.Cursor) -> None:
 			invoice_id INTEGER PRIMARY KEY AUTOINCREMENT,
 			project_id INTEGER NOT NULL,
 			created_date TEXT NOT NULL,
-			invoice_number TEXT,
+			invoice_number INTEGER,
 			status TEXT DEFAULT 'draft',
 			FOREIGN KEY (project_id) REFERENCES projects (project_id)
 		)
@@ -158,3 +158,18 @@ def add_project(project: Project, cur: sqlite3.Cursor) -> int:
 	project.project_id = project_id
 
 	return project_id
+
+
+def add_invoice(invoice: Invoice, cur: sqlite3.Cursor) -> int:
+	"""Add an Invoice object to the invoices table"""
+	sql = "INSERT INTO invoices (project_id, created_date, invoice_number, status) \
+		VALUES (?, ?, ?, ?)"
+
+	invoice_values = (invoice.project.project_id, invoice.created_date, invoice.invoice_number,
+		invoice.status)
+
+	cur.execute(sql, invoice_values)
+	invoice_id = cur.lastrowid
+	invoice.invoice_id = invoice_id
+
+	return invoice_id

@@ -6,7 +6,7 @@ import sqlite3
 
 from architectsLog_db import get_connection, create_architect_table, create_project_table
 from architectsLog_db import create_phases_table, create_invoices_table, create_time_entries_table
-from architectsLog_db import add_architect
+from architectsLog_db import add_architect, initialize_phases, add_project
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry
 
@@ -42,6 +42,7 @@ def test_foreign_keys_enabled(test_conn):
     cursor.execute("PRAGMA foreign_keys")
     result = cursor.fetchone()[0]
     assert result == 1, "Foreign keys should be enabled"
+
 
 
 #	~~~TABLE CREATION TESTS~~~
@@ -116,6 +117,7 @@ def test_create_time_entries_table(test_conn):
 	assert result[0] == 'time_entries'	
 
 
+
 #	~~FIXTURE FOR GETTING TABLE INFORMATION~~
 
 #create a generic fixture so I can get table information for all table tests
@@ -137,6 +139,7 @@ def table_info(test_conn):
 		return cursor.fetchall()
 
 	return _get_table_info
+
 
 
 #	~~~TABLE COLUMN NAME AND COLUMN TYPE TESTS~~~
@@ -204,7 +207,6 @@ def test_phases_table_column_names(table_info):
 
 	assert 'phase_id' in column_names
 	assert 'project_phase' in column_names
-	assert 'phase_order' in column_names
 
 #test if phases table has correct column types
 def test_phase_table_column_types(table_info):
@@ -213,7 +215,6 @@ def test_phase_table_column_types(table_info):
 
 	assert column_types['phase_id'] == 'INTEGER'
 	assert column_types['project_phase'] == 'TEXT'
-	assert column_types['phase_order'] == 'INTEGER'
 
 
 #test if the invoices table has correct column names
@@ -270,6 +271,7 @@ def test_create_time_entries_table_types(table_info):
 	assert column_types['notes'] == 'TEXT'
 
 
+
 #	~~~INSERT FUNCTIONS TESTS~~~
 
 #test if the add_architect function adds an architect to the architects table
@@ -309,3 +311,84 @@ def test_add_architect(test_conn):
 
 	#test if architect object was updated with architect_id
 	assert testArchitect.architect_id == 1
+
+
+#test if the phases table is correctly initialized with the PHASES dictionary
+def test_initialize_phases(test_conn):
+	"""Test that the phases table is correctly populated by the PHASES dictionary"""
+	cur = test_conn.cursor()
+	create_phases_table(cur)
+	test_conn.commit()
+
+	#initialize the phases table
+	initialize_phases(cur)
+	initialize_phases(cur)
+
+	#quiery all information from the newly initialized phases table
+	sql = "SELECT * FROM phases"
+	cur.execute(sql)
+	rows = cur.fetchall()
+
+	#test if number of items in phases table equals number of items in PHASES dictionary
+	#and that table is only initialized once
+	assert len(rows) == 8
+
+	#test all rows for correct insertion 
+	assert rows[0] == (1, "Scematic Design")
+	assert rows[1] == (2, "Design Development")
+	assert rows[2] == (3, "Construction Documents")
+	assert rows[3] == (4, "Bidding Negotiation" )
+	assert rows[4] == (5, "Construction Administration")
+	assert rows[5] == (6, "Interior Design")
+	assert rows[6] == (7, "Business Development")
+	assert rows[7] == (8, "Administration")
+
+
+#test if the add_project function adds a project to the projects table
+def test_add_project(test_conn):
+	"""Test that the architects table has correctly added architect"""
+	#create cursor, create architect table, create project table and commit it to the database
+	cur = test_conn.cursor()
+	create_architect_table(cur)
+	create_phases_table(cur)
+	create_project_table(cur)
+	test_conn.commit()
+
+	#add an architect to Architect table to get architect_id assigned
+	testArchitect = Architect("Name", "LicenseNumber01", "123-456-7890", "email@domain.com", "MyCompany")
+	architect_id = add_architect(testArchitect, cur)
+
+	#initilialize the phases table
+	initialize_phases(cur)
+
+	#create a test project with testArchitect and add it to the project table, then commit to tables
+	testProject = Project("NewProject", "NewClient", "123ClientStreet", "01-01-2025", testArchitect)
+	project_id = add_project(testProject, cur)
+	test_conn.commit()
+
+	#quiery information from newly added project to ensure insertion
+	sql = "SELECT * FROM projects WHERE project_id = ?"
+	cur.execute(sql, (project_id,))
+	row = cur.fetchone()
+
+	#test if row was created
+	assert row is not None
+
+	#unpack row for readibility 
+	project_id, project_name, client_name, client_address, architect_id, start_date, current_phase_id, status = row
+
+	#test table columns for correct insertion
+	assert project_id == 1
+	assert project_name == "NewProject"
+	assert client_name == "NewClient"
+	assert client_address == "123ClientStreet"
+	assert architect_id == testArchitect.architect_id
+	assert start_date == "01-01-2025"
+	assert current_phase_id == 1
+	assert status == "active"
+
+	#test return of function
+	assert project_id == 1
+
+	#test if project object was updated with project_id
+	assert testProject.project_id == 1

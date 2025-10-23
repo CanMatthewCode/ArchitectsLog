@@ -30,12 +30,13 @@ class Project:
 
 
 class Invoice:
-	def __init__(self, invoice_number: str, created_date: str, invoice_id: int = None, 
-		project_id: int = None, status: str = "draft") -> None:
+	def __init__(self, invoice_number: int, created_date: str, project: Project = None,
+		status: str = "draft", invoice_id: int = None) -> None:
 		self.invoice_number = invoice_number
 		self.created_date = created_date
+		self.project = project
+		self.status = status
 		self.invoice_id = invoice_id
-		self.project_id = project_id
 
 
 class TimeEntry:

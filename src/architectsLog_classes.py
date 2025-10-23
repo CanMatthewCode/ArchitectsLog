@@ -17,7 +17,7 @@ class Architect:
 
 class Project:
 	def __init__(self, project_name: str, client_name: str, client_address: str, start_date: str,
-		architect: Architect = None, current_phase_id: int = None, status: str = "active", 
+		architect: Architect = None, current_phase_id: int = 1, status: str = "active", 
 		project_id: int = None) -> None:
 		self.project_name = project_name
 		self.client_name = client_name
@@ -41,7 +41,7 @@ class Invoice:
 class TimeEntry:
 	def __init__(self, start_time: str, end_time: str, duration_minutes: int, 
 		project: Project = None, architect: Architect = None, time_entry_id: int = None,
-		phase_id: int = None, invoice_id: int = None, notes: str = None) -> None:
+		phase_id: int = 1, invoice_id: int = None, notes: str = None) -> None:
 		self.start_time = start_time
 		self.end_time = end_time
 		self.duration_minutes = duration_minutes

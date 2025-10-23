@@ -4,7 +4,8 @@ from __future__ import annotations
 
 
 class Architect:
-	def __init__(self, name: str, license_number: str, phone_number: str, email: str, company_name: str, is_active: int = 1, architect_id: int = None) -> None:
+	def __init__(self, name: str, license_number: str, phone_number: str, email: str,
+		company_name: str, is_active: int = 1, architect_id: int = None) -> None:
 		self.architect_id = architect_id
 		self.name = name
 		self.license_number = license_number
@@ -15,8 +16,9 @@ class Architect:
 
 
 class Project:
-	def __init__(self, project_name: str, client_name: str, client_address: str, start_date: str, architect: Architect = None, current_phase_id: int = None, \
-		status: str = "active", project_id: int = None) -> None:
+	def __init__(self, project_name: str, client_name: str, client_address: str, start_date: str,
+		architect: Architect = None, current_phase_id: int = None, status: str = "active", 
+		project_id: int = None) -> None:
 		self.project_name = project_name
 		self.client_name = client_name
 		self.client_address = client_address
@@ -28,7 +30,8 @@ class Project:
 
 
 class Invoice:
-	def __init__(self, invoice_number: str, created_date: str, invoice_id: int = None, project_id: int = None, status: str = "draft") -> None:
+	def __init__(self, invoice_number: str, created_date: str, invoice_id: int = None, 
+		project_id: int = None, status: str = "draft") -> None:
 		self.invoice_number = invoice_number
 		self.created_date = created_date
 		self.invoice_id = invoice_id
@@ -36,7 +39,8 @@ class Invoice:
 
 
 class TimeEntry:
-	def __init__(self, start_time: str, end_time: str, duration_minutes: int, project: Project = None, architect: Architect = None, time_entry_id: int = None, \
+	def __init__(self, start_time: str, end_time: str, duration_minutes: int, 
+		project: Project = None, architect: Architect = None, time_entry_id: int = None,
 		phase_id: int = None, invoice_id: int = None, notes: str = None) -> None:
 		self.start_time = start_time
 		self.end_time = end_time

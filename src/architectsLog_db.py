@@ -117,11 +117,11 @@ def create_time_entries_table(cur: sqlite3.Cursor) -> None:
 
 def add_architect(architect: Architect, cur: sqlite3.Cursor) -> int:
 	"""Add an Architect object to the architects table"""
-	sql = "INSERT INTO architects (name, license_number, phone_number, email, company_name, is_active) \
-	VALUES(?, ?, ?, ?, ?, ?)"
+	sql = "INSERT INTO architects (name, license_number, phone_number, email, \
+		company_name, is_active) VALUES(?, ?, ?, ?, ?, ?)"
 
-	architect_values = (architect.name, architect.license_number, architect.phone_number, architect.email, 
-		architect.company_name, architect.is_active)
+	architect_values = (architect.name, architect.license_number, architect.phone_number, 
+		architect.email, architect.company_name, architect.is_active)
 
 	cur.execute(sql, architect_values)
 	architect_id = cur.lastrowid
@@ -129,4 +129,17 @@ def add_architect(architect: Architect, cur: sqlite3.Cursor) -> int:
 
 	return architect_id
 
+def add_project(project: Project, cur: sqlite3.Cursor) -> int:
+	"""Add a Project object to the projects table"""
+	sql = "INSERT INTO projects (project_name, client_name, client_address, architect_id, \
+		start_date, current_phase_id, status) VALUES (?, ?, ?, ?, ?, ?, ?)"
 
+	project_values = (project.name, project.client_name, project.client_address, 
+		project.architect.architect_id, project.start_date, project.current_phase_id, 
+		project.status)
+
+	cur.execute(sql, project_values)
+	project_id = cur.lastrowid
+	project.project_id = project_id
+
+	return project_id

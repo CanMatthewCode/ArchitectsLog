@@ -4,8 +4,8 @@ import pytest
 import os
 import sqlite3
 
-from architectsLog_db import get_connection, create_architect_table, create_project_table, create_phases_table
-from architectsLog_db import create_invoices_table, create_time_entries_table
+from architectsLog_db import get_connection, create_architect_table, create_project_table
+from architectsLog_db import create_phases_table, create_invoices_table, create_time_entries_table
 from architectsLog_db import add_architect
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry

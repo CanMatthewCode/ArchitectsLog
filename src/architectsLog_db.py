@@ -74,8 +74,7 @@ def create_phases_table(cur: sqlite3.Cursor) -> None:
 	cur.execute('''
 		CREATE TABLE IF NOT EXISTS phases (
 			phase_id INTEGER PRIMARY KEY AUTOINCREMENT,
-			project_phase TEXT NOT NULL,
-			phase_order INTEGER NOT NULL
+			project_phase TEXT NOT NULL
 		)
 	''')
 
@@ -129,12 +128,28 @@ def add_architect(architect: Architect, cur: sqlite3.Cursor) -> int:
 
 	return architect_id
 
+
+def initialize_phases(cur: sqlite3.Cursor) -> None:
+	"""Initialize the phases table with the PHASES dictionary if not done so already"""
+	query = "SELECT COUNT(*) FROM phases"
+	cur.execute(query)
+	#check if the PHASES are already in the phases table - fetchone() returns tuple
+	number_of_phases = cur.fetchone()[0]
+	if number_of_phases > 0:
+		return
+	#if not, loop through PHASES dictionary and add values to match PHASES order
+	else:
+		sql = "INSERT INTO phases (project_phase) VALUES (?)"
+		for phase_id, phase_name in PHASES.items():
+			cur.execute(sql, (phase_name,))
+
+
 def add_project(project: Project, cur: sqlite3.Cursor) -> int:
 	"""Add a Project object to the projects table"""
 	sql = "INSERT INTO projects (project_name, client_name, client_address, architect_id, \
 		start_date, current_phase_id, status) VALUES (?, ?, ?, ?, ?, ?, ?)"
 
-	project_values = (project.name, project.client_name, project.client_address, 
+	project_values = (project.project_name, project.client_name, project.client_address, 
 		project.architect.architect_id, project.start_date, project.current_phase_id, 
 		project.status)
 

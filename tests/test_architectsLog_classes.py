@@ -35,12 +35,15 @@ def test_project_initialization():
 #test if the Invoice class instance is initialized correctly
 def test_invoice_initialization():
 	"""Test if the Invoice class is created and __init__() initializes correctly"""
-	testInvoice = Invoice(1, "01-01-2025")
+	testArchitect = Architect("Name", "LicenseNumber01", "123-456-7890", "email@domain.com", "MyCompany")
+	testProject = Project("NewProject", "NewClient", "123ClientStreet", "01-01-2025", testArchitect)
+	testInvoice = Invoice(1, "01-01-2025", testProject)
 
 	assert testInvoice.invoice_number == 1
 	assert testInvoice.created_date == "01-01-2025"
+	assert testInvoice.project == testProject
+	assert testInvoice.status == "draft"
 	assert testInvoice.invoice_id == None
-	assert testInvoice.project_id == None
 
 #test if the TimeEntry class instance is initialized correctly
 def test_time_entry_initialization():

@@ -2,7 +2,7 @@
 
 #All possible phases eachg project will go through
 PHASES = {
-	1: "Scematic Design", 
+	1: "Schematic Design", 
 	2: "Design Development", 
 	3: "Construction Documents", 
 	4: "Bidding Negotiation", 

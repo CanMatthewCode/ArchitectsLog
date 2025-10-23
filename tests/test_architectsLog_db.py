@@ -6,13 +6,13 @@ import sqlite3
 
 from architectsLog_db import get_connection, create_architect_table, create_project_table
 from architectsLog_db import create_phases_table, create_invoices_table, create_time_entries_table
-from architectsLog_db import add_architect, initialize_phases, add_project
+from architectsLog_db import add_architect, initialize_phases, add_project, add_invoice
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry
 
 TEST_DB = 'test_architectsLog.db'
 
-#createa database auto cleanup before and after each test
+#create a database auto cleanup before and after each test
 @pytest.fixture(autouse=True)
 def cleanup_test_db():
     if os.path.exists(TEST_DB):
@@ -236,7 +236,7 @@ def test_create_invoices_table_column_types(table_info):
 	assert column_types['invoice_id'] == 'INTEGER'
 	assert column_types['project_id'] == 'INTEGER'
 	assert column_types['created_date'] == 'TEXT'
-	assert column_types['invoice_number'] == 'TEXT'
+	assert column_types['invoice_number'] == 'INTEGER'
 	assert column_types['status'] == 'TEXT'
 
 
@@ -276,7 +276,7 @@ def test_create_time_entries_table_types(table_info):
 
 #test if the add_architect function adds an architect to the architects table
 def test_add_architect(test_conn):
-	"""Test that the architects table has correctly added architect"""
+	"""Test that the architects table has correctly added a new architect"""
 	#create cursor, create architect table, and commit it to the database
 	cur = test_conn.cursor()
 	create_architect_table(cur)
@@ -286,7 +286,7 @@ def test_add_architect(test_conn):
 	architect_id = add_architect(testArchitect, cur)
 	test_conn.commit()
 
-	#quiery information from newly added architect to ensure insertion
+	#query information from newly added architect to ensure insertion
 	sql = "SELECT * FROM architects WHERE architect_id = ?"
 	cur.execute(sql, (architect_id,))
 	row = cur.fetchone()
@@ -324,17 +324,17 @@ def test_initialize_phases(test_conn):
 	initialize_phases(cur)
 	initialize_phases(cur)
 
-	#quiery all information from the newly initialized phases table
+	#query all information from the newly initialized phases table
 	sql = "SELECT * FROM phases"
 	cur.execute(sql)
 	rows = cur.fetchall()
 
 	#test if number of items in phases table equals number of items in PHASES dictionary
-	#and that table is only initialized once
+	#and test that table is only initialized once
 	assert len(rows) == 8
 
 	#test all rows for correct insertion 
-	assert rows[0] == (1, "Scematic Design")
+	assert rows[0] == (1, "Schematic Design")
 	assert rows[1] == (2, "Design Development")
 	assert rows[2] == (3, "Construction Documents")
 	assert rows[3] == (4, "Bidding Negotiation" )
@@ -346,8 +346,8 @@ def test_initialize_phases(test_conn):
 
 #test if the add_project function adds a project to the projects table
 def test_add_project(test_conn):
-	"""Test that the architects table has correctly added architect"""
-	#create cursor, create architect table, create project table and commit it to the database
+	"""Test that the projects table has correctly added a new project"""
+	#create cursor, create architects table, create projects table and commit them to the database
 	cur = test_conn.cursor()
 	create_architect_table(cur)
 	create_phases_table(cur)
@@ -358,7 +358,7 @@ def test_add_project(test_conn):
 	testArchitect = Architect("Name", "LicenseNumber01", "123-456-7890", "email@domain.com", "MyCompany")
 	architect_id = add_architect(testArchitect, cur)
 
-	#initilialize the phases table
+	#initialize the phases table
 	initialize_phases(cur)
 
 	#create a test project with testArchitect and add it to the project table, then commit to tables
@@ -366,7 +366,7 @@ def test_add_project(test_conn):
 	project_id = add_project(testProject, cur)
 	test_conn.commit()
 
-	#quiery information from newly added project to ensure insertion
+	#query information from newly added project to ensure insertion
 	sql = "SELECT * FROM projects WHERE project_id = ?"
 	cur.execute(sql, (project_id,))
 	row = cur.fetchone()
@@ -374,7 +374,7 @@ def test_add_project(test_conn):
 	#test if row was created
 	assert row is not None
 
-	#unpack row for readibility 
+	#unpack row for readability 
 	project_id, project_name, client_name, client_address, architect_id, start_date, current_phase_id, status = row
 
 	#test table columns for correct insertion
@@ -392,3 +392,56 @@ def test_add_project(test_conn):
 
 	#test if project object was updated with project_id
 	assert testProject.project_id == 1
+
+
+#test if the add_invoice function adds an invoice to the projects table
+def test_add_invoice(test_conn):
+	"""Test that the invoices table has correctly added a new invoice"""
+	#create cursor, create architects table, create projects table, create invoices table and
+	#commit them to the database
+	cur = test_conn.cursor()
+	create_architect_table(cur)
+	create_phases_table(cur)
+	create_project_table(cur)
+	create_invoices_table(cur)
+	test_conn.commit()
+
+	#add an architect to Architect table to get architect_id assigned
+	testArchitect = Architect("Name", "LicenseNumber01", "123-456-7890", "email@domain.com", "MyCompany")
+	architect_id = add_architect(testArchitect, cur)
+
+	#initialize the phases table
+	initialize_phases(cur)
+
+	#create a test project with testArchitect and add it to the project table
+	testProject = Project("NewProject", "NewClient", "123ClientStreet", "01-01-2025", testArchitect)
+	project_id = add_project(testProject, cur)
+
+	#create a test invoice with testProject and add it to the invoice table, then commit to tables
+	testInvoice = Invoice(1, "01-01-2025", testProject)
+	invoice_id = add_invoice(testInvoice, cur)
+	test_conn.commit()
+
+	#query information from newly added project to ensure insertion
+	sql = "SELECT * FROM invoices WHERE invoice_id = ?"
+	cur.execute(sql, (invoice_id,))
+	row = cur.fetchone()
+
+	#test if row was created
+	assert row is not None
+
+	#unpack row for readability
+	invoice_id, project_id, created_date, invoice_number, status = row
+
+	#test table columns for correct insertion 
+	assert invoice_id == 1
+	assert project_id == testProject.project_id
+	assert created_date == "01-01-2025"
+	assert invoice_number == 1
+	assert status == "draft"
+
+	#test return of function
+	assert invoice_id == 1
+
+	#test if invoice object was updated with invoice_id
+	assert testInvoice.invoice_id == 1

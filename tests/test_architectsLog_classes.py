@@ -28,7 +28,7 @@ def test_project_initialization():
 	assert testProject.client_address == "123ClientStreet"
 	assert testProject.start_date == "01-01-2025"
 	assert testProject.architect == testArchitect
-	assert testProject.current_phase_id == None
+	assert testProject.current_phase_id == 1
 	assert testProject.status == "active"
 	assert testProject.project_id == None
 
@@ -59,6 +59,6 @@ def test_time_entry_initialization():
 	assert testTimeEntry.project == testProject
 	assert testTimeEntry.architect == testArchitect
 	assert testTimeEntry.time_entry_id == None
-	assert testTimeEntry.phase_id == None
+	assert testTimeEntry.phase_id == 1
 	assert testTimeEntry.invoice_id == None
 	assert testTimeEntry.notes == None

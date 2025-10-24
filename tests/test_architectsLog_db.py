@@ -6,11 +6,13 @@ import sqlite3
 
 from architectsLog_db import get_connection, create_architect_table, create_project_table
 from architectsLog_db import create_phases_table, create_invoices_table, create_time_entries_table
-from architectsLog_db import add_architect, initialize_phases, add_project, add_invoice
+from architectsLog_db import add_architect, initialize_phases, add_project, add_invoice, add_time_entry
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry
 
 TEST_DB = 'test_architectsLog.db'
+
+#	~~~PYTEST.FIXTURES AND DATABASE CONNECTIONS~~~
 
 #create a database auto cleanup before and after each test
 @pytest.fixture(autouse=True)
@@ -28,6 +30,53 @@ def test_conn():
     conn = get_connection(TEST_DB)
     yield conn
     conn.close()
+
+#create all tables and populate or initialize them 
+@pytest.fixture
+def table_initialize(test_conn):
+	#create cursor, create architects table, create projects table, create invoices table and
+	#commit them to the database
+	cur = test_conn.cursor()
+	create_architect_table(cur)
+	create_phases_table(cur)
+	create_project_table(cur)
+	create_invoices_table(cur)
+	create_time_entries_table(cur)
+	test_conn.commit()
+
+	#add an architect to Architect table to get architect_id assigned
+	testArchitect = Architect("Name", "LicenseNumber01", "123-456-7890", "email@domain.com", "MyCompany")
+	architect_id = add_architect(testArchitect, cur)
+
+	#initialize the phases table
+	initialize_phases(cur)
+
+	#create a test project with testArchitect and add it to the project table
+	testProject = Project("NewProject", "NewClient", "123ClientStreet", "01-01-2025", testArchitect)
+	project_id = add_project(testProject, cur)
+
+	#create a test invoice with testProject and add it to the invoice table
+	testInvoice = Invoice(1, "01-01-2025", testProject)
+	invoice_id = add_invoice(testInvoice, cur)
+
+	#create a test time entry with testProject and testArchitect and add it to the time_entries table
+	testTimeEntry = TimeEntry("01-01-2025 12:00:00", "01-01-2025 12:30:00", 30, testProject, testArchitect)
+	time_entry_id = add_time_entry(testTimeEntry, cur)
+
+	#commit and return the created objects as a dictionary 
+	test_conn.commit()
+
+	return {
+		'architect' : testArchitect,
+		'architect_id' : architect_id,
+		'project' : testProject,
+		'project_id' : project_id,
+		'invoice' : testInvoice,
+		'invoice_id' : invoice_id,
+		'time_entry' : testTimeEntry,
+		'time_entry_id' : time_entry_id
+	}
+
 
 #tests if the database connection works
 def test_get_connection_creates_connection(test_conn):
@@ -252,8 +301,8 @@ def test_create_time_entries_table_names(table_info):
 	assert 'start_time' in column_names
 	assert 'end_time' in column_names
 	assert 'duration_minutes' in column_names
-	assert 'invoice_id' in column_names
 	assert 'notes' in column_names
+	assert 'invoice_id' in column_names
 
 #test if the time_entries table has correct column types
 def test_create_time_entries_table_types(table_info):
@@ -267,8 +316,9 @@ def test_create_time_entries_table_types(table_info):
 	assert column_types['start_time'] == 'TEXT'
 	assert column_types['end_time'] == 'TEXT'
 	assert column_types['duration_minutes'] == 'INTEGER'
-	assert column_types['invoice_id'] == 'INTEGER'
 	assert column_types['notes'] == 'TEXT'
+	assert column_types['invoice_id'] == 'INTEGER'
+
 
 
 
@@ -445,3 +495,29 @@ def test_add_invoice(test_conn):
 
 	#test if invoice object was updated with invoice_id
 	assert testInvoice.invoice_id == 1
+
+
+#test if the add_time_entry function adds a time_entry to the time_entries table
+def test_add_time_entries(test_conn, table_initialize):
+	"""Test that the time_entries table has correctly added a new time_entry"""
+	cur = test_conn.cursor()
+	#query information from newly added time_entry to unsure insertion
+	sql = "SELECT * FROM time_entries WHERE time_entry_id = ?"
+	cur.execute(sql, (table_initialize['time_entry_id'],))
+	row = cur.fetchone()
+
+	time_entry_id, project_id, architect_id, phase_id, start_time, end_time, duration_minutes, notes, invoice_id = row
+
+	#test if row was created - if so, it validates the add_time_entry function's return value
+	assert row is not None
+
+	#test table columns for correct insertion
+	assert time_entry_id == 1
+	assert project_id == table_initialize['project'].project_id
+	assert architect_id == table_initialize['architect'].architect_id
+	assert phase_id == table_initialize['project'].current_phase_id
+	assert start_time == "01-01-2025 12:00:00"
+	assert end_time == "01-01-2025 12:30:00"
+	assert duration_minutes == 30
+	assert notes == None
+	assert invoice_id == None

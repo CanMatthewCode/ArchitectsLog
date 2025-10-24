@@ -102,8 +102,8 @@ def create_time_entries_table(cur: sqlite3.Cursor) -> None:
 			start_time TEXT NOT NULL,
 			end_time TEXT NOT NULL,
 			duration_minutes INTEGER NOT NULL,
-			invoice_id INTEGER,
 			notes TEXT,
+			invoice_id INTEGER,
 			FOREIGN KEY (project_id) REFERENCES projects (project_id),
 			FOREIGN KEY (architect_id) REFERENCES architects (architect_id),
 			FOREIGN KEY (phase_id) REFERENCES phases (phase_id),
@@ -165,11 +165,27 @@ def add_invoice(invoice: Invoice, cur: sqlite3.Cursor) -> int:
 	sql = "INSERT INTO invoices (project_id, created_date, invoice_number, status) \
 		VALUES (?, ?, ?, ?)"
 
-	invoice_values = (invoice.project.project_id, invoice.created_date, invoice.invoice_number,
-		invoice.status)
+	invoice_values = (invoice.project.project_id, invoice.created_date, 
+		invoice.invoice_number, invoice.status)
 
 	cur.execute(sql, invoice_values)
 	invoice_id = cur.lastrowid
 	invoice.invoice_id = invoice_id
 
 	return invoice_id
+
+
+def add_time_entry(time_entry: TimeEntry, cur: sqlite3.Cursor) -> int:
+	"""Add a TimeEntry object to the time_entries table"""
+	sql = "INSERT INTO time_entries (project_id, architect_id, phase_id, start_time, \
+		end_time, duration_minutes, invoice_id, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+
+	time_entry_values = (time_entry.project.project_id, time_entry.architect.architect_id,
+		time_entry.project.current_phase_id, time_entry.start_time, time_entry.end_time,
+		time_entry.duration_minutes, time_entry.notes, time_entry.invoice_id)
+
+	cur.execute(sql, time_entry_values)
+	time_entry_id = cur.lastrowid
+	time_entry.time_entry_id = time_entry_id
+
+	return time_entry_id

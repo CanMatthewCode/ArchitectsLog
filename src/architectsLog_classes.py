@@ -42,7 +42,7 @@ class Invoice:
 class TimeEntry:
 	def __init__(self, start_time: str, end_time: str, duration_minutes: int, 
 		project: Project = None, architect: Architect = None, time_entry_id: int = None,
-		phase_id: int = 1, invoice_id: int = None, notes: str = None) -> None:
+		phase_id: int = 1, notes: str = None, invoice_id: int = None) -> None:
 		self.start_time = start_time
 		self.end_time = end_time
 		self.duration_minutes = duration_minutes
@@ -50,6 +50,6 @@ class TimeEntry:
 		self.architect = architect
 		self.time_entry_id = time_entry_id
 		self.phase_id = phase_id
-		self.invoice_id = invoice_id
 		self.notes = notes
-
+		self.invoice_id = invoice_id
+		

@@ -63,5 +63,5 @@ def test_time_entry_initialization():
 	assert testTimeEntry.architect == testArchitect
 	assert testTimeEntry.time_entry_id == None
 	assert testTimeEntry.phase_id == 1
-	assert testTimeEntry.invoice_id == None
 	assert testTimeEntry.notes == None
+	assert testTimeEntry.invoice_id == None

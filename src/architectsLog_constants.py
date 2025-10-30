@@ -12,6 +12,10 @@ PHASES = {
 	8: "Administration"
 	}
 
+#Possible architect statuses
+ARCHITECT_STATUSES = ('active', 'inactive')
+
+
 #tuples of all updatable columns per table
 UPDATABLE_ARCHITECTS_COLUMNS = (
 	"name", 

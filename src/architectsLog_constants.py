@@ -12,3 +12,39 @@ PHASES = {
 	8: "Administration"
 	}
 
+#tuples of all updatable columns per table
+UPDATABLE_ARCHITECTS_COLUMNS = (
+	"name", 
+	"license_number",
+	"phone_number",
+	"email",
+	"company_name",
+	"is_active"
+	)
+
+UPDATABLE_PROJECTS_COLUMNS = (
+	"project_name",
+	"client_name",
+	"client_address",
+	"architect_id",
+	"start_date",
+	"current_phase_id",
+	"status"
+	)
+
+UPDATABLE_INVOICES_COLUMNS = (
+	"created_date",
+	"invoice_number",
+	"status"
+	)
+
+UPDATABLE_TIME_ENTRIES_COLUMNS = (
+	"project_id",
+	"architect_id",
+	"phase_id",
+	"start_time",
+	"end_time",
+	"duration_minutes",
+	"notes",
+	"invoice_id"
+	)

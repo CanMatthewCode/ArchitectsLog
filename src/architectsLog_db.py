@@ -49,7 +49,7 @@ def create_architect_table(cur: sqlite3.Cursor) -> None:
 			phone_number TEXT NOT NULL,
 			email TEXT NOT NULL UNIQUE,
 			company_name TEXT,
-			is_active INTEGER DEFAULT 1
+			is_active TEXT DEFAULT 'active'
 		)
 	''')
 
@@ -190,19 +190,29 @@ def add_time_entry(time_entry: TimeEntry, cur: sqlite3.Cursor) -> int:
 
 
 
+#	~~~LOAD EXISTING OBJECT FROM TABLE FUNCTIONS~~~
+
+def load_architect(architect_id: int, cur: sqlite3.Cursor) -> Architect:
+	sql = "SELECT * FROM architects WHERE architect_id = ?"
+	cur.execute(sql, (architect_id,))
+	arch_info = cur.fetchone()
+	loaded_architect = Architect(arch_info[1], arch_info[2], arch_info[3],
+		arch_info[4], arch_info[5], arch_info[6], arch_info[0])
+
+	return loaded_architect
+
+
+
 #	~~~TABLE UPDATE FUNCTIONS~~~
 
-def update_architect(column_name: str, architect: Architect, value: int | str, cur: sqlite3.Cursor) -> int:
+def update_architect(column_name: str, architect: Architect, value: int | str, cur: sqlite3.Cursor) -> Architect:
 	"""Update one column for a row which already exists in the architects table"""
 	if column_name not in UPDATABLE_ARCHITECTS_COLUMNS:
 		raise ValueError(f"Invalid column: {column_name}")
 	sql = f"UPDATE architects SET {column_name} = ? WHERE architect_id = ?"
 	update_values = (value, architect.architect_id)
 
-	rows_updated = cur.execute(sql, update_values)
-
-	if rows_updated.rowcount > 0:
-		setattr(architect, column_name, value)
-		return architect
-	else:
-		return None
+	cur.execute(sql, update_values)
+	setattr(architect, column_name, value)
+	
+	return architect

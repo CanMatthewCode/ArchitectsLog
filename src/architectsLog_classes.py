@@ -49,7 +49,7 @@ class TimeEntry:
 		self.project = project
 		self.architect = architect
 		self.time_entry_id = time_entry_id
-		self.phase_id = phase_id
+		self.phase_id = project.current_phase_id if project else phase_id
 		self.notes = notes
 		self.invoice_id = invoice_id
 		

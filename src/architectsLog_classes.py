@@ -5,7 +5,7 @@ from __future__ import annotations
 
 class Architect:
 	def __init__(self, name: str, license_number: str, phone_number: str, email: str,
-		company_name: str, is_active: int = 1, architect_id: int = None) -> None:
+		company_name: str, is_active: str = "active", architect_id: int = None) -> None:
 		self.architect_id = architect_id
 		self.name = name
 		self.license_number = license_number

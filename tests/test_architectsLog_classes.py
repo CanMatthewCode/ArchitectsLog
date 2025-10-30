@@ -14,7 +14,7 @@ def test_architect_initialization():
 	assert testArchitect.phone_number == "123-456-7890"
 	assert testArchitect.email =="email@domain.com"
 	assert testArchitect.company_name == "MyCompany"
-	assert testArchitect.is_active == 1
+	assert testArchitect.is_active == "active"
 	assert testArchitect.architect_id == None
 
 #test if the Project class instance is initialized correctly

@@ -4,7 +4,8 @@ import sqlite3
 import os
 from contextlib import contextmanager
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry
-from architectsLog_constants import PHASES
+from architectsLog_constants import PHASES, UPDATABLE_ARCHITECTS_COLUMNS, \
+	UPDATABLE_PROJECTS_COLUMNS, UPDATABLE_INVOICES_COLUMNS, UPDATABLE_TIME_ENTRIES_COLUMNS
 
 DB_FILE = 'architectsLog.db'
 
@@ -189,3 +190,22 @@ def add_time_entry(time_entry: TimeEntry, cur: sqlite3.Cursor) -> int:
 	time_entry.time_entry_id = time_entry_id
 
 	return time_entry_id
+
+
+
+#	~~~TABLE UPDATE FUNCTIONS~~~
+
+def update_architect(column_name: str, architect: Architect, value: int | str, cur: sqlite3.Cursor) -> int:
+	"""Update one column for a row which already exists in the architects table"""
+	if column_name not in UPDATABLE_ARCHITECTS_COLUMNS:
+		raise ValueError(f"Invalid column: {column_name}")
+	sql = f"UPDATE architects SET {column_name} = ? WHERE architect_id = ?"
+	update_values = (value, architect.architect_id)
+
+	rows_updated = cur.execute(sql, update_values)
+
+	if rows_updated.rowcount > 0:
+		setattr(architect, column_name, value)
+		return architect
+	else:
+		return None

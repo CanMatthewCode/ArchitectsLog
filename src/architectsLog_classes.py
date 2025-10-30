@@ -17,13 +17,11 @@ class Architect:
 
 class Project:
 	def __init__(self, project_name: str, client_name: str, client_address: str, start_date: str,
-		architect: Architect = None, current_phase_id: int = 1, status: str = "active", 
-		project_id: int = None) -> None:
+		current_phase_id: int = 1, status: str = "active", project_id: int = None) -> None:
 		self.project_name = project_name
 		self.client_name = client_name
 		self.client_address = client_address
 		self.start_date = start_date
-		self.architect = architect
 		self.current_phase_id = current_phase_id
 		self.status = status
 		self.project_id = project_id

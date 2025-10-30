@@ -52,7 +52,7 @@ def table_initialize(test_conn):
 	initialize_phases(cur)
 
 	#create a test project with testArchitect and add it to the project table
-	testProject = Project("NewProject", "NewClient", "123ClientStreet", "01-01-2025", testArchitect)
+	testProject = Project("NewProject", "NewClient", "123ClientStreet", "01-01-2025")
 	project_id = add_project(testProject, cur)
 
 	#create a test invoice with testProject and add it to the invoice table
@@ -229,7 +229,6 @@ def test_project_table_column_names(table_info):
 	assert 'project_name' in column_names
 	assert 'client_name' in column_names
 	assert 'client_address' in column_names
-	assert 'architect_id' in column_names
 	assert 'start_date' in column_names
 	assert 'current_phase_id' in column_names
 	assert 'status' in column_names
@@ -243,7 +242,6 @@ def test_project_table_column_types(table_info):
 	assert column_types['project_name'] == 'TEXT'
 	assert column_types['client_name'] == 'TEXT'
 	assert column_types['client_address'] == 'TEXT'
-	assert column_types['architect_id'] == 'INTEGER'
 	assert column_types['start_date'] == 'TEXT'
 	assert column_types['current_phase_id'] == 'INTEGER'
 	assert column_types['status'] == 'TEXT'
@@ -396,14 +394,13 @@ def test_add_project(test_conn, table_initialize):
 	assert row is not None
 
 	#unpack row for readability 
-	project_id, project_name, client_name, client_address, architect_id, start_date, current_phase_id, status = row
+	project_id, project_name, client_name, client_address, start_date, current_phase_id, status = row
 
 	#test table columns for correct insertion
 	assert project_id == 1
 	assert project_name == "NewProject"
 	assert client_name == "NewClient"
 	assert client_address == "123ClientStreet"
-	assert architect_id == table_initialize['project'].architect.architect_id
 	assert start_date == "01-01-2025"
 	assert current_phase_id == 1
 	assert status == "active"

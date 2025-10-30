@@ -61,11 +61,9 @@ def create_project_table(cur: sqlite3.Cursor) -> None:
 			project_name TEXT NOT NULL,
 			client_name TEXT NOT NULL,
 			client_address TEXT NOT NULL UNIQUE,
-			architect_id INTEGER,
 			start_date TEXT NOT NULL,
 			current_phase_id INTEGER NOT NULL,
 			status TEXT DEFAULT 'active',
-			FOREIGN KEY (architect_id) REFERENCES architects (architect_id)
 			FOREIGN KEY (current_phase_id) REFERENCES phases (phase_id)
 		)
 	''')
@@ -147,12 +145,11 @@ def initialize_phases(cur: sqlite3.Cursor) -> None:
 
 def add_project(project: Project, cur: sqlite3.Cursor) -> int:
 	"""Add a Project object to the projects table"""
-	sql = "INSERT INTO projects (project_name, client_name, client_address, architect_id, \
-		start_date, current_phase_id, status) VALUES (?, ?, ?, ?, ?, ?, ?)"
+	sql = "INSERT INTO projects (project_name, client_name, client_address, \
+		start_date, current_phase_id, status) VALUES (?, ?, ?, ?, ?, ?)"
 
 	project_values = (project.project_name, project.client_name, project.client_address, 
-		project.architect.architect_id, project.start_date, project.current_phase_id, 
-		project.status)
+		project.start_date, project.current_phase_id, project.status)
 
 	cur.execute(sql, project_values)
 	project_id = cur.lastrowid

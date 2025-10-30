@@ -26,7 +26,6 @@ UPDATABLE_PROJECTS_COLUMNS = (
 	"project_name",
 	"client_name",
 	"client_address",
-	"architect_id",
 	"start_date",
 	"current_phase_id",
 	"status"

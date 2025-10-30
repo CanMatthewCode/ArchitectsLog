@@ -6,7 +6,7 @@ import sqlite3
 
 from architectsLog_db import get_connection, create_architect_table, create_project_table, \
  create_phases_table, create_invoices_table, create_time_entries_table, add_architect, \
- initialize_phases, add_project, add_invoice, add_time_entry
+ initialize_phases, add_project, add_invoice, add_time_entry, update_architect
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry
 
@@ -217,7 +217,7 @@ def test_architect_table_column_types(table_info):
 	assert column_types['phone_number'] == 'TEXT'
 	assert column_types['email'] == 'TEXT'
 	assert column_types['company_name'] == 'TEXT'
-	assert column_types['is_active'] == 'INTEGER'
+	assert column_types['is_active'] == 'TEXT'
 
 
 #test if projects table has correct column names
@@ -346,7 +346,7 @@ def test_add_architect(test_conn, table_initialize):
 	assert phone == "123-456-7890"
 	assert email == "email@domain.com"
 	assert company == "MyCompany"
-	assert is_active == 1
+	assert is_active == "active"
 
 	#test if architect object was updated with architect_id
 	assert table_initialize['architect'].architect_id == 1
@@ -464,3 +464,65 @@ def test_add_time_entries(test_conn, table_initialize):
 
 	#test if time_entry object was updated with time_entry_id
 	assert table_initialize['time_entry'].time_entry_id == 1
+
+
+
+#	~~~UPDATE FUNCTIONS TESTS~~~
+
+#test if the update_architect function updates the architect table
+def test_update_architect(test_conn, table_initialize):
+	"""Test that the architects table has been correctly updated with the new input values"""
+	cur = test_conn.cursor()
+	architect = table_initialize['architect']
+	
+	#update all columns in the architect table with new values
+	architect = update_architect('name', architect, 'New_Name', cur)
+	architect = update_architect('license_number', architect, 'LicenseNumber02', cur)
+	architect = update_architect('phone_number', architect, '987-654-3210', cur)
+	architect = update_architect('email', architect, 'new_email@domain.com', cur)
+	architect = update_architect('company_name', architect, 'MyNewCompany', cur)
+	architect = update_architect('is_active', architect, 'inactive', cur)
+	test_conn.commit()
+
+	#test if all table columns were correctly updated
+	sql = "SELECT * FROM architects WHERE architect_id = ?"
+	cur.execute(sql, (architect.architect_id,))
+	row = cur.fetchone()
+
+	#unpack row for readability
+	arch_id, name, license_number, phone_number, email, company_name, is_active = row
+
+	assert name == "New_Name"
+	assert license_number == "LicenseNumber02"
+	assert phone_number == "987-654-3210"
+	assert email == "new_email@domain.com"
+	assert company_name == "MyNewCompany"
+	assert is_active == "inactive"
+
+	#test if all object attributes were correctly updated
+
+	assert architect.name == "New_Name"
+	assert architect.license_number == "LicenseNumber02"
+	assert architect.phone_number == "987-654-3210"
+	assert architect.email == "new_email@domain.com"
+	assert architect.company_name == "MyNewCompany"
+	assert architect.is_active == "inactive"
+
+#test if the update_architect function raises an exception to an incorrect column name"
+def test_update_architect_invalid_column(test_conn, table_initialize):
+	"""Test to see if trying to change an invalid column in the architect table throws an exception"""
+	cur = test_conn.cursor()
+	architect = table_initialize['architect']
+
+	with pytest.raises(ValueError, match="Invalid column"):
+		update_architect('invalid_column', architect, 'value', cur)
+
+
+
+
+#	~~~LOAD OBJECT FROM DATABASE FUNCTIONS TESTS~~~
+
+#Test if the load_architect function correctly loads an architect object from the architects database
+def test_load_architect(test_conn, table_initialize):
+	"""Test that an Architect object successfully loads from the architects table"""
+	pass

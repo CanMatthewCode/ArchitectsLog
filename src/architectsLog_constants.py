@@ -8,8 +8,9 @@ PHASES = {
 	4: "Bidding Negotiation", 
 	5: "Construction Administration",
 	6: "Interior Design",
-	7: "Business Development",
-	8: "Administration"
+	7: "Add Service",
+	8: "Business Development",
+	9: "Administration"
 	}
 
 #Possible architect statuses
@@ -23,7 +24,7 @@ UPDATABLE_ARCHITECTS_COLUMNS = (
 	"phone_number",
 	"email",
 	"company_name",
-	"is_active"
+	"status"
 	)
 
 UPDATABLE_PROJECTS_COLUMNS = (

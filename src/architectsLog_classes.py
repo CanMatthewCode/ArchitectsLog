@@ -5,14 +5,14 @@ from __future__ import annotations
 
 class Architect:
 	def __init__(self, name: str, license_number: str, phone_number: str, email: str,
-		company_name: str, is_active: str = "active", architect_id: int = None) -> None:
+		company_name: str, status: str = "active", architect_id: int = None) -> None:
 		self.architect_id = architect_id
 		self.name = name
 		self.license_number = license_number
 		self.phone_number = phone_number
 		self.email = email
 		self.company_name = company_name
-		self.is_active = is_active
+		self.status = status
 
 
 class Project:

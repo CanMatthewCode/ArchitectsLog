@@ -6,8 +6,8 @@ import sqlite3
 
 from architectsLog_db import get_connection, create_architect_table, create_project_table, \
  create_phases_table, create_invoices_table, create_time_entries_table, add_architect, \
- initialize_phases, add_project, add_invoice, add_time_entry, load_architect, update_architect, \
- load_all_architects
+ initialize_phases, add_project, add_invoice, add_time_entry, load_all_architects, \
+ load_architect, load_all_projects, update_architect 
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry
 
@@ -473,7 +473,7 @@ def test_add_time_entries(test_conn, table_initialize):
 
 #Test if the load_all_architects function correctly loads and returns all the architect names and ids
 def test_load_all_architects(test_conn, table_initialize):
-	"""Test that all Architect objects successfully load from the architects table and return as 
+	"""Test that all architect names and ids successfully load from the architects table and return as 
 	a list of tuples"""
 	cur = test_conn.cursor()
 	second_architect = Architect("Name 2", "LicenseNumber02", "987-654-3210", "email2@domain.com", "Company 2")
@@ -505,6 +505,26 @@ def test_load_architect(test_conn, table_initialize):
 	assert testArchitect.company_name == "MyCompany"
 	assert testArchitect.status == "active"
 	assert testArchitect.architect_id == 1
+
+
+#Test if the load_all_projects function correctly loads and returns all the project names and ids"
+def test_load_all_projects(test_conn, table_initialize):
+	"""Test that all project names and ids successfully load from the projects table and return as
+	a list of tuples"""
+	cur = test_conn.cursor()
+	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", "02-02-2025")
+	add_project(second_project, cur)
+	test_conn.commit()
+	testProjectList = load_all_projects(cur)
+
+	#test if the returned number of projects match the number in the table
+	assert len(testProjectList) == 2
+
+	#test if all the projects in the project table were returned
+	assert testProjectList[0][0] == 1
+	assert testProjectList[0][1] == "NewProject"
+	assert testProjectList[1][0] == 2
+	assert testProjectList[1][1] == "NewProject2"
 
 
 

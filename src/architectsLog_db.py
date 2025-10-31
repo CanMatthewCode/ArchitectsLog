@@ -49,7 +49,7 @@ def create_architect_table(cur: sqlite3.Cursor) -> None:
 			phone_number TEXT NOT NULL,
 			email TEXT NOT NULL UNIQUE,
 			company_name TEXT,
-			is_active TEXT DEFAULT 'active'
+			status TEXT DEFAULT 'active'
 		)
 	''')
 
@@ -114,12 +114,13 @@ def create_time_entries_table(cur: sqlite3.Cursor) -> None:
 #	~~~TABLE INSERTION FUNCTIONS~~~
 
 def add_architect(architect: Architect, cur: sqlite3.Cursor) -> int:
-	"""Add an Architect object to the architects table"""
+	"""Add an Architect object to the architects table, add architect_id to architect object, 
+	return newly added architect_id"""
 	sql = "INSERT INTO architects (name, license_number, phone_number, email, \
-		company_name, is_active) VALUES(?, ?, ?, ?, ?, ?)"
+		company_name, status) VALUES(?, ?, ?, ?, ?, ?)"
 
 	architect_values = (architect.name, architect.license_number, architect.phone_number, 
-		architect.email, architect.company_name, architect.is_active)
+		architect.email, architect.company_name, architect.status)
 
 	cur.execute(sql, architect_values)
 	architect_id = cur.lastrowid
@@ -132,6 +133,7 @@ def initialize_phases(cur: sqlite3.Cursor) -> None:
 	"""Initialize the phases table with the PHASES dictionary if not done so already"""
 	query = "SELECT COUNT(*) FROM phases"
 	cur.execute(query)
+
 	#check if the PHASES are already in the phases table - fetchone() returns tuple
 	number_of_phases = cur.fetchone()[0]
 	if number_of_phases > 0:
@@ -144,7 +146,8 @@ def initialize_phases(cur: sqlite3.Cursor) -> None:
 
 
 def add_project(project: Project, cur: sqlite3.Cursor) -> int:
-	"""Add a Project object to the projects table"""
+	"""Add a Project object to the projects table, add project_id to the Project object,
+	return newly added project_id"""
 	sql = "INSERT INTO projects (project_name, client_name, client_address, \
 		start_date, current_phase_id, status) VALUES (?, ?, ?, ?, ?, ?)"
 
@@ -159,7 +162,8 @@ def add_project(project: Project, cur: sqlite3.Cursor) -> int:
 
 
 def add_invoice(invoice: Invoice, cur: sqlite3.Cursor) -> int:
-	"""Add an Invoice object to the invoices table"""
+	"""Add an Invoice object to the invoices table, add invoice_id to the Invoice object, 
+	return newly added invoice_id"""
 	sql = "INSERT INTO invoices (project_id, created_date, invoice_number, status) \
 		VALUES (?, ?, ?, ?)"
 
@@ -174,7 +178,7 @@ def add_invoice(invoice: Invoice, cur: sqlite3.Cursor) -> int:
 
 
 def add_time_entry(time_entry: TimeEntry, cur: sqlite3.Cursor) -> int:
-	"""Add a TimeEntry object to the time_entries table"""
+	"""Add a TimeEntry object to the time_entries table, return newly added time_entry_id"""
 	sql = "INSERT INTO time_entries (project_id, architect_id, phase_id, start_time, \
 		end_time, duration_minutes, invoice_id, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
 
@@ -192,7 +196,19 @@ def add_time_entry(time_entry: TimeEntry, cur: sqlite3.Cursor) -> int:
 
 #	~~~LOAD EXISTING OBJECT FROM TABLE FUNCTIONS~~~
 
+def load_all_architects(cur: sqlite3.Cursor) -> list[tuple[int, str]]:
+	"""Load all architect names and architect_ids from architects table, 
+	return list of tuples containing both"""
+	sql = """SELECT architect_id, name FROM architects WHERE status = 'active' 
+		ORDER BY name ASC"""
+	cur.execute(sql)
+	architect_list = cur.fetchall()
+
+	return architect_list
+
+
 def load_architect(architect_id: int, cur: sqlite3.Cursor) -> Architect:
+	"""Load Architect object from the architects database and return it"""
 	sql = "SELECT * FROM architects WHERE architect_id = ?"
 	cur.execute(sql, (architect_id,))
 	arch_info = cur.fetchone()
@@ -205,8 +221,10 @@ def load_architect(architect_id: int, cur: sqlite3.Cursor) -> Architect:
 
 #	~~~TABLE UPDATE FUNCTIONS~~~
 
-def update_architect(column_name: str, architect: Architect, value: int | str, cur: sqlite3.Cursor) -> Architect:
-	"""Update one column for a row which already exists in the architects table"""
+def update_architect(column_name: str, architect: Architect, value: int | str, 
+	cur: sqlite3.Cursor) -> Architect:
+	"""Update one column for a row which exists in the architects table, set newly
+	changed attribute value to the Architect object, return Architect object"""
 	if column_name not in UPDATABLE_ARCHITECTS_COLUMNS:
 		raise ValueError(f"Invalid column: {column_name}")
 	sql = f"UPDATE architects SET {column_name} = ? WHERE architect_id = ?"

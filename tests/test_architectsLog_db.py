@@ -7,7 +7,7 @@ import sqlite3
 from architectsLog_db import get_connection, create_architect_table, create_project_table, \
  create_phases_table, create_invoices_table, create_time_entries_table, add_architect, \
  initialize_phases, add_project, add_invoice, add_time_entry, load_all_architects, \
- load_architect, load_all_projects, update_architect 
+ load_architect, load_all_projects, load_project, update_architect 
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry
 
@@ -497,7 +497,7 @@ def test_load_architect(test_conn, table_initialize):
 	cur = test_conn.cursor()
 	testArchitect = load_architect(1, cur)
 
-	#test if all columns were correctly updated
+	#test if all columns were correctly loaded into Architect object
 	assert testArchitect.name ==  "Name"
 	assert testArchitect.license_number == "LicenseNumber01"
 	assert testArchitect.phone_number == "123-456-7890"
@@ -525,6 +525,22 @@ def test_load_all_projects(test_conn, table_initialize):
 	assert testProjectList[0][1] == "NewProject"
 	assert testProjectList[1][0] == 2
 	assert testProjectList[1][1] == "NewProject2"
+
+
+#Test if the load_projects function correctly loads a project object from the project database"""
+def test_load_project(test_conn, table_initialize):
+	"""Test that a Project object successfully loads and returns from the projects table"""
+	cur = test_conn.cursor()
+	testProject = load_project(1, cur)
+
+	#test if all columns were correctly loaded into Project object
+	assert testProject.project_name == "NewProject"
+	assert testProject.client_name == "NewClient"
+	assert testProject.client_address == "123ClientStreet"
+	assert testProject.start_date == "01-01-2025"
+	assert testProject.current_phase_id == 1
+	assert testProject.status == "active"
+	assert testProject.project_id == 1
 
 
 

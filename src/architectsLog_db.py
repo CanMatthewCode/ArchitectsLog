@@ -229,6 +229,16 @@ def load_all_projects(cur:sqlite3.Cursor) -> list[tuple[int, str]]:
 	return project_list
 
 
+def load_project(project_id: int, cur: sqlite3.Cursor) -> Project:
+	"""Load Project object from teh projects database and return it"""
+	sql = "SELECT * FROM projects WHERE project_id = ?"
+	cur.execute(sql, (project_id,))
+	proj_info = cur.fetchone()
+	loaded_project = Project(proj_info[1], proj_info[2], proj_info[3], proj_info[4],
+		proj_info[5], proj_info[6], proj_info[0])
+
+	return loaded_project
+
 
 #	~~~TABLE UPDATE FUNCTIONS~~~
 

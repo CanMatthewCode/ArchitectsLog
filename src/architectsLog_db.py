@@ -262,6 +262,19 @@ def load_all_projects(cur:sqlite3.Cursor) -> list[tuple[int, str, str]]:
 	return project_list
 
 
+def load_time_entry(time_entry_id: int, cur: sqlite3.Cursor) -> TimeEntry:
+	"""Load TimeEntry object from the time_entries table and return it"""
+	sql = "SELECT * FROM time_entries WHERE time_entry_id = ?"
+	cur.execute(sql, (time_entry_id,))
+	t_e_info = cur.fetchone()
+	project = load_project(t_e_info[1], cur)
+	architect = load_architect(t_e_info[2], cur)
+	loaded_time_entry = TimeEntry(t_e_info[4], t_e_info[5], t_e_info[6], project,
+		architect, t_e_info[3], t_e_info[7], t_e_info[8], t_e_info[0])
+
+	return loaded_time_entry
+
+
 
 #	~~~TABLE UPDATE FUNCTIONS~~~
 

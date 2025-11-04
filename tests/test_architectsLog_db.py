@@ -472,7 +472,7 @@ def test_add_time_entries(test_conn, table_initialize):
 
 #	~~~LOAD OBJECT FROM DATABASE FUNCTIONS TESTS~~~
 
-#Test if the load_architect function correctly loads an architect object from the architects database
+#Test if the load_architect function correctly loads an architect object from the architects table
 def test_load_architect(test_conn, table_initialize):
 	"""Test that an Architect object successfully loads and returns from the architects table"""
 	cur = test_conn.cursor()
@@ -541,7 +541,7 @@ def test_load_all_architects(test_conn, table_initialize):
 	assert testArchitectList[2][2] == "inactive"
 
 
-#Test if the load_projects function correctly loads a project object from the project database"""
+#Test if the load_projects function correctly loads a project object from the project table"""
 def test_load_project(test_conn, table_initialize):
 	"""Test that a Project object successfully loads and returns from the projects table"""
 	cur = test_conn.cursor()
@@ -606,6 +606,24 @@ def test_load_all_projects(test_conn, table_initialize):
 	assert testProjectList[2][0] == 3
 	assert testProjectList[2][1] == "NewProject3"
 	assert testProjectList[2][2] == "completed"
+
+
+#Test if the load_time_entry function correctly loads a TimeEntry object from the time_entry table
+def test_load_time_entry(test_conn, table_initialize):
+	"""Test that a TimeEntry object successfully loads and returns from the time_entry table"""
+	cur = test_conn.cursor()
+	test_time_entry = load_time_entry(1, cur)
+
+	#test if all columns were correctly loaded into TimeEntry object
+	assert test_time_entry.start_time == "01-01-2025 12:00:00"
+	assert test_time_entry.end_time == "01-01-2025 12:30:00"
+	assert test_time_entry.duration_minutes == 30
+	assert test_time_entry.project.project_id == table_initialize['project'].project_id
+	assert test_time_entry.architect.architect_id == table_initialize['architect'].architect_id
+	assert test_time_entry.phase_id == 1
+	assert test_time_entry.notes == None
+	assert test_time_entry.invoice_id == None
+	assert test_time_entry.time_entry_id == 1
 
 
 

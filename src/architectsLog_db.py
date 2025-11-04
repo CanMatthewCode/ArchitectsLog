@@ -196,6 +196,17 @@ def add_time_entry(time_entry: TimeEntry, cur: sqlite3.Cursor) -> int:
 
 #	~~~LOAD EXISTING OBJECT FROM TABLE FUNCTIONS~~~
 
+def load_architect(architect_id: int, cur: sqlite3.Cursor) -> Architect:
+	"""Load Architect object from the architects table and return it"""
+	sql = "SELECT * FROM architects WHERE architect_id = ?"
+	cur.execute(sql, (architect_id,))
+	arch_info = cur.fetchone()
+	loaded_architect = Architect(arch_info[1], arch_info[2], arch_info[3],
+		arch_info[4], arch_info[5], arch_info[6], arch_info[0])
+
+	return loaded_architect
+	
+
 def load_all_active_architects(cur: sqlite3.Cursor) -> list[tuple[int, str]]:
 	"""Load all active architect names and architect_ids from architects table, 
 	return list of tuples containing both"""
@@ -218,16 +229,16 @@ def load_all_architects(cur: sqlite3.Cursor) -> list[tuple[int, str, str]]:
 	return architect_list
 
 
-def load_architect(architect_id: int, cur: sqlite3.Cursor) -> Architect:
-	"""Load Architect object from the architects database and return it"""
-	sql = "SELECT * FROM architects WHERE architect_id = ?"
-	cur.execute(sql, (architect_id,))
-	arch_info = cur.fetchone()
-	loaded_architect = Architect(arch_info[1], arch_info[2], arch_info[3],
-		arch_info[4], arch_info[5], arch_info[6], arch_info[0])
+def load_project(project_id: int, cur: sqlite3.Cursor) -> Project:
+	"""Load Project object from the projects table and return it"""
+	sql = "SELECT * FROM projects WHERE project_id = ?"
+	cur.execute(sql, (project_id,))
+	proj_info = cur.fetchone()
+	loaded_project = Project(proj_info[1], proj_info[2], proj_info[3], proj_info[4],
+		proj_info[5], proj_info[6], proj_info[0])
 
-	return loaded_architect
-	
+	return loaded_project
+
 
 def load_all_active_projects(cur:sqlite3.Cursor) -> list[tuple[int, str]]:
 	"""Load all the active project names and project_ids from the projects table,
@@ -251,17 +262,6 @@ def load_all_projects(cur:sqlite3.Cursor) -> list[tuple[int, str, str]]:
 	return project_list
 
 
-def load_project(project_id: int, cur: sqlite3.Cursor) -> Project:
-	"""Load Project object from teh projects database and return it"""
-	sql = "SELECT * FROM projects WHERE project_id = ?"
-	cur.execute(sql, (project_id,))
-	proj_info = cur.fetchone()
-	loaded_project = Project(proj_info[1], proj_info[2], proj_info[3], proj_info[4],
-		proj_info[5], proj_info[6], proj_info[0])
-
-	return loaded_project
-
-
 
 #	~~~TABLE UPDATE FUNCTIONS~~~
 
@@ -278,3 +278,18 @@ def update_architect(column_name: str, architect: Architect, value: int | str,
 	setattr(architect, column_name, value)
 	
 	return architect
+
+
+def update_project(column_name: str, project: Project, value: int | str,
+	cur: sqlite3.Cursor) -> Project:
+	"""Update one column for a row which exists in the projects table, set newly
+	changed attribute value to the Project object, return Project object"""
+	if column_name not in UPDATABLE_PROJECTS_COLUMNS:
+		raise ValueError(f"Invalid column: {column_name}")
+	sql = f"UPDATE projects SET {column_name} = ? WHERE project_id = ?"
+	update_values = (value, project.project_id)
+
+	cur.execute(sql, update_values)
+	setattr(project, column_name, value)
+
+	return project

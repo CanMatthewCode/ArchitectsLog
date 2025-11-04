@@ -6,8 +6,8 @@ import sqlite3
 
 from architectsLog_db import get_connection, create_architect_table, create_project_table, \
  create_phases_table, create_invoices_table, create_time_entries_table, add_architect, \
- initialize_phases, add_project, add_invoice, add_time_entry, load_all_architects, \
- load_architect, load_all_projects, load_project, update_architect 
+ initialize_phases, add_project, add_invoice, add_time_entry, load_all_active_architects, \
+ load_architect, load_all_active_projects, load_project, update_architect 
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry
 
@@ -472,16 +472,20 @@ def test_add_time_entries(test_conn, table_initialize):
 #	~~~LOAD OBJECT FROM DATABASE FUNCTIONS TESTS~~~
 
 #Test if the load_all_architects function correctly loads and returns all the architect names and ids
-def test_load_all_architects(test_conn, table_initialize):
+def test_load_all_active_architects(test_conn, table_initialize):
 	"""Test that all architect names and ids successfully load from the architects table and return as 
 	a list of tuples"""
 	cur = test_conn.cursor()
-	second_architect = Architect("Name 2", "LicenseNumber02", "987-654-3210", "email2@domain.com", "Company 2")
+	second_architect = Architect("Name 2", "LicenseNumber02", "987-654-3210", "email2@domain.com",
+		"Company 2")
+	third_architect = Architect("Name 3", "LicenseNumber03", "987-654-3211", "email3@domain.com",
+		"Company 3", status = 'inactive')
 	add_architect(second_architect, cur)
+	add_architect(third_architect, cur)
 	test_conn.commit()
-	testArchitectList = load_all_architects(cur)
+	testArchitectList = load_all_active_architects(cur)
 
-	#test if the returned number of architects match the number in the table
+	#test if the returned number of active architects match the number in the table
 	assert len(testArchitectList) == 2
 
 	#test if all architects in the architect table were returned
@@ -508,14 +512,17 @@ def test_load_architect(test_conn, table_initialize):
 
 
 #Test if the load_all_projects function correctly loads and returns all the project names and ids"
-def test_load_all_projects(test_conn, table_initialize):
+def test_load_all_active_projects(test_conn, table_initialize):
 	"""Test that all project names and ids successfully load from the projects table and return as
 	a list of tuples"""
 	cur = test_conn.cursor()
 	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", "02-02-2025")
+	third_project = Project("NewProject3", "NewClient3", "678ClientStreet", "03-03-2025",
+		status = 'completed')
 	add_project(second_project, cur)
+	add_project(third_project, cur)
 	test_conn.commit()
-	testProjectList = load_all_projects(cur)
+	testProjectList = load_all_active_projects(cur)
 
 	#test if the returned number of projects match the number in the table
 	assert len(testProjectList) == 2

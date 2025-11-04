@@ -196,8 +196,8 @@ def add_time_entry(time_entry: TimeEntry, cur: sqlite3.Cursor) -> int:
 
 #	~~~LOAD EXISTING OBJECT FROM TABLE FUNCTIONS~~~
 
-def load_all_architects(cur: sqlite3.Cursor) -> list[tuple[int, str]]:
-	"""Load all architect names and architect_ids from architects table, 
+def load_all_active_architects(cur: sqlite3.Cursor) -> list[tuple[int, str]]:
+	"""Load all active architect names and architect_ids from architects table, 
 	return list of tuples containing both"""
 	sql = """SELECT architect_id, name FROM architects WHERE status = 'active' 
 		ORDER BY name ASC"""
@@ -218,8 +218,8 @@ def load_architect(architect_id: int, cur: sqlite3.Cursor) -> Architect:
 	return loaded_architect
 	
 
-def load_all_projects(cur:sqlite3.Cursor) -> list[tuple[int, str]]:
-	"""Load all the project names and project_ids from the projects table,
+def load_all_active_projects(cur:sqlite3.Cursor) -> list[tuple[int, str]]:
+	"""Load all the active project names and project_ids from the projects table,
 	return list of tuples containing both"""
 	sql = """SELECT project_id, project_name FROM projects WHERE status = 'active' 
 		ORDER BY project_name ASC"""
@@ -238,6 +238,7 @@ def load_project(project_id: int, cur: sqlite3.Cursor) -> Project:
 		proj_info[5], proj_info[6], proj_info[0])
 
 	return loaded_project
+
 
 
 #	~~~TABLE UPDATE FUNCTIONS~~~

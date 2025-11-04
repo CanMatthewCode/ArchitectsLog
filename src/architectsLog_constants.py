@@ -18,6 +18,7 @@ ARCHITECT_STATUSES = ('active', 'inactive')
 
 PROJECT_STATUSES = ('active', 'completed')
 
+INVOICE_STATUSES = ('draft', 'sent', 'paid')
 
 #tuples of all updatable columns per table
 UPDATABLE_ARCHITECTS_COLUMNS = (

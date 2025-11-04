@@ -8,7 +8,7 @@ from architectsLog_db import get_connection, create_architect_table, create_proj
  create_phases_table, create_invoices_table, create_time_entries_table, add_architect, \
  initialize_phases, add_project, add_invoice, add_time_entry, load_all_active_architects, \
  load_all_architects, load_architect, load_all_active_projects, load_all_projects, \
- load_project, update_architect 
+ load_project, load_time_entry, update_architect, update_project
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry
 
@@ -472,6 +472,22 @@ def test_add_time_entries(test_conn, table_initialize):
 
 #	~~~LOAD OBJECT FROM DATABASE FUNCTIONS TESTS~~~
 
+#Test if the load_architect function correctly loads an architect object from the architects database
+def test_load_architect(test_conn, table_initialize):
+	"""Test that an Architect object successfully loads and returns from the architects table"""
+	cur = test_conn.cursor()
+	testArchitect = load_architect(1, cur)
+
+	#test if all columns were correctly loaded into Architect object
+	assert testArchitect.name ==  "Name"
+	assert testArchitect.license_number == "LicenseNumber01"
+	assert testArchitect.phone_number == "123-456-7890"
+	assert testArchitect.email =="email@domain.com"
+	assert testArchitect.company_name == "MyCompany"
+	assert testArchitect.status == "active"
+	assert testArchitect.architect_id == 1
+
+
 #Test if the load_all_active_architects function correctly loads and returns all the architect names and ids
 def test_load_all_active_architects(test_conn, table_initialize):
 	"""Test that all architect names and ids successfully load from the architects table and return as 
@@ -525,20 +541,20 @@ def test_load_all_architects(test_conn, table_initialize):
 	assert testArchitectList[2][2] == "inactive"
 
 
-#Test if the load_architect function correctly loads an architect object from the architects database
-def test_load_architect(test_conn, table_initialize):
-	"""Test that an Architect object successfully loads and returns from the architects table"""
+#Test if the load_projects function correctly loads a project object from the project database"""
+def test_load_project(test_conn, table_initialize):
+	"""Test that a Project object successfully loads and returns from the projects table"""
 	cur = test_conn.cursor()
-	testArchitect = load_architect(1, cur)
+	testProject = load_project(1, cur)
 
-	#test if all columns were correctly loaded into Architect object
-	assert testArchitect.name ==  "Name"
-	assert testArchitect.license_number == "LicenseNumber01"
-	assert testArchitect.phone_number == "123-456-7890"
-	assert testArchitect.email =="email@domain.com"
-	assert testArchitect.company_name == "MyCompany"
-	assert testArchitect.status == "active"
-	assert testArchitect.architect_id == 1
+	#test if all columns were correctly loaded into Project object
+	assert testProject.project_name == "NewProject"
+	assert testProject.client_name == "NewClient"
+	assert testProject.client_address == "123ClientStreet"
+	assert testProject.start_date == "01-01-2025"
+	assert testProject.current_phase_id == 1
+	assert testProject.status == "active"
+	assert testProject.project_id == 1
 
 
 #Test if the load_all_active_projects function correctly loads and returns all the project names and ids"
@@ -592,22 +608,6 @@ def test_load_all_projects(test_conn, table_initialize):
 	assert testProjectList[2][2] == "completed"
 
 
-#Test if the load_projects function correctly loads a project object from the project database"""
-def test_load_project(test_conn, table_initialize):
-	"""Test that a Project object successfully loads and returns from the projects table"""
-	cur = test_conn.cursor()
-	testProject = load_project(1, cur)
-
-	#test if all columns were correctly loaded into Project object
-	assert testProject.project_name == "NewProject"
-	assert testProject.client_name == "NewClient"
-	assert testProject.client_address == "123ClientStreet"
-	assert testProject.start_date == "01-01-2025"
-	assert testProject.current_phase_id == 1
-	assert testProject.status == "active"
-	assert testProject.project_id == 1
-
-
 
 #	~~~UPDATE FUNCTIONS TESTS~~~
 
@@ -617,7 +617,7 @@ def test_update_architect(test_conn, table_initialize):
 	cur = test_conn.cursor()
 	architect = table_initialize['architect']
 	
-	#update all columns in the architect table with new values
+	#update all columns in the architects table with new values
 	architect = update_architect('name', architect, 'New_Name', cur)
 	architect = update_architect('license_number', architect, 'LicenseNumber02', cur)
 	architect = update_architect('phone_number', architect, '987-654-3210', cur)
@@ -651,7 +651,7 @@ def test_update_architect(test_conn, table_initialize):
 	assert architect.status == "inactive"
 
 
-#test if the update_architect function raises an exception to an incorrect column name"
+#Test if the update_architect function raises an exception to an incorrect column name
 def test_update_architect_invalid_column(test_conn, table_initialize):
 	"""Test to see if trying to change an invalid column in the architect table throws an exception"""
 	cur = test_conn.cursor()
@@ -659,3 +659,52 @@ def test_update_architect_invalid_column(test_conn, table_initialize):
 
 	with pytest.raises(ValueError, match="Invalid column"):
 		update_architect('invalid_column', architect, 'value', cur)
+
+
+#Test if the update_project function updates the project table
+def test_update_project(test_conn, table_initialize):
+	"""Test that the projects table has been correctly updated with the new input values"""
+	cur = test_conn.cursor()
+	project = table_initialize['project']
+
+	#update all columns in the projects table with new values
+	project = update_project('project_name', project, "NewProject2", cur)
+	project = update_project('client_name', project, "NewClient2", cur)
+	project = update_project('client_address', project, "345ClientStreet", cur)
+	project = update_project('start_date', project, "02-02-2025", cur)
+	project = update_project('current_phase_id', project, 2, cur)
+	project = update_project('status', project, 'completed', cur)
+	test_conn.commit()
+
+	#test if all column values were correctly updated
+	sql = "SELECT * FROM projects WHERE project_id = ?"
+	cur.execute(sql, (project.project_id,))
+	row = cur.fetchone()
+
+	#unpack row for readability 
+	project_id, project_name, client_name, client_address, start_date, current_phase_id, status = row
+
+	#test if all object attributes were correctly updated
+	assert project_name == "NewProject2"
+	assert client_name == "NewClient2"
+	assert client_address == "345ClientStreet"
+	assert start_date == "02-02-2025"
+	assert current_phase_id == 2
+	assert status == 'completed'
+
+	#test if all object attributes where correctly updated
+	assert project.project_name == "NewProject2"
+	assert project.client_name == "NewClient2"
+	assert project.client_address == "345ClientStreet"
+	assert project.start_date == "02-02-2025"
+	assert project.current_phase_id == 2
+	assert project.status == 'completed'
+
+
+#Test if the update_project function raises an exception to an incorrect column name
+def test_update_project_invalid_column(test_conn, table_initialize):
+	cur = test_conn.cursor()
+	project = table_initialize['project']
+
+	with pytest.raises(ValueError, match='Invalid column'):
+		update_project('invalid_column', project, 'value', cur)

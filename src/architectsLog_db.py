@@ -207,6 +207,17 @@ def load_all_active_architects(cur: sqlite3.Cursor) -> list[tuple[int, str]]:
 	return architect_list
 
 
+def load_all_architects(cur: sqlite3.Cursor) -> list[tuple[int, str, str]]:
+	"""Load all active and inactive architect names, architect_ids, and statuses
+	from architects table, return list of tuples containing all three columns"""
+	sql = """SELECT architect_id, name, status FROM architects 
+		ORDER BY status ASC, name ASC"""
+	cur.execute(sql)
+	architect_list = cur.fetchall()
+
+	return architect_list
+
+
 def load_architect(architect_id: int, cur: sqlite3.Cursor) -> Architect:
 	"""Load Architect object from the architects database and return it"""
 	sql = "SELECT * FROM architects WHERE architect_id = ?"
@@ -223,6 +234,17 @@ def load_all_active_projects(cur:sqlite3.Cursor) -> list[tuple[int, str]]:
 	return list of tuples containing both"""
 	sql = """SELECT project_id, project_name FROM projects WHERE status = 'active' 
 		ORDER BY project_name ASC"""
+	cur.execute(sql)
+	project_list = cur.fetchall()
+
+	return project_list
+
+
+def load_all_projects(cur:sqlite3.Cursor) -> list[tuple[int, str, str]]:
+	"""Load all the project names, project_ids, and statuses from the projects table,
+	return list of tuples containing all three columns"""
+	sql = """SELECT project_id, project_name, status FROM projects
+		ORDER BY project_name ASC, status ASC"""
 	cur.execute(sql)
 	project_list = cur.fetchall()
 

@@ -258,6 +258,17 @@ def load_all_projects(cur:sqlite3.Cursor) -> list[tuple[int, str, str]]:
 	return project_list
 
 
+def load_invoice(invoice_id: int, cur: sqlite3.Cursor) -> Invoice:
+	"""Load Invoice object from the invoices table and return it"""
+	sql = "SELECT * FROM invoices WHERE invoice_id = ?"
+	cur.execute(sql, (invoice_id,))
+	inv_info = cur.fetchone()
+	project = load_project(inv_info[1], cur)
+	loaded_invoice = Invoice(inv_info[3], inv_info[2], project, inv_info[4], inv_info[0])
+
+	return loaded_invoice
+
+
 def load_time_entry(time_entry_id: int, cur: sqlite3.Cursor) -> TimeEntry:
 	"""Load TimeEntry object from the time_entries table and return it"""
 	sql = "SELECT * FROM time_entries WHERE time_entry_id = ?"

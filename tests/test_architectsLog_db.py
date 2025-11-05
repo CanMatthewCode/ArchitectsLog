@@ -8,7 +8,7 @@ from architectsLog_db import get_connection, create_architect_table, create_proj
  create_phases_table, create_invoices_table, create_time_entries_table, add_architect, \
  initialize_phases, add_project, add_invoice, add_time_entry, load_all_active_architects, \
  load_all_architects, load_architect, load_all_active_projects, load_all_projects, \
- load_project, load_time_entry, load_all_project_time_entries, \
+ load_project, load_invoice, load_time_entry, load_all_project_time_entries, \
  load_all_architect_time_entries, load_all_time_entries, update_architect, \
  update_project, update_invoice, update_time_entry
 
@@ -609,6 +609,20 @@ def test_load_all_projects(test_conn, table_initialize):
 	assert testProjectList[2][0] == 3
 	assert testProjectList[2][1] == "NewProject3"
 	assert testProjectList[2][2] == "completed"
+
+
+#Test if the load_invoice function correctly loads an Invoice object from the invoices table
+def test_load_invoice(test_conn, table_initialize):
+	"""Test that an Invoice object successfully loads and returns from the invoices table"""
+	cur = test_conn.cursor()
+	testInvoice = load_invoice(1, cur)
+
+	#test if all columns were correctly loaded into Invoice object
+	assert testInvoice.invoice_number == 1
+	assert testInvoice.created_date == "01-01-2025"
+	assert testInvoice.project.project_id == 1
+	assert testInvoice.status == "draft"
+	assert testInvoice.invoice_id == 1
 
 
 #Test if the load_time_entry function correctly loads a TimeEntry object from the time_entry table

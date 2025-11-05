@@ -181,9 +181,9 @@ def add_time_entry(time_entry: TimeEntry, cur: sqlite3.Cursor) -> int:
 	"""Add a TimeEntry object to the time_entries table, return newly added time_entry_id"""
 	sql = "INSERT INTO time_entries (project_id, architect_id, phase_id, start_time, \
 		end_time, duration_minutes, invoice_id, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-
-	time_entry_values = (time_entry.project.project_id, time_entry.architect.architect_id,
-		time_entry.project.current_phase_id, time_entry.start_time, time_entry.end_time,
+	project_id = time_entry.project.project_id if time_entry.project else None
+	time_entry_values = (project_id, time_entry.architect.architect_id,
+		time_entry.phase_id, time_entry.start_time, time_entry.end_time,
 		time_entry.duration_minutes, time_entry.notes, time_entry.invoice_id)
 
 	cur.execute(sql, time_entry_values)
@@ -205,7 +205,6 @@ def load_architect(architect_id: int, cur: sqlite3.Cursor) -> Architect:
 		arch_info[4], arch_info[5], arch_info[6], arch_info[0])
 
 	return loaded_architect
-	
 
 def load_all_active_architects(cur: sqlite3.Cursor) -> list[tuple[int, str]]:
 	"""Load all active architect names and architect_ids from architects table, 
@@ -216,7 +215,6 @@ def load_all_active_architects(cur: sqlite3.Cursor) -> list[tuple[int, str]]:
 	architect_list = cur.fetchall()
 
 	return architect_list
-
 
 def load_all_architects(cur: sqlite3.Cursor) -> list[tuple[int, str, str]]:
 	"""Load all active and inactive architect names, architect_ids, and statuses
@@ -239,7 +237,6 @@ def load_project(project_id: int, cur: sqlite3.Cursor) -> Project:
 
 	return loaded_project
 
-
 def load_all_active_projects(cur:sqlite3.Cursor) -> list[tuple[int, str]]:
 	"""Load all the active project names and project_ids from the projects table,
 	return list of tuples containing both"""
@@ -249,7 +246,6 @@ def load_all_active_projects(cur:sqlite3.Cursor) -> list[tuple[int, str]]:
 	project_list = cur.fetchall()
 
 	return project_list
-
 
 def load_all_projects(cur:sqlite3.Cursor) -> list[tuple[int, str, str]]:
 	"""Load all the project names, project_ids, and statuses from the projects table,
@@ -273,6 +269,45 @@ def load_time_entry(time_entry_id: int, cur: sqlite3.Cursor) -> TimeEntry:
 		architect, t_e_info[3], t_e_info[7], t_e_info[8], t_e_info[0])
 
 	return loaded_time_entry
+
+def load_all_project_time_entries(project_id: int, 
+	cur: sqlite3.Cursor) -> list[tuple[int, str, int, str]]:
+	"""Load all time_entries from time_entries table with same project_id,
+	returns a list of tuples containing time_entry_id, start_time, duration_minutes,
+	architect.name"""
+	sql = "SELECT time_entry_id, start_time, duration_minutes, architects.name \
+		FROM time_entries INNER JOIN architects ON time_entries.architect_id \
+		= architects.architect_id WHERE project_id = ? ORDER BY start_time ASC"
+	cur.execute(sql, (project_id,))
+	time_entries_list = cur.fetchall()
+
+	return time_entries_list
+
+def load_all_architect_time_entries(architect_id: int,
+	cur: sqlite3.Cursor) -> list[tuple[int, str, int, str]]:
+	"""Load all time_entries from time_entries table with same architect_id,
+	returns a list of tuples containing time_entry_id, start_time, 
+	duration_minutes, project_name"""
+	sql = "SELECT time_entry_id, start_time, duration_minutes, projects.project_name \
+		FROM time_entries LEFT JOIN projects ON time_entries.project_id = \
+		projects.project_id WHERE architect_id = ? ORDER BY start_time ASC"
+	cur.execute(sql, (architect_id,))
+	time_entries_list = cur.fetchall()
+
+	return time_entries_list
+
+def load_all_time_entries(cur: sqlite3.Cursor) -> list[tuple[int, str, int, str, str]]:
+	"""Load all time_entries in time_entries table, returns a list of tuples
+	containing time_entry_id, start_time, duration_minutes, project_name, architect_name"""
+	sql = "SELECT time_entry_id, start_time, duration_minutes, projects.project_name, \
+	architects.name FROM time_entries \
+	LEFT JOIN projects ON time_entries.project_id = projects.project_id \
+	INNER JOIN architects ON time_entries.architect_id = architects.architect_id \
+	ORDER BY project_name IS NULL, project_name ASC, name ASC"
+	cur.execute(sql)
+	time_entries_list = cur.fetchall()
+
+	return time_entries_list
 
 
 

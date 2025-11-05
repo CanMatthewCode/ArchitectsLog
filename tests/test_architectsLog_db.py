@@ -8,7 +8,9 @@ from architectsLog_db import get_connection, create_architect_table, create_proj
  create_phases_table, create_invoices_table, create_time_entries_table, add_architect, \
  initialize_phases, add_project, add_invoice, add_time_entry, load_all_active_architects, \
  load_all_architects, load_architect, load_all_active_projects, load_all_projects, \
- load_project, load_time_entry, update_architect, update_project
+ load_project, load_time_entry, load_all_project_time_entries, \
+ load_all_architect_time_entries, load_all_time_entries, update_architect, \
+ update_project
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry
 
@@ -62,7 +64,8 @@ def table_initialize(test_conn):
 	invoice_id = add_invoice(testInvoice, cur)
 
 	#create a test time entry with testProject and testArchitect and add it to the time_entries table
-	testTimeEntry = TimeEntry("01-01-2025 12:00:00", "01-01-2025 12:30:00", 30, testProject, testArchitect)
+	testTimeEntry = TimeEntry("01-01-2025 12:00:00", "01-01-2025 12:30:00", 
+		30, testProject, testArchitect)
 	time_entry_id = add_time_entry(testTimeEntry, cur)
 
 	#commit and return the created objects as a dictionary 
@@ -105,7 +108,8 @@ def test_architect_table_creation(test_conn):
 	create_architect_table(cursor)
 
 	#query sqlite_master to check if the table exists
-	cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='architects'")
+	cursor.execute("SELECT name FROM sqlite_master WHERE type='table' \
+		AND name='architects'")
 	result = cursor.fetchone()
 
 	assert result is not None, "architects table should exist"
@@ -119,7 +123,8 @@ def test_project_table_creation(test_conn):
 	create_project_table(cursor)
 
 	#query sqlite_master to check if the table exists
-	cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='projects'")
+	cursor.execute("SELECT name FROM sqlite_master WHERE type='table' \
+		AND name='projects'")
 	result = cursor.fetchone()
 
 	assert result is not None, "projects table should exist"
@@ -133,7 +138,8 @@ def test_phase_table_creation(test_conn):
 	create_phases_table(cursor)
 
 	#query sqlite_master to check if the table exits
-	cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='phases'")
+	cursor.execute("SELECT name FROM sqlite_master WHERE type='table' \
+		AND name='phases'")
 	result = cursor.fetchone()
 
 	assert result is not None, "phases table should exist"
@@ -147,7 +153,8 @@ def test_create_invoices_table(test_conn):
 	create_invoices_table(cursor)
 
 	#query sqlite_master to check if the table exists
-	cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='invoices'")
+	cursor.execute("SELECT name FROM sqlite_master WHERE type='table' \
+		AND name='invoices'")
 	result = cursor.fetchone()
 
 	assert result is not None, "invoices table should exist"
@@ -161,7 +168,8 @@ def test_create_time_entries_table(test_conn):
 	create_time_entries_table(cursor)
 
 	#query sqlite_master to check if time_entries table is created
-	cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='time_entries'")
+	cursor.execute("SELECT name FROM sqlite_master WHERE type='table' \
+		AND name='time_entries'")
 	result = cursor.fetchone()
 
 	assert result is not None, "time_entries table should exist"
@@ -318,7 +326,6 @@ def test_create_time_entries_table_types(table_info):
 	assert column_types['duration_minutes'] == 'INTEGER'
 	assert column_types['notes'] == 'TEXT'
 	assert column_types['invoice_id'] == 'INTEGER'
-
 
 
 
@@ -487,7 +494,6 @@ def test_load_architect(test_conn, table_initialize):
 	assert testArchitect.status == "active"
 	assert testArchitect.architect_id == 1
 
-
 #Test if the load_all_active_architects function correctly loads and returns all the architect names and ids
 def test_load_all_active_architects(test_conn, table_initialize):
 	"""Test that all architect names and ids successfully load from the architects table and return as 
@@ -510,7 +516,6 @@ def test_load_all_active_architects(test_conn, table_initialize):
 	assert testArchitectList[0][1] == "Name"
 	assert testArchitectList[1][0] == 2
 	assert testArchitectList[1][1] == "Name 2"
-
 
 #Test if the load_all_architects function correctly loads and returns all the architect names, ids, and statuses
 def test_load_all_architects(test_conn, table_initialize):
@@ -556,7 +561,6 @@ def test_load_project(test_conn, table_initialize):
 	assert testProject.status == "active"
 	assert testProject.project_id == 1
 
-
 #Test if the load_all_active_projects function correctly loads and returns all the project names and ids"
 def test_load_all_active_projects(test_conn, table_initialize):
 	"""Test that all project names and ids successfully load from the projects table and return as
@@ -578,7 +582,6 @@ def test_load_all_active_projects(test_conn, table_initialize):
 	assert testProjectList[0][1] == "NewProject"
 	assert testProjectList[1][0] == 2
 	assert testProjectList[1][1] == "NewProject2"
-
 
 #Test if the load_all_projects function correctly loads and returns all the project names, ids, and statuses"
 def test_load_all_projects(test_conn, table_initialize):
@@ -612,18 +615,131 @@ def test_load_all_projects(test_conn, table_initialize):
 def test_load_time_entry(test_conn, table_initialize):
 	"""Test that a TimeEntry object successfully loads and returns from the time_entry table"""
 	cur = test_conn.cursor()
-	test_time_entry = load_time_entry(1, cur)
+	testTimeEntry = load_time_entry(1, cur)
 
 	#test if all columns were correctly loaded into TimeEntry object
-	assert test_time_entry.start_time == "01-01-2025 12:00:00"
-	assert test_time_entry.end_time == "01-01-2025 12:30:00"
-	assert test_time_entry.duration_minutes == 30
-	assert test_time_entry.project.project_id == table_initialize['project'].project_id
-	assert test_time_entry.architect.architect_id == table_initialize['architect'].architect_id
-	assert test_time_entry.phase_id == 1
-	assert test_time_entry.notes == None
-	assert test_time_entry.invoice_id == None
-	assert test_time_entry.time_entry_id == 1
+	assert testTimeEntry.start_time == "01-01-2025 12:00:00"
+	assert testTimeEntry.end_time == "01-01-2025 12:30:00"
+	assert testTimeEntry.duration_minutes == 30
+	assert testTimeEntry.project.project_id == table_initialize['project'].project_id
+	assert testTimeEntry.architect.architect_id == table_initialize['architect'].architect_id
+	assert testTimeEntry.phase_id == 1
+	assert testTimeEntry.notes == None
+	assert testTimeEntry.invoice_id == None
+	assert testTimeEntry.time_entry_id == 1
+
+#Test if the load_all_project_time_entries function correctly loads all project TimeEnty rows
+def test_load_all_project_time_entries(test_conn, table_initialize):
+	"""Test that all time_entry rows for a project are returned as a list of tuples
+	containing time_entry_id, start_time, duration_minutes, architect.name"""
+	cur = test_conn.cursor()
+	project = table_initialize['project']
+	architect = table_initialize['architect']
+	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", "02-02-2025")
+	add_project(second_project, cur)
+	test_conn.commit()
+	testTimeEntry2 = TimeEntry("01-01-2025 1:00:00", "01-01-2025 1:45:00", 45, project, architect)
+	testTimeEntry3 = TimeEntry("02-02-2025 12:00:00", "02-02-2025 1:00:00", 60, second_project, architect)
+	add_time_entry(testTimeEntry2, cur)
+	add_time_entry(testTimeEntry3, cur)
+	test_conn.commit()
+
+	testTimeEntries = load_all_project_time_entries(project.project_id, cur)
+
+	#test if the returned number of tuples matches the number of TimeEntry objects
+	#in the table that correspond to the same project
+	assert len(testTimeEntries) == 2
+
+	#test if all the columns were correctly loaded into the tuples
+	assert testTimeEntries[0][0] == 1
+	assert testTimeEntries[0][1] == "01-01-2025 12:00:00"
+	assert testTimeEntries[0][2] == 30
+	assert testTimeEntries[0][3] == "Name"
+	assert testTimeEntries[1][0] == 2
+	assert testTimeEntries[1][1] == "01-01-2025 1:00:00"
+	assert testTimeEntries[1][2] == 45
+	assert testTimeEntries[1][3] == "Name"
+
+#Test if the load_all_architect_time_entries function correctly loads all architect TimeEntry rows
+def test_load_all_architect_time_entries(test_conn, table_initialize):
+	"""Test that all time_entry rows for an architect are returned as a list of tuples
+	containing time_entry_id, start_time, duration_minutes, project_name"""
+	cur = test_conn.cursor()
+	project = table_initialize['project']
+	architect = table_initialize['architect']
+	second_architect = Architect("Name 2", "LicenseNumber02", "987-654-3210", "email2@domain.com",
+		"Company 2")
+	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", "02-02-2025")
+	add_architect(second_architect, cur)
+	add_project(second_project, cur)
+	test_conn.commit()
+	testTimeEntry2 = TimeEntry("01-01-2025 1:00:00", "01-01-2025 1:45:00", 45, second_project, architect)
+	testTimeEntry3 = TimeEntry("02-02-2025 12:00:00", "02-02-2025 1:00:00", 60, project, second_architect)
+	add_time_entry(testTimeEntry2, cur)
+	add_time_entry(testTimeEntry3, cur)
+	test_conn.commit()
+
+	testTimeEntries = load_all_architect_time_entries(architect.architect_id, cur)
+	#test if the returned number of tuples matches the number of TimeEntry objects
+	#in the database that correspond to the same architect
+	assert len(testTimeEntries) == 2
+
+	#test if all the columns were correctly loaded into the tuples
+	assert testTimeEntries[0][0] == 1
+	assert testTimeEntries[0][1] == "01-01-2025 12:00:00"
+	assert testTimeEntries[0][2] == 30
+	assert testTimeEntries[0][3] == "NewProject"
+	assert testTimeEntries[1][0] == 2
+	assert testTimeEntries[1][1] == "01-01-2025 1:00:00"
+	assert testTimeEntries[1][2] == 45
+	assert testTimeEntries[1][3] == "NewProject2"
+
+#Test if the load_all_time_entries function correctly loads all time entries from the table
+def test_load_all_time_entries(test_conn, table_initialize):
+	"""Test that all time_entry rows in the table are returned as a list of tuples
+	containing time_entry_id, start_time, duration_minutes, project_name, architect_name"""
+	cur = test_conn.cursor()
+	architect = table_initialize['architect']
+	project = table_initialize['project']
+	second_architect = Architect("Name 2", "LicenseNumber02", "987-654-3210", "email2@domain.com",
+		"Company 2")
+	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", "02-02-2025")
+	add_architect(second_architect, cur)
+	add_project(second_project, cur)
+	test_conn.commit()
+	testTimeEntry2 = TimeEntry("01-01-2025 1:00:00", "01-01-2025 1:45:00", 45, second_project, architect)
+	testTimeEntry3 = TimeEntry("02-02-2025 12:00:00", "02-02-2025 1:00:00", 60, project, second_architect)
+	testTimeEntry4 = TimeEntry("03-03-2025 3:00:00", "03-03-2025 5:00:00", 120, None, second_architect)
+	add_time_entry(testTimeEntry2, cur)
+	add_time_entry(testTimeEntry3, cur)
+	add_time_entry(testTimeEntry4, cur)
+	test_conn.commit()
+
+	testTimeEntries = load_all_time_entries(cur)
+	#test if the returned number of tuples matches the number of TimeEntry objects in the table
+	assert len(testTimeEntries) == 4
+
+	#test if all the columns were correctly loaded into the tuples
+	assert testTimeEntries[0][0] == 1
+	assert testTimeEntries[0][1] == "01-01-2025 12:00:00"
+	assert testTimeEntries[0][2] == 30
+	assert testTimeEntries[0][3] == "NewProject"
+	assert testTimeEntries[0][4] == "Name"
+	assert testTimeEntries[1][0] == 3
+	assert testTimeEntries[1][1] == "02-02-2025 12:00:00"
+	assert testTimeEntries[1][2] == 60
+	assert testTimeEntries[1][3] == "NewProject"
+	assert testTimeEntries[1][4] == "Name 2"
+	assert testTimeEntries[2][0] == 2
+	assert testTimeEntries[2][1] == "01-01-2025 1:00:00"
+	assert testTimeEntries[2][2] == 45
+	assert testTimeEntries[2][3] == "NewProject2"
+	assert testTimeEntries[2][4] == "Name"
+	assert testTimeEntries[3][0] == 4
+	assert testTimeEntries[3][1] == "03-03-2025 3:00:00"
+	assert testTimeEntries[3][2] == 120
+	assert testTimeEntries[3][3] == None
+	assert testTimeEntries[3][4] == "Name 2"
 
 
 
@@ -667,7 +783,6 @@ def test_update_architect(test_conn, table_initialize):
 	assert architect.email == "new_email@domain.com"
 	assert architect.company_name == "MyNewCompany"
 	assert architect.status == "inactive"
-
 
 #Test if the update_architect function raises an exception to an incorrect column name
 def test_update_architect_invalid_column(test_conn, table_initialize):
@@ -717,7 +832,6 @@ def test_update_project(test_conn, table_initialize):
 	assert project.start_date == "02-02-2025"
 	assert project.current_phase_id == 2
 	assert project.status == 'completed'
-
 
 #Test if the update_project function raises an exception to an incorrect column name
 def test_update_project_invalid_column(test_conn, table_initialize):

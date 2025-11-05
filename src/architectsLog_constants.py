@@ -40,6 +40,7 @@ UPDATABLE_PROJECTS_COLUMNS = (
 	)
 
 UPDATABLE_INVOICES_COLUMNS = (
+	"project_id",
 	"created_date",
 	"invoice_number",
 	"status"

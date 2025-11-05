@@ -10,7 +10,7 @@ from architectsLog_db import get_connection, create_architect_table, create_proj
  load_all_architects, load_architect, load_all_active_projects, load_all_projects, \
  load_project, load_time_entry, load_all_project_time_entries, \
  load_all_architect_time_entries, load_all_time_entries, update_architect, \
- update_project, update_time_entry
+ update_project, update_invoice, update_time_entry
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry
 
@@ -776,7 +776,6 @@ def test_update_architect(test_conn, table_initialize):
 	assert status == "inactive"
 
 	#test if all object attributes were correctly updated
-
 	assert architect.name == "New_Name"
 	assert architect.license_number == "LicenseNumber02"
 	assert architect.phone_number == "987-654-3210"
@@ -786,7 +785,7 @@ def test_update_architect(test_conn, table_initialize):
 
 #Test if the update_architect function raises an exception to an incorrect column name
 def test_update_architect_invalid_column(test_conn, table_initialize):
-	"""Test to see if trying to change an invalid column in the architect table throws an exception"""
+	"""Test to see if trying to change an invalid column in the architects table throws an exception"""
 	cur = test_conn.cursor()
 	architect = table_initialize['architect']
 
@@ -817,7 +816,6 @@ def test_update_project(test_conn, table_initialize):
 	#unpack row for readability 
 	project_id, project_name, client_name, client_address, start_date, current_phase_id, status = row
 
-	#test if all object attributes were correctly updated
 	assert project_name == "NewProject2"
 	assert client_name == "NewClient2"
 	assert client_address == "345ClientStreet"
@@ -835,11 +833,57 @@ def test_update_project(test_conn, table_initialize):
 
 #Test if the update_project function raises an exception to an incorrect column name
 def test_update_project_invalid_column(test_conn, table_initialize):
+	"""Test to see if trying to change an invalid column in the projects table throws an exception"""
 	cur = test_conn.cursor()
 	project = table_initialize['project']
 
 	with pytest.raises(ValueError, match='Invalid column'):
 		update_project('invalid_column', project, 'value', cur)
+
+
+#Test if the update_invoice function updates the invoices table
+def test_update_invoice(test_conn, table_initialize):
+	"""Test that the invoices table has been correctly updated with the new input values"""
+	cur = test_conn.cursor()
+	invoice = table_initialize['invoice']
+	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", "02-02-2025")
+	add_project(second_project, cur)
+	test_conn.commit()
+
+	#update all columns in the invoices table with new values
+	invoice = update_invoice('project_id', invoice, 2, cur)
+	invoice = update_invoice('created_date', invoice, "02-02-2025", cur)
+	invoice = update_invoice('invoice_number', invoice, 2, cur)
+	invoice = update_invoice('status', invoice, "billed", cur)
+	test_conn.commit()
+
+	#test if all column values were correctly updated
+	sql = "SELECT * FROM invoices WHERE invoice_id = ?"
+	cur.execute(sql, (invoice.invoice_id,))
+	row = cur.fetchone()
+
+	#unpack row for readability
+	invoice_id, project_id, created_date, invoice_number, status = row
+
+	assert project_id == 2
+	assert created_date == "02-02-2025"
+	assert invoice_number == 2
+	assert status == "billed"
+
+	#test if all object attributes were correctly updated
+	assert invoice.project.project_id == 2
+	assert invoice.created_date == "02-02-2025"
+	assert invoice.invoice_number == 2
+	assert invoice.status == "billed"
+
+#Test if the update_invoice function raises an exception to an incorrect column name
+def test_update_invoice_invalid_column(test_conn, table_initialize):
+	"""Test to see if trying to change an invalid column in the invoices table throws an exception"""
+	cur = test_conn.cursor()
+	invoice = table_initialize['invoice']
+
+	with pytest.raises(ValueError, match='Invalid column'):
+		update_invoice('invalid_column', invoice, 'value', cur)
 
 
 #Test if the update_time_entry function updates the time_entries table
@@ -874,7 +918,6 @@ def test_update_time_entry(test_conn, table_initialize):
 	time_entry_id, project_id, architect_id, phase_id, start_time, end_time, \
 		duration_minutes, notes, invoice_id = row
 
-	#test if all object attributes were correctly updated
 	assert project_id == 2
 	assert architect_id == 2
 	assert phase_id == 2
@@ -896,6 +939,7 @@ def test_update_time_entry(test_conn, table_initialize):
 
 #Test if the update_time_entry function raises an exception to an incorrect column name
 def test_update_time_entry_invalid_column(test_conn, table_initialize):
+	"""Test to see if trying to change an invalid column in the time_entry table throws an exception"""
 	cur = test_conn.cursor()
 	time_entry = table_initialize['time_entry']
 

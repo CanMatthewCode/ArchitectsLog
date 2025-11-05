@@ -343,6 +343,27 @@ def update_project(column_name: str, project: Project, value: int | str,
 	return project
 
 
+def update_invoice(column_name: str, invoice: Invoice, value: int | str,
+	cur: sqlite3.Cursor) -> Invoice:
+	"""Update one column for a row which exists in the invoices table, set newly
+	changed attribute value to the Invoice object, return Invoice object"""
+	if column_name not in UPDATABLE_INVOICES_COLUMNS:
+		raise ValueError(f"Invalid column: {column_name}")
+	sql = f"UPDATE invoices SET {column_name} = ? WHERE invoice_id = ?"
+	update_values = (value, invoice.invoice_id)
+
+	cur.execute(sql, update_values)
+
+	if column_name == "project_id":
+		project = load_project(value, cur)
+		column_name = "project"
+		value = project
+
+	setattr(invoice, column_name, value)
+
+	return invoice
+
+
 def update_time_entry(column_name: str, time_entry: TimeEntry, value: int | str,
 	cur: sqlite3.Cursor) -> TimeEntry:
 	"""Update one column for a row which exists in the time_entries table, set

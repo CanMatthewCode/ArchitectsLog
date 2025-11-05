@@ -341,3 +341,28 @@ def update_project(column_name: str, project: Project, value: int | str,
 	setattr(project, column_name, value)
 
 	return project
+
+
+def update_time_entry(column_name: str, time_entry: TimeEntry, value: int | str,
+	cur: sqlite3.Cursor) -> TimeEntry:
+	"""Update one column for a row which exists in the time_entries table, set
+	newly changed attribute value to the TimeEntry object, return TimeEntry object"""
+	if column_name not in UPDATABLE_TIME_ENTRIES_COLUMNS:
+		raise ValueError(f"Invalid column: {column_name}")
+	sql = f"UPDATE time_entries SET {column_name} = ? WHERE time_entry_id = ?"
+	update_values = (value, time_entry.time_entry_id)
+
+	cur.execute(sql, update_values)
+
+	if column_name == "architect_id":
+		architect = load_architect(value, cur)
+		column_name = "architect"
+		value = architect
+	elif column_name == "project_id":
+		project = load_project(value, cur)
+		column_name = "project"
+		value = project
+
+	setattr(time_entry, column_name, value)
+
+	return time_entry

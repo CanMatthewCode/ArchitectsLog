@@ -10,7 +10,7 @@ from architectsLog_db import get_connection, create_architect_table, create_proj
  load_all_architects, load_architect, load_all_active_projects, load_all_projects, \
  load_project, load_time_entry, load_all_project_time_entries, \
  load_all_architect_time_entries, load_all_time_entries, update_architect, \
- update_project
+ update_project, update_time_entry
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry
 
@@ -840,3 +840,64 @@ def test_update_project_invalid_column(test_conn, table_initialize):
 
 	with pytest.raises(ValueError, match='Invalid column'):
 		update_project('invalid_column', project, 'value', cur)
+
+
+#Test if the update_time_entry function updates the time_entries table
+def test_update_time_entry(test_conn, table_initialize):
+	"""Test that the time_entries table has been correctly updated with the new input values"""
+	cur = test_conn.cursor()
+	time_entry = table_initialize['time_entry']
+	second_architect = Architect("Name 2", "LicenseNumber02", "987-654-3210", "email2@domain.com",
+		"Company 2")
+	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", "02-02-2025")
+	add_architect(second_architect, cur)
+	add_project(second_project, cur)
+	test_conn.commit()
+
+	#update all columns in the time_entries table with new values
+	time_entry = update_time_entry('project_id', time_entry, 2, cur)
+	time_entry = update_time_entry('architect_id', time_entry, 2, cur)
+	time_entry = update_time_entry('phase_id', time_entry, 2, cur)
+	time_entry = update_time_entry('start_time', time_entry, '02-02-2025 1:00:00', cur)
+	time_entry = update_time_entry('end_time', time_entry, '02-02-2025 2:00:00', cur)
+	time_entry = update_time_entry('duration_minutes', time_entry, 60, cur)
+	time_entry = update_time_entry('notes', time_entry, 'New Note', cur)
+	time_entry = update_time_entry('invoice_id', time_entry, 1, cur)
+	test_conn.commit()
+
+	#test if all column values were correctly updated
+	sql = "SELECT * FROM time_entries WHERE time_entry_id = ?"
+	cur.execute(sql, (time_entry.time_entry_id,))
+	row = cur.fetchone()
+
+	#unpack row for readability
+	time_entry_id, project_id, architect_id, phase_id, start_time, end_time, \
+		duration_minutes, notes, invoice_id = row
+
+	#test if all object attributes were correctly updated
+	assert project_id == 2
+	assert architect_id == 2
+	assert phase_id == 2
+	assert start_time == "02-02-2025 1:00:00"
+	assert end_time == "02-02-2025 2:00:00"
+	assert duration_minutes == 60
+	assert notes == "New Note"
+	assert invoice_id == 1
+
+	#test if all object attributes where correctly updated
+	assert time_entry.start_time == "02-02-2025 1:00:00"
+	assert time_entry.end_time == "02-02-2025 2:00:00"
+	assert time_entry.duration_minutes == 60
+	assert time_entry.project.project_id == 2
+	assert time_entry.architect.architect_id == 2
+	assert time_entry.phase_id == 2
+	assert time_entry.notes == "New Note"
+	assert time_entry.invoice_id == 1
+
+#Test if the update_time_entry function raises an exception to an incorrect column name
+def test_update_time_entry_invalid_column(test_conn, table_initialize):
+	cur = test_conn.cursor()
+	time_entry = table_initialize['time_entry']
+
+	with pytest.raises(ValueError, match='Invalid column'):
+		update_time_entry('invalid_column', time_entry, 'value', cur)

@@ -268,6 +268,16 @@ def load_invoice(invoice_id: int, cur: sqlite3.Cursor) -> Invoice:
 
 	return loaded_invoice
 
+def load_project_invoices(project_id: int, cur: sqlite3.Cursor) -> list[tuple[int, str]]:
+	"""Load all rows in the invoices table associated with a project_id, return
+	list of tuples containing invoice_id, invoice_number, created_date, status"""
+	sql = "SELECT invoice_id, invoice_number, created_date, status FROM invoices \
+		WHERE project_id = ? ORDER BY status ASC, created_date ASC"
+	cur.execute(sql, (project_id,))
+	loaded_invoices = cur.fetchall()
+
+	return loaded_invoices
+
 
 def load_time_entry(time_entry_id: int, cur: sqlite3.Cursor) -> TimeEntry:
 	"""Load TimeEntry object from the time_entries table and return it"""
@@ -315,12 +325,12 @@ def load_invoice_time_entries(invoice_id: int | None,
 	unaffiliated time_entries ordered by project_id"""
 	if invoice_id is None:
 		sql = "SELECT time_entry_id, start_time, duration_minutes, project_id, notes \
-		FROM time_entries WHERE invoice_id is Null \
-		ORDER BY project_id ASC, start_time ASC"
+			FROM time_entries WHERE invoice_id is Null \
+			ORDER BY project_id ASC, start_time ASC"
 		cur.execute(sql)
 	else:
 		sql = "SELECT time_entry_id, start_time, duration_minutes, project_id, notes \
-		FROM time_entries WHERE invoice_id = ? ORDER BY start_time ASC"
+			FROM time_entries WHERE invoice_id = ? ORDER BY start_time ASC"
 		cur.execute(sql, (invoice_id,))
 	time_entries_list = cur.fetchall()
 
@@ -330,10 +340,10 @@ def load_all_time_entries(cur: sqlite3.Cursor) -> list[tuple[int, str, int, str,
 	"""Load all time_entries in time_entries table, returns a list of tuples
 	containing time_entry_id, start_time, duration_minutes, project_name, architect_name"""
 	sql = "SELECT time_entry_id, start_time, duration_minutes, projects.project_name, \
-	architects.name FROM time_entries \
-	LEFT JOIN projects ON time_entries.project_id = projects.project_id \
-	INNER JOIN architects ON time_entries.architect_id = architects.architect_id \
-	ORDER BY project_name IS NULL, project_name ASC, name ASC"
+		architects.name FROM time_entries \
+		LEFT JOIN projects ON time_entries.project_id = projects.project_id \
+		INNER JOIN architects ON time_entries.architect_id = architects.architect_id \
+		ORDER BY project_name IS NULL, project_name ASC, name ASC"
 	cur.execute(sql)
 	time_entries_list = cur.fetchall()
 
@@ -346,8 +356,8 @@ def load_nonproject_phases_time_entries(
 	Returns a list of tuples containing time_entry_id, start time, duration_mionutes,
 	architect_name, phase_id"""
 	sql = "SELECT time_entry_id, start_time, duration_minutes, architects.name, \
-	phase_id FROM time_entries INNER JOIN architects ON time_entries.architect_id= \
-	architects.architect_id WHERE phase_id IN (8,9) ORDER BY start_time ASC"
+		phase_id FROM time_entries INNER JOIN architects ON time_entries.architect_id= \
+		architects.architect_id WHERE phase_id IN (8,9) ORDER BY start_time ASC"
 
 	cur.execute(sql)
 	time_entries_list = cur.fetchall()

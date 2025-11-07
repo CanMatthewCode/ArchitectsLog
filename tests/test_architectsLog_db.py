@@ -10,7 +10,8 @@ from architectsLog_db import get_connection, create_architect_table, create_proj
  load_all_architects, load_architect, load_all_active_projects, load_all_projects, \
  load_project, load_invoice, load_time_entry, load_all_project_time_entries, \
  load_all_architect_time_entries, load_invoice_time_entries, load_all_time_entries, \
- update_architect, update_project, update_invoice, update_time_entry
+ load_nonproject_phases_time_entries, update_architect, update_project, update_invoice, \
+ update_time_entry
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry
 
@@ -793,6 +794,41 @@ def test_load_all_time_entries(test_conn, table_initialize):
 	assert testTimeEntries[3][2] == 120
 	assert testTimeEntries[3][3] == None
 	assert testTimeEntries[3][4] == "Name 2"
+
+#Test if the load_nonproject_phases_time_entries correctly loads time_entries from phases 8 & 9 only
+def test_load_nonproject_phases_time_entries(test_conn, table_initialize):
+	"""Test that all time_entry rows for phases 8 and 9 are loaded and returned 
+	as a list of tuples containing time_entry_id, start time, duration_mionutes,
+	architect_name, phase_id"""
+	cur = test_conn.cursor()
+	architect = table_initialize['architect']
+	testTimeEntry2 = TimeEntry("01-01-2025 1:00:00", "01-01-2025 1:45:00", 45, None, 
+		architect, phase_id = 8)
+	testTimeEntry3 = TimeEntry("02-02-2025 12:00:00", "02-02-2025 1:00:00", 60, None, 
+		architect, phase_id = 8)
+	testTimeEntry4 = TimeEntry("03-03-2025 3:00:00", "03-03-2025 5:00:00", 120, None, 
+		architect, phase_id = 9)
+	add_time_entry(testTimeEntry2, cur)
+	add_time_entry(testTimeEntry3, cur)
+	add_time_entry(testTimeEntry4, cur)
+	test_conn.commit()
+
+	testTimeEntries = load_nonproject_phases_time_entries(cur)
+	#test if the returned number of tuples matches the number of TimeEntry objects 
+	#with phases 8 and 9 in the table, ordered by phase_id
+	assert len(testTimeEntries) == 3
+
+	#test if all the columns were correctly loaded into the tuples
+	assert testTimeEntries[0][0] == 2
+	assert testTimeEntries[0][1] == "01-01-2025 1:00:00"
+	assert testTimeEntries[0][2] == 45
+	assert testTimeEntries[0][3] == "Name"
+	assert testTimeEntries[0][4] == 8
+	assert testTimeEntries[2][0] == 4
+	assert testTimeEntries[2][1] == "03-03-2025 3:00:00"
+	assert testTimeEntries[2][2] == 120
+	assert testTimeEntries[2][3] == "Name"
+	assert testTimeEntries[2][4] == 9
 
 
 

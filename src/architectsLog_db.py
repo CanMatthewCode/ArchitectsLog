@@ -339,6 +339,21 @@ def load_all_time_entries(cur: sqlite3.Cursor) -> list[tuple[int, str, int, str,
 
 	return time_entries_list
 
+def load_nonproject_phases_time_entries(
+	cur:sqlite3.Cursor) -> list[tuple[int, str, int, str, int]]:
+	"""Load all time_entries by phase in the time_entries table which do not 
+	have an attached project: either Business Development (8) or Administration (9)
+	Returns a list of tuples containing time_entry_id, start time, duration_mionutes,
+	architect_name, phase_id"""
+	sql = "SELECT time_entry_id, start_time, duration_minutes, architects.name, \
+	phase_id FROM time_entries INNER JOIN architects ON time_entries.architect_id= \
+	architects.architect_id WHERE phase_id IN (8,9) ORDER BY start_time ASC"
+
+	cur.execute(sql)
+	time_entries_list = cur.fetchall()
+
+	return time_entries_list
+
 
 
 #	~~~TABLE UPDATE FUNCTIONS~~~

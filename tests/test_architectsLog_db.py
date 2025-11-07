@@ -9,8 +9,8 @@ from architectsLog_db import get_connection, create_architect_table, create_proj
  initialize_phases, add_project, add_invoice, add_time_entry, load_all_active_architects, \
  load_all_architects, load_architect, load_all_active_projects, load_all_projects, \
  load_project, load_invoice, load_time_entry, load_all_project_time_entries, \
- load_all_architect_time_entries, load_all_time_entries, update_architect, \
- update_project, update_invoice, update_time_entry
+ load_all_architect_time_entries, load_invoice_time_entries, load_all_time_entries, \
+ update_architect, update_project, update_invoice, update_time_entry
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry
 
@@ -65,7 +65,7 @@ def table_initialize(test_conn):
 
 	#create a test time entry with testProject and testArchitect and add it to the time_entries table
 	testTimeEntry = TimeEntry("01-01-2025 12:00:00", "01-01-2025 12:30:00", 
-		30, testProject, testArchitect)
+		30, testProject, testArchitect, notes= "Note", invoice_id= 1)
 	time_entry_id = add_time_entry(testTimeEntry, cur)
 
 	#commit and return the created objects as a dictionary 
@@ -469,8 +469,8 @@ def test_add_time_entries(test_conn, table_initialize):
 	assert start_time == "01-01-2025 12:00:00"
 	assert end_time == "01-01-2025 12:30:00"
 	assert duration_minutes == 30
-	assert notes == None
-	assert invoice_id == None
+	assert notes == "Note"
+	assert invoice_id == 1
 
 	#test if time_entry object was updated with time_entry_id
 	assert table_initialize['time_entry'].time_entry_id == 1
@@ -638,8 +638,8 @@ def test_load_time_entry(test_conn, table_initialize):
 	assert testTimeEntry.project.project_id == table_initialize['project'].project_id
 	assert testTimeEntry.architect.architect_id == table_initialize['architect'].architect_id
 	assert testTimeEntry.phase_id == 1
-	assert testTimeEntry.notes == None
-	assert testTimeEntry.invoice_id == None
+	assert testTimeEntry.notes == "Note"
+	assert testTimeEntry.invoice_id == 1
 	assert testTimeEntry.time_entry_id == 1
 
 #Test if the load_all_project_time_entries function correctly loads all project TimeEnty rows
@@ -674,7 +674,7 @@ def test_load_all_project_time_entries(test_conn, table_initialize):
 	assert testTimeEntries[1][2] == 45
 	assert testTimeEntries[1][3] == "Name"
 
-#Test if the load_all_architect_time_entries function correctly loads all architect TimeEntry rows
+#Test if the load_all_architect_time_entries function correctly loads all architect time_entries rows
 def test_load_all_architect_time_entries(test_conn, table_initialize):
 	"""Test that all time_entry rows for an architect are returned as a list of tuples
 	containing time_entry_id, start_time, duration_minutes, project_name"""
@@ -707,6 +707,45 @@ def test_load_all_architect_time_entries(test_conn, table_initialize):
 	assert testTimeEntries[1][1] == "01-01-2025 1:00:00"
 	assert testTimeEntries[1][2] == 45
 	assert testTimeEntries[1][3] == "NewProject2"
+
+#Test if the load_invoice_time_entries function correctly loads all invoice time_entries rows
+def test_load_invoice_time_entries(test_conn, table_initialize):
+	"""Test that all time_entries rows for an invoice are returned as a list of tuples
+	containing time_entry_id, start_time, duration_minutes, project_id, notes. 
+	Test if passing in None returns all non-invoice affiliated time_entries rows"""
+	cur = test_conn.cursor()
+	architect = table_initialize['architect']
+	project = table_initialize['project']
+	testInvoice2 = Invoice(2, "02-02-2025", project)
+	add_invoice(testInvoice2, cur)
+	testTimeEntry2 = TimeEntry("01-01-2025 1:00:00", "01-01-2025 1:45:00", 45, 
+		project, architect, invoice_id=1)
+	testTimeEntry3 = TimeEntry("02-02-2025 12:00:00", "02-02-2025 1:00:00", 60, 
+		project, architect, invoice_id=2)
+	testTimeEntry4 = TimeEntry("03-03-2025 3:00:00", "03-03-2025 5:00:00", 120, 
+		project, architect, invoice_id=None)
+	add_time_entry(testTimeEntry2, cur)
+	add_time_entry(testTimeEntry3, cur)
+	add_time_entry(testTimeEntry4, cur)
+	test_conn.commit()
+
+	testTimeEntries = load_invoice_time_entries(1, cur)
+	testTimeEntries2 = load_invoice_time_entries(None, cur)
+	#test if the returned number of tuples matches the number of TimeEntry objects with the same invoice_id
+	assert len(testTimeEntries) == 2
+	assert len(testTimeEntries2) == 1
+
+	#test if all the columns were correctly loaded into the tuples in the correct order
+	assert testTimeEntries[0][0] == 1
+	assert testTimeEntries[0][1] == "01-01-2025 12:00:00"
+	assert testTimeEntries[0][2] == 30
+	assert testTimeEntries[0][3] == 1
+	assert testTimeEntries[0][4] == "Note"
+	assert testTimeEntries[1][0] == 2
+	assert testTimeEntries[1][1] == "01-01-2025 1:00:00"
+	assert testTimeEntries[1][2] == 45
+	assert testTimeEntries[1][3] == 1
+	assert testTimeEntries[1][4] == None
 
 #Test if the load_all_time_entries function correctly loads all time entries from the table
 def test_load_all_time_entries(test_conn, table_initialize):

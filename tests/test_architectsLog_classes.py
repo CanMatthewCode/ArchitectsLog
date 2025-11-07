@@ -52,7 +52,8 @@ def test_time_entry_initialization():
 
 	testArchitect = Architect("Name", "LicenseNumber01", "123-456-7890", "email@domain.com", "MyCompany")
 	testProject = Project("NewProject", "NewClient", "123ClientStreet", "01-01-2025")
-	testTimeEntry = TimeEntry(start_time, end_time, duration, testProject, testArchitect)
+	testTimeEntry = TimeEntry(start_time, end_time, duration, testProject, testArchitect, 
+		notes = "Note", invoice_id = 1)
 
 	assert testTimeEntry.start_time == start_time
 	assert testTimeEntry.end_time == end_time
@@ -60,6 +61,6 @@ def test_time_entry_initialization():
 	assert testTimeEntry.project == testProject
 	assert testTimeEntry.architect == testArchitect
 	assert testTimeEntry.phase_id == 1
-	assert testTimeEntry.notes == None
-	assert testTimeEntry.invoice_id == None
+	assert testTimeEntry.notes == "Note"
+	assert testTimeEntry.invoice_id == 1
 	assert testTimeEntry.time_entry_id == None

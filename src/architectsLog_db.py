@@ -180,7 +180,7 @@ def add_invoice(invoice: Invoice, cur: sqlite3.Cursor) -> int:
 def add_time_entry(time_entry: TimeEntry, cur: sqlite3.Cursor) -> int:
 	"""Add a TimeEntry object to the time_entries table, return newly added time_entry_id"""
 	sql = "INSERT INTO time_entries (project_id, architect_id, phase_id, start_time, \
-		end_time, duration_minutes, invoice_id, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+		end_time, duration_minutes, notes, invoice_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
 	project_id = time_entry.project.project_id if time_entry.project else None
 	time_entry_values = (project_id, time_entry.architect.architect_id,
 		time_entry.phase_id, time_entry.start_time, time_entry.end_time,
@@ -303,6 +303,25 @@ def load_all_architect_time_entries(architect_id: int,
 		FROM time_entries LEFT JOIN projects ON time_entries.project_id = \
 		projects.project_id WHERE architect_id = ? ORDER BY start_time ASC"
 	cur.execute(sql, (architect_id,))
+	time_entries_list = cur.fetchall()
+
+	return time_entries_list
+
+def load_invoice_time_entries(invoice_id: int | None, 
+	cur: sqlite3.Cursor) -> list[tuple[int, str, int, int, str]]:
+	"""Load all time_entries from time_entries table with same invoice_id, 
+	returns a list of tuples containing time_entry_id, start_time, 
+	duration_minutes, project_id, notes. Passing in None returns all 
+	unaffiliated time_entries ordered by project_id"""
+	if invoice_id is None:
+		sql = "SELECT time_entry_id, start_time, duration_minutes, project_id, notes \
+		FROM time_entries WHERE invoice_id is Null \
+		ORDER BY project_id ASC, start_time ASC"
+		cur.execute(sql)
+	else:
+		sql = "SELECT time_entry_id, start_time, duration_minutes, project_id, notes \
+		FROM time_entries WHERE invoice_id = ? ORDER BY start_time ASC"
+		cur.execute(sql, (invoice_id,))
 	time_entries_list = cur.fetchall()
 
 	return time_entries_list

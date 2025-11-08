@@ -8,10 +8,10 @@ from architectsLog_db import get_connection, create_architect_table, create_proj
  create_phases_table, create_invoices_table, create_time_entries_table, add_architect, \
  initialize_phases, add_project, add_invoice, add_time_entry, load_all_active_architects, \
  load_all_architects, load_architect, load_all_active_projects, load_all_projects, \
- load_project, load_invoice, load_project_invoices, load_time_entry, \
- load_all_project_time_entries, load_all_architect_time_entries, load_invoice_time_entries, \
- load_all_time_entries, load_nonproject_phases_time_entries, update_architect, \
- update_project, update_invoice, update_time_entry
+ load_project, load_invoice, load_project_invoices, load_status_invoices, load_all_invoices, \
+ load_time_entry, load_all_project_time_entries, load_all_architect_time_entries, \
+ load_invoice_time_entries, load_all_time_entries, load_nonproject_phases_time_entries, \
+ update_architect, update_project, update_invoice, update_time_entry
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry
 
@@ -659,6 +659,80 @@ def test_load_project_invoices(test_conn, table_initialize):
 	assert testInvoices[2][1] == 2
 	assert testInvoices[2][2] == "02-02-2025"
 	assert testInvoices[2][3] == "draft"
+
+def test_load_status_invoices(test_conn, table_initialize):
+	"""Test that all invoices associated with a status are returned as a list of tuples 
+	containing invoice_id, invoice_number, created_date, project_name"""
+	cur = test_conn.cursor()
+	project = table_initialize['project']
+	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", "02-02-2025")
+	add_project(second_project, cur)
+	testInvoice2 = Invoice(2, "02-02-2025", project)
+	testInvoice3 = Invoice(3, "03-03-2025", project, status = "billed")
+	testInvoice4 = Invoice(4, "04-04-2025", second_project, status = "billed")
+	add_invoice(testInvoice2, cur)
+	add_invoice(testInvoice3, cur)
+	add_invoice(testInvoice4, cur)
+	test_conn.commit()
+	testDraftInvoices = load_status_invoices("draft", cur)
+	testBilledInvoices = load_status_invoices("billed", cur)
+
+	#test if the returned number of invoices matches the number in the invoices table
+	assert len(testDraftInvoices) == 2
+	assert len(testBilledInvoices) == 2
+
+	#test if all columns were correctly loaded into the tuples in the correct order
+	assert testDraftInvoices[0][0] == 1
+	assert testDraftInvoices[0][1] == 1
+	assert testDraftInvoices[0][2] == "01-01-2025"
+	assert testDraftInvoices[0][3] == "NewProject"
+	assert testBilledInvoices[0][0] == 3
+	assert testBilledInvoices[0][1] == 3
+	assert testBilledInvoices[0][2] == "03-03-2025"
+	assert testBilledInvoices[0][3] == "NewProject"
+	assert testBilledInvoices[1][0] == 4
+	assert testBilledInvoices[1][1] == 4
+	assert testBilledInvoices[1][2] == "04-04-2025"
+	assert testBilledInvoices[1][3] == "NewProject2"
+
+def test_load_status_invoices_invalid_column(test_conn, table_initialize):
+	"""Test to see if inputting an invalid invoice status throws an exception"""
+	cur = test_conn.cursor()
+
+	with pytest.raises(ValueError, match='Invalid status'):
+		load_status_invoices("invalid", cur)
+
+def test_load_all_invoices(test_conn, table_initialize):
+	"""Test that all invoices were loaded into a list of tuples containing invoice_id, 
+	project name, created date, invoice number, status and ordered by project name, 
+	invoice status, then creation date"""
+	cur = test_conn.cursor()
+	project = table_initialize['project']
+	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", "02-02-2025")
+	add_project(second_project, cur)
+	testInvoice2 = Invoice(2, "02-02-2025", project, status = "paid")
+	testInvoice3 = Invoice(3, "03-03-2025", second_project, status = "billed")
+	testInvoice4 = Invoice(4, "04-04-2025", second_project, status = "paid")
+	add_invoice(testInvoice2, cur)
+	add_invoice(testInvoice3, cur)
+	add_invoice(testInvoice4, cur)
+	test_conn.commit()
+	testInvoices = load_all_invoices(cur)
+
+	#test if the returned number of invoices match the number in the invoices table
+	assert len(testInvoices) == 4
+
+	#test if all columns were correctly loaded into the tuples in the correct order
+	assert testInvoices[0][0] == 1
+	assert testInvoices[0][1] == "NewProject"
+	assert testInvoices[0][2] == "01-01-2025"
+	assert testInvoices[0][3] == 1
+	assert testInvoices[0][4] == "draft"
+	assert testInvoices[3][0] == 4
+	assert testInvoices[3][1] == "NewProject2"
+	assert testInvoices[3][2] == "04-04-2025"
+	assert testInvoices[3][3] == 4
+	assert testInvoices[3][4] == "paid"
 
 
 #Test if the load_time_entry function correctly loads a TimeEntry object from the time_entry table

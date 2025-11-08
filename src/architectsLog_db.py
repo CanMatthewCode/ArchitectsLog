@@ -5,7 +5,8 @@ import os
 from contextlib import contextmanager
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry
 from architectsLog_constants import PHASES, UPDATABLE_ARCHITECTS_COLUMNS, \
-	UPDATABLE_PROJECTS_COLUMNS, UPDATABLE_INVOICES_COLUMNS, UPDATABLE_TIME_ENTRIES_COLUMNS
+	UPDATABLE_PROJECTS_COLUMNS, UPDATABLE_INVOICES_COLUMNS, UPDATABLE_TIME_ENTRIES_COLUMNS, \
+	ARCHITECT_STATUSES, INVOICE_STATUSES, PROJECT_STATUSES
 
 DB_FILE = 'architectsLog.db'
 
@@ -268,12 +269,39 @@ def load_invoice(invoice_id: int, cur: sqlite3.Cursor) -> Invoice:
 
 	return loaded_invoice
 
-def load_project_invoices(project_id: int, cur: sqlite3.Cursor) -> list[tuple[int, str]]:
+def load_project_invoices(project_id: int, 
+	cur: sqlite3.Cursor) -> list[tuple[int, int, str, str]]:
 	"""Load all rows in the invoices table associated with a project_id, return
 	list of tuples containing invoice_id, invoice_number, created_date, status"""
 	sql = "SELECT invoice_id, invoice_number, created_date, status FROM invoices \
 		WHERE project_id = ? ORDER BY status ASC, created_date ASC"
 	cur.execute(sql, (project_id,))
+	loaded_invoices = cur.fetchall()
+
+	return loaded_invoices
+
+def load_status_invoices(invoice_status: str, 
+	cur: sqlite3.Cursor) -> list[tuple[int, int, str, str]]:
+	"""Load all rows in the invoices table associated with an invoice status, return
+	list of tuples containing invoice_id, invoice_number, created_date, project_name"""
+	if invoice_status not in INVOICE_STATUSES:
+		raise ValueError(f"Invalid status: {invoice_status}")
+	sql = "SELECT invoice_id, invoice_number, created_date, projects.project_name \
+		FROM invoices INNER JOIN projects ON invoices.project_id = projects.project_id \
+		WHERE invoices.status = ? ORDER BY project_name ASC, created_date ASC"
+	cur.execute(sql, (invoice_status,))
+	loaded_invoices = cur.fetchall()
+
+	return loaded_invoices
+
+def load_all_invoices(cur: sqlite3.Cursor) -> list[tuple[int, str, str, int, str]]:
+	"""Load all invoice rows from the invoice table and return them as a list of 
+	tuples containing invoice_id, project name, created date, invoice number, status"""
+	sql = "SELECT invoice_id, projects.project_name, created_date, invoice_number, \
+		invoices.status FROM invoices INNER JOIN projects \
+		ON invoices.project_id = projects.project_id \
+		ORDER BY project_name ASC, invoices.status ASC, created_date ASC"
+	cur.execute(sql)
 	loaded_invoices = cur.fetchall()
 
 	return loaded_invoices

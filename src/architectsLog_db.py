@@ -107,7 +107,8 @@ def create_time_entries_table(cur: sqlite3.Cursor) -> None:
 			FOREIGN KEY (project_id) REFERENCES projects (project_id),
 			FOREIGN KEY (architect_id) REFERENCES architects (architect_id),
 			FOREIGN KEY (phase_id) REFERENCES phases (phase_id),
-			FOREIGN KEY (invoice_id) REFERENCES invoices (invoice_id)
+			FOREIGN KEY (invoice_id) REFERENCES invoices (invoice_id) 
+				ON DELETE SET NULL
 		)
 	''')
 
@@ -470,3 +471,17 @@ def update_time_entry(column_name: str, time_entry: TimeEntry, value: int | str,
 	setattr(time_entry, column_name, value)
 
 	return time_entry
+
+
+#	~~~TABLE DELETE FUNCTIONS~~~
+
+def delete_invoice(invoice_id: int, cur: sqlite3.Cursor) -> None:
+	"""Permenently delete an invoice row from the invoices table"""
+	sql = "DELETE FROM invoices WHERE invoice_id = ?"
+	cur.execute(sql, (invoice_id,))
+
+
+def delete_time_entry(time_entry_id: int, cur: sqlite3.Cursor) -> None:
+	"""Permenently delete a time_entry row from the time_entries table"""
+	sql = "DELETE FROM time_entries WHERE time_entry_id = ?"
+	cur.execute(sql, (time_entry_id,))

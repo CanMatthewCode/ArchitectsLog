@@ -11,7 +11,9 @@ from architectsLog_db import get_connection, create_architect_table, create_proj
  load_project, load_invoice, load_project_invoices, load_status_invoices, load_all_invoices, \
  load_time_entry, load_all_project_time_entries, load_all_architect_time_entries, \
  load_invoice_time_entries, load_all_time_entries, load_nonproject_phases_time_entries, \
- update_architect, update_project, update_invoice, update_time_entry
+ update_architect, update_project, update_invoice, update_time_entry, \
+ delete_invoice, delete_time_entry
+
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry
 
@@ -1143,3 +1145,62 @@ def test_update_time_entry_invalid_column(test_conn, table_initialize):
 
 	with pytest.raises(ValueError, match='Invalid column'):
 		update_time_entry('invalid_column', time_entry, 'value', cur)
+
+
+
+#	~~~DELETE FUNCTIONS TESTS~~~
+
+#Test if the delete_invoice function deletes the correct row from the invoices table
+def test_delete_invoice(test_conn, table_initialize):
+	"""Test to see if the delete_invoice function deletes the correct row"""
+	cur = test_conn.cursor()
+	project = table_initialize['project']
+	testInvoice2 = Invoice(2, "02-02-2025", project, status = "paid")
+	add_invoice(testInvoice2, cur)
+	test_conn.commit()
+	pre_delete_invoices = load_all_invoices(cur)
+
+	#test to see if there are 2 invoices to start
+	assert len(pre_delete_invoices) == 2
+
+	#test delete_invoice function
+	delete_invoice(1, cur)
+	test_conn.commit()
+	post_delete_invoices = load_all_invoices(cur)
+	assert len(post_delete_invoices) == 1
+
+	#test the correct invoice was deleted
+	assert post_delete_invoices[0][0] == 2
+	assert post_delete_invoices[0][1] == "NewProject"
+	assert post_delete_invoices[0][2] == "02-02-2025"
+	assert post_delete_invoices[0][3] == 2
+	assert post_delete_invoices[0][4] == "paid"
+
+
+#Test if the delete_time_entry function deletes the correct row from the time_entry table
+def test_delete_time_entry(test_conn, table_initialize):
+	"""Test to see if the delete_time_entry function deletes the correct row"""
+	cur = test_conn.cursor()
+	architect = table_initialize['architect']
+	project = table_initialize['project']
+	testTimeEntry2 = TimeEntry("01-01-2025 1:00:00", "01-01-2025 1:45:00", 45, project, 
+		architect, phase_id = 8)
+	add_time_entry(testTimeEntry2, cur)
+	test_conn.commit()
+	pre_delete_time_entries = load_all_time_entries(cur)
+
+	#test to see if there are 2 time_entries to start
+	assert len(pre_delete_time_entries) == 2
+
+	#test delete_time_entries function
+	delete_time_entry(1, cur)
+	test_conn.commit()
+	post_delete_time_entries = load_all_time_entries(cur)
+	assert len(post_delete_time_entries) == 1
+
+	#test the correct time_entry was deleted
+	assert post_delete_time_entries[0][0] == 2
+	assert post_delete_time_entries[0][1] == "01-01-2025 1:00:00"
+	assert post_delete_time_entries[0][2] == 45
+	assert post_delete_time_entries[0][3] == "NewProject"
+	assert post_delete_time_entries[0][4] == "Name"

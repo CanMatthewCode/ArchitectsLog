@@ -8,7 +8,8 @@ from architectsLog_constants import PHASES, UPDATABLE_ARCHITECTS_COLUMNS, \
 	UPDATABLE_PROJECTS_COLUMNS, UPDATABLE_INVOICES_COLUMNS, UPDATABLE_TIME_ENTRIES_COLUMNS, \
 	ARCHITECT_STATUSES, INVOICE_STATUSES, PROJECT_STATUSES
 
-DB_FILE = 'architectsLog.db'
+basedir = os.path.dirname(os.path.abspath(__file__))
+DB_FILE = os.path.join(basedir, 'architectsLog.db')
 
 #database connection function for testing
 def get_connection(db_file: str | None = None) -> sqlite3.Connection:
@@ -111,6 +112,23 @@ def create_time_entries_table(cur: sqlite3.Cursor) -> None:
 				ON DELETE SET NULL
 		)
 	''')
+
+
+
+#	~~~TABLE INITIALIZE FUNCTION~~~
+
+def sqltable_initialize() -> None:
+	"""Creates all needed tables for architects database on initial program boot up
+	initializes phases table to store possible project phases"""
+	with get_db_connection() as conn:
+		cur = conn.cursor()
+		create_architect_table(cur)
+		create_project_table(cur)
+		create_phases_table(cur)
+		create_invoices_table(cur)
+		create_time_entries_table(cur)
+		initialize_phases(cur)
+
 
 
 #	~~~TABLE INSERTION FUNCTIONS~~~

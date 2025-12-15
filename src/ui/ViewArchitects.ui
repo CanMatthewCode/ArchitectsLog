@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ViewArchitectsWindow</class>
+ <widget class="QWidget" name="ViewArchitectsWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>830</width>
+    <height>450</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>830</width>
+    <height>450</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget{
+	background-color: #1E2E34;
+}</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="MainTitle">
+     <property name="minimumSize">
+      <size>
+       <width>550</width>
+       <height>60</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>48</pointsize>
+       <bold>true</bold>
+       <underline>true</underline>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QLabel{
+	color: #008080;
+}</string>
+     </property>
+     <property name="text">
+      <string>Architects</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item alignment="Qt::AlignmentFlag::AlignRight">
+    <widget class="QCheckBox" name="hideArchitectCheckBox">
+     <property name="styleSheet">
+      <string notr="true">QCheckBox{
+	color: #35B5AC;
+}</string>
+     </property>
+     <property name="text">
+      <string>Hide Inactive</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTableView" name="architectsTableView">
+     <property name="styleSheet">
+      <string notr="true">QTableView{
+	color: #89D5D2;
+}</string>
+     </property>
+     <property name="alternatingRowColors">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

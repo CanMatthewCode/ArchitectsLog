@@ -493,7 +493,7 @@ QPushButton:pressed {
       <item>
        <layout class="QHBoxLayout" name="logs_layout">
         <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
-         <widget class="QPushButton" name="ArchitectLogsBtn">
+         <widget class="QPushButton" name="ViewArchitectsBtn">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -551,7 +551,7 @@ QPushButton:pressed {
          </widget>
         </item>
         <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
-         <widget class="QPushButton" name="ProjectLogsBtn">
+         <widget class="QPushButton" name="ViewProjectsBtn">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -609,7 +609,7 @@ QPushButton:pressed {
          </widget>
         </item>
         <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
-         <widget class="QPushButton" name="TimeLogsBtn">
+         <widget class="QPushButton" name="ViewTimeLogsBtn">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -667,7 +667,7 @@ QPushButton:pressed {
          </widget>
         </item>
         <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
-         <widget class="QPushButton" name="InvoiceLogsBtn">
+         <widget class="QPushButton" name="ViewInvoiceLogsBtn">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>0</horstretch>

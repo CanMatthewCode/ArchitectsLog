@@ -13,12 +13,12 @@ PHASES = {
 	9: "Administration"
 	}
 
-#Possible architect statuses
-ARCHITECT_STATUSES = ('active', 'inactive')
+#Possible statuses
+ARCHITECT_STATUSES = ('Active', 'Inactive')
 
-PROJECT_STATUSES = ('active', 'completed')
+PROJECT_STATUSES = ('Active', 'Completed')
 
-INVOICE_STATUSES = ('draft', 'billed', 'paid')
+INVOICE_STATUSES = ('Draft', 'Billed', 'Paid')
 
 #tuples of all updatable columns per table
 UPDATABLE_ARCHITECTS_COLUMNS = (

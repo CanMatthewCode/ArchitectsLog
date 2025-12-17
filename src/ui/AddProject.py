@@ -200,7 +200,7 @@ class Ui_AddProjectDialog(object):
         self.MainTitle.setText(QCoreApplication.translate("AddProjectDialog", u"Add Project", None))
         self.projectName.setText(QCoreApplication.translate("AddProjectDialog", u"Project Name:", None))
         self.client.setText(QCoreApplication.translate("AddProjectDialog", u"Client Name:", None))
-        self.projectAddress.setText(QCoreApplication.translate("AddProjectDialog", u"Address:", None))
+        self.projectAddress.setText(QCoreApplication.translate("AddProjectDialog", u"Project Address:", None))
         self.startDate.setText(QCoreApplication.translate("AddProjectDialog", u"Start Date:", None))
         self.projectStartDate.setDisplayFormat(QCoreApplication.translate("AddProjectDialog", u"MM/dd/yy", None))
         self.phase.setText(QCoreApplication.translate("AddProjectDialog", u"Phase:", None))

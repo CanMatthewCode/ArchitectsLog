@@ -121,7 +121,7 @@
 }</string>
          </property>
          <property name="text">
-          <string>Address:</string>
+          <string>Project Address:</string>
          </property>
         </widget>
        </item>

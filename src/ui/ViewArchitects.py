@@ -22,7 +22,7 @@ class Ui_ViewArchitectsWindow(object):
     def setupUi(self, ViewArchitectsWindow):
         if not ViewArchitectsWindow.objectName():
             ViewArchitectsWindow.setObjectName(u"ViewArchitectsWindow")
-        ViewArchitectsWindow.resize(830, 450)
+        ViewArchitectsWindow.resize(850, 450)
         ViewArchitectsWindow.setMinimumSize(QSize(830, 450))
         ViewArchitectsWindow.setStyleSheet(u"QWidget{\n"
 "	background-color: #1E2E34;\n"
@@ -54,6 +54,7 @@ class Ui_ViewArchitectsWindow(object):
 
         self.architectsTableView = QTableView(ViewArchitectsWindow)
         self.architectsTableView.setObjectName(u"architectsTableView")
+        self.architectsTableView.setMinimumSize(QSize(850, 0))
         self.architectsTableView.setStyleSheet(u"QTableView{\n"
 "	color: #89D5D2;\n"
 "}")

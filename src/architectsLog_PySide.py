@@ -3,19 +3,20 @@
 import sys
 import os
 import re
+from datetime import datetime
 
 from PySide6.QtWidgets import (QMainWindow, QApplication, QDialog, QMessageBox,
-	QStyledItemDelegate, QComboBox, QWidget)
+	QStyledItemDelegate, QComboBox, QWidget, QLCDNumber)
 from PySide6.QtSql import (QSqlDatabase, QSqlTableModel, QSqlRelationalTableModel, 
 	QSqlRelation, QSqlRelationalDelegate)
-from PySide6.QtCore import Qt, QDate, QModelIndex, QTimer
+from PySide6.QtCore import Qt, QDate, QModelIndex, QTimer, QTime
 
 from ui.MainWindow import Ui_MainWindow
 from ui.AddArchitect import Ui_AddArchitectDialog
 from ui.AddProject import Ui_AddProjectDialog
 from ui.ViewArchitects import Ui_ViewArchitectsWindow
 from ui.ViewProjects import Ui_ViewProjectsWindow
-from ui.TimeLogger import Ui_TimeLoggerWindow
+from ui.ViewTimeEntries import Ui_ViewTimeEntries
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry 
 from architectsLog_constants import	(PHASES, ARCHITECT_STATUSES, PROJECT_STATUSES, 
@@ -65,9 +66,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.ViewArchitectsBtn.clicked.connect(self.viewArchitects)
 		self.ViewProjectsBtn.clicked.connect(self.viewProjects)
 		self.LogTimeBtn.clicked.connect(self.logTime)
-
-		# attribute to store the time logger class instance for persistancy
-		self.time_logger = None
 
 		self.show()
 
@@ -132,6 +130,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		"""Method to activate TimeLogger window and store resulting 
 		TimeEntry object in time_entries database"""
 		self.log_time = TimeLogger(self)
+		self.showMinimized()
 
 
 		
@@ -446,6 +445,25 @@ class ViewProjects(QWidget, Ui_ViewProjectsWindow):
 			self.projectsTableView.setColumnHidden(status_column, hide_status)
 
 
+class TimerDisplay(QLCDNumber):
+	def __init__(self, parent = None):
+		super().__init__(parent)
+
+		QTimer.singleShot(0, lambda: self.display("   00:00"))
+		self.timer = QTimer()
+		self.timer.setInterval(1000)
+		self.timer.timeout.connect(self.update_lcd)
+		self.timer.start()
+
+	def update_lcd(self):
+		elapsed_time = self.parent().time_log.elapsed_time()
+		qt_time = QTime(0, 0, 0).addSecs(int(elapsed_time))
+		self.display(qt_time.toString("   hh:mm"))
+
+# Import ui.TimeLogger after TimerDisplay to stop circular import
+from ui.TimeLogger import Ui_TimeLoggerWindow
+
+
 class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 	def __init__(self, main_window) -> None:
 		super(TimeLogger, self).__init__()
@@ -475,9 +493,57 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 		self.PhaseComboBox.setModel(self.phase_model)
 		self.PhaseComboBox.setModelColumn(1)
 		setLinkedComboBox(self.main_window.PhasesComboBox, 
-			self.PhaseComboBox)			
+			self.PhaseComboBox)
+
+		# link buttons
+		self.startPauseTimer.clicked.connect(self.start_pause_time)
+		self.stopTimer.clicked.connect(self.stop_time)
+
+		self.time_log = TimeLog()
 
 		self.show()
+
+	def start_pause_time(self):
+		if self.time_log.timer_state == "inactive":
+			self.time_log.timer_state = "running"
+			self.time_log.start_time = datetime.now()
+			self.startPauseTimer.setText("PAUSE")
+			self.timer.setStyleSheet("QLCDNumber {color : #35B5AC;}")
+		elif self.time_log.timer_state == "running":
+			self.time_log.timer_state = "paused"
+			self.startPauseTimer.setText("RESUME")
+			self.time_log.pause_start_time = datetime.now()
+			self.timer.setStyleSheet("QLCDNumber {color : #008080;}")
+		else:
+			self.time_log.total_pause_duration += (datetime.now() - 
+				self.time_log.pause_start_time).total_seconds()
+			self.time_log.timer_state = "running"
+			self.startPauseTimer.setText("PAUSE")
+			self.time_log.pause_start_time = 0
+			self.timer.setStyleSheet("QLCDNumber {color : #35B5AC;}")
+
+	def stop_time(self):
+		self.main_window.showNormal()
+		self.close()
+
+class TimeLog():
+	def __init__(self):
+		self.timer_state = "inactive"
+		self.total_time = 0
+		self.start_time = 0
+		self.end_time = 0
+		self.pause_start_time = 0
+		self.total_pause_duration = 0
+
+	def elapsed_time(self):
+		if self.timer_state == "running":
+			self.total_time = ((datetime.now() - self.start_time).total_seconds()
+				- self.total_pause_duration)
+		elif self.timer_state == "paused":
+			self.total_time = ((self.pause_start_time - self.start_time).total_seconds()
+				- self.total_pause_duration)
+		return self.total_time
+
 
 
 class NoDeleteTableModel(QSqlTableModel):
@@ -487,7 +553,7 @@ class NoDeleteTableModel(QSqlTableModel):
 
 
 class StatusDelegate(QStyledItemDelegate):
-	"""Class to allow drop down ComboBoxes for areas where only a specific
+	"""Class to allow drop down ComboBoxes for table cells where only a specific
 	selection of values is allowed"""
 	def __init__(self, options, parent=None) -> None:
 		super().__init__(parent)

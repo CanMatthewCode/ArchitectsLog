@@ -51,7 +51,7 @@ def create_architect_table(cur: sqlite3.Cursor) -> None:
 			phone_number TEXT NOT NULL,
 			email TEXT NOT NULL UNIQUE,
 			company_name TEXT,
-			status TEXT DEFAULT 'active'
+			status TEXT DEFAULT 'Active'
 		)
 	''')
 
@@ -65,7 +65,7 @@ def create_project_table(cur: sqlite3.Cursor) -> None:
 			client_address TEXT NOT NULL UNIQUE,
 			start_date TEXT NOT NULL,
 			current_phase_id INTEGER NOT NULL,
-			status TEXT DEFAULT 'active',
+			status TEXT DEFAULT 'Active',
 			FOREIGN KEY (current_phase_id) REFERENCES phases (phase_id)
 		)
 	''')
@@ -87,7 +87,7 @@ def create_invoices_table(cur: sqlite3.Cursor) -> None:
 			project_id INTEGER NOT NULL,
 			created_date TEXT NOT NULL,
 			invoice_number INTEGER,
-			status TEXT DEFAULT 'draft',
+			status TEXT DEFAULT 'Draft',
 			FOREIGN KEY (project_id) REFERENCES projects (project_id)
 		)
 	''')

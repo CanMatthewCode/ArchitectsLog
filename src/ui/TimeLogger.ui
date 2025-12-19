@@ -19,8 +19,8 @@
 }</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <widget class="QLCDNumber" name="timer">
+   <item alignment="Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignVCenter">
+    <widget class="TimerDisplay" name="timer">
      <property name="minimumSize">
       <size>
        <width>400</width>
@@ -29,7 +29,7 @@
      </property>
      <property name="styleSheet">
       <string notr="true">QLCDNumber{
-	color: #35B5AC;
+	color: #008080;
 }</string>
      </property>
      <property name="frameShape">
@@ -99,7 +99,7 @@
       </spacer>
      </item>
      <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
-      <widget class="QPushButton" name="pushButton_3">
+      <widget class="QPushButton" name="startPauseTimer">
        <property name="minimumSize">
         <size>
          <width>80</width>
@@ -128,7 +128,7 @@ QPushButton:pressed {
       </widget>
      </item>
      <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="stopTimer">
        <property name="minimumSize">
         <size>
          <width>80</width>
@@ -160,6 +160,13 @@ QPushButton:pressed {
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>TimerDisplay</class>
+   <extends>QLCDNumber</extends>
+   <header>architectsLog_PySide</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

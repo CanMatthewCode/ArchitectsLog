@@ -50,7 +50,7 @@ class Ui_MainWindow(object):
         font.setUnderline(True)
         self.MainTitle.setFont(font)
         self.MainTitle.setStyleSheet(u"QLabel{\n"
-"	color: teal;\n"
+"	color: #008080;\n"
 "}")
         self.MainTitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
@@ -58,6 +58,10 @@ class Ui_MainWindow(object):
 
         self.project_button_layout = QHBoxLayout()
         self.project_button_layout.setObjectName(u"project_button_layout")
+        self.horizontalSpacer = QSpacerItem(70, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
+
+        self.project_button_layout.addItem(self.horizontalSpacer)
+
         self.architects_layout = QVBoxLayout()
         self.architects_layout.setObjectName(u"architects_layout")
         self.Architects = QLabel(self.centralwidget)
@@ -84,6 +88,10 @@ class Ui_MainWindow(object):
 
         self.architects_layout.addWidget(self.ArchitectsComboBox, 0, Qt.AlignmentFlag.AlignVCenter)
 
+        self.verticalSpacer = QSpacerItem(5, 5, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+
+        self.architects_layout.addItem(self.verticalSpacer)
+
         self.AddArchitectBtn = QPushButton(self.centralwidget)
         self.AddArchitectBtn.setObjectName(u"AddArchitectBtn")
         sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
@@ -91,7 +99,7 @@ class Ui_MainWindow(object):
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.AddArchitectBtn.sizePolicy().hasHeightForWidth())
         self.AddArchitectBtn.setSizePolicy(sizePolicy1)
-        self.AddArchitectBtn.setMinimumSize(QSize(200, 40))
+        self.AddArchitectBtn.setMinimumSize(QSize(180, 40))
         self.AddArchitectBtn.setMaximumSize(QSize(16777215, 16777215))
         font2 = QFont()
         font2.setPointSize(18)
@@ -117,6 +125,10 @@ class Ui_MainWindow(object):
 
         self.project_button_layout.addLayout(self.architects_layout)
 
+        self.horizontalSpacer_3 = QSpacerItem(30, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
+
+        self.project_button_layout.addItem(self.horizontalSpacer_3)
+
         self.projects_layout = QVBoxLayout()
         self.projects_layout.setObjectName(u"projects_layout")
         self.Projects = QLabel(self.centralwidget)
@@ -137,11 +149,15 @@ class Ui_MainWindow(object):
 
         self.projects_layout.addWidget(self.ProjectsComboBox, 0, Qt.AlignmentFlag.AlignVCenter)
 
+        self.verticalSpacer_2 = QSpacerItem(20, 5, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+
+        self.projects_layout.addItem(self.verticalSpacer_2)
+
         self.AddProjectBtn = QPushButton(self.centralwidget)
         self.AddProjectBtn.setObjectName(u"AddProjectBtn")
         sizePolicy1.setHeightForWidth(self.AddProjectBtn.sizePolicy().hasHeightForWidth())
         self.AddProjectBtn.setSizePolicy(sizePolicy1)
-        self.AddProjectBtn.setMinimumSize(QSize(200, 40))
+        self.AddProjectBtn.setMinimumSize(QSize(180, 40))
         self.AddProjectBtn.setMaximumSize(QSize(16777215, 16777215))
         self.AddProjectBtn.setFont(font2)
         self.AddProjectBtn.setStyleSheet(u"QPushButton{\n"
@@ -164,6 +180,10 @@ class Ui_MainWindow(object):
 
 
         self.project_button_layout.addLayout(self.projects_layout)
+
+        self.horizontalSpacer_4 = QSpacerItem(30, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
+
+        self.project_button_layout.addItem(self.horizontalSpacer_4)
 
         self.phases_layout = QVBoxLayout()
         self.phases_layout.setObjectName(u"phases_layout")
@@ -197,10 +217,14 @@ class Ui_MainWindow(object):
 
         self.project_button_layout.addLayout(self.phases_layout)
 
+        self.horizontalSpacer_2 = QSpacerItem(70, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
+
+        self.project_button_layout.addItem(self.horizontalSpacer_2)
+
 
         self.main_layout.addLayout(self.project_button_layout)
 
-        self.main_layout_spacer = QSpacerItem(10, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        self.main_layout_spacer = QSpacerItem(10, 25, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
 
         self.main_layout.addItem(self.main_layout_spacer)
 

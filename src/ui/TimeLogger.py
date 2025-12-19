@@ -19,6 +19,8 @@ from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QHBoxLayout,
     QLCDNumber, QPushButton, QSizePolicy, QSpacerItem,
     QVBoxLayout, QWidget)
 
+from architectsLog_PySide import TimerDisplay
+
 class Ui_TimeLoggerWindow(object):
     def setupUi(self, TimeLoggerWindow):
         if not TimeLoggerWindow.objectName():
@@ -29,11 +31,11 @@ class Ui_TimeLoggerWindow(object):
 "}")
         self.verticalLayout = QVBoxLayout(TimeLoggerWindow)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.timer = QLCDNumber(TimeLoggerWindow)
+        self.timer = TimerDisplay(TimeLoggerWindow)
         self.timer.setObjectName(u"timer")
         self.timer.setMinimumSize(QSize(400, 90))
         self.timer.setStyleSheet(u"QLCDNumber{\n"
-"	color: #35B5AC;\n"
+"	color: #008080;\n"
 "}")
         self.timer.setFrameShape(QFrame.Shape.Box)
         self.timer.setSmallDecimalPoint(False)
@@ -41,7 +43,7 @@ class Ui_TimeLoggerWindow(object):
         self.timer.setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
         self.timer.setProperty(u"intValue", 0)
 
-        self.verticalLayout.addWidget(self.timer)
+        self.verticalLayout.addWidget(self.timer, 0, Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
 
         self.input_values_layout = QHBoxLayout()
         self.input_values_layout.setObjectName(u"input_values_layout")
@@ -74,10 +76,10 @@ class Ui_TimeLoggerWindow(object):
 
         self.buttons_layout.addItem(self.horizontalSpacer)
 
-        self.pushButton_3 = QPushButton(TimeLoggerWindow)
-        self.pushButton_3.setObjectName(u"pushButton_3")
-        self.pushButton_3.setMinimumSize(QSize(80, 25))
-        self.pushButton_3.setStyleSheet(u"QPushButton{\n"
+        self.startPauseTimer = QPushButton(TimeLoggerWindow)
+        self.startPauseTimer.setObjectName(u"startPauseTimer")
+        self.startPauseTimer.setMinimumSize(QSize(80, 25))
+        self.startPauseTimer.setStyleSheet(u"QPushButton{\n"
 "	border-radius: 4px;\n"
 "	border: 1px solid black;\n"
 "	background-color: #35B5AC;\n"
@@ -92,12 +94,12 @@ class Ui_TimeLoggerWindow(object):
 "	background-color: #1F6B66;\n"
 "}")
 
-        self.buttons_layout.addWidget(self.pushButton_3, 0, Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignVCenter)
+        self.buttons_layout.addWidget(self.startPauseTimer, 0, Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignVCenter)
 
-        self.pushButton = QPushButton(TimeLoggerWindow)
-        self.pushButton.setObjectName(u"pushButton")
-        self.pushButton.setMinimumSize(QSize(80, 25))
-        self.pushButton.setStyleSheet(u"QPushButton{\n"
+        self.stopTimer = QPushButton(TimeLoggerWindow)
+        self.stopTimer.setObjectName(u"stopTimer")
+        self.stopTimer.setMinimumSize(QSize(80, 25))
+        self.stopTimer.setStyleSheet(u"QPushButton{\n"
 "	border-radius: 4px;\n"
 "	border: 1px solid black;\n"
 "	background-color: #35B5AC;\n"
@@ -112,7 +114,7 @@ class Ui_TimeLoggerWindow(object):
 "	background-color: #1F6B66;\n"
 "}")
 
-        self.buttons_layout.addWidget(self.pushButton, 0, Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignVCenter)
+        self.buttons_layout.addWidget(self.stopTimer, 0, Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignVCenter)
 
 
         self.verticalLayout.addLayout(self.buttons_layout)
@@ -125,7 +127,7 @@ class Ui_TimeLoggerWindow(object):
 
     def retranslateUi(self, TimeLoggerWindow):
         TimeLoggerWindow.setWindowTitle(QCoreApplication.translate("TimeLoggerWindow", u"Form", None))
-        self.pushButton_3.setText(QCoreApplication.translate("TimeLoggerWindow", u"START", None))
-        self.pushButton.setText(QCoreApplication.translate("TimeLoggerWindow", u"STOP", None))
+        self.startPauseTimer.setText(QCoreApplication.translate("TimeLoggerWindow", u"START", None))
+        self.stopTimer.setText(QCoreApplication.translate("TimeLoggerWindow", u"STOP", None))
     # retranslateUi
 

@@ -67,8 +67,8 @@ def table_initialize(test_conn):
 	invoice_id = add_invoice(testInvoice, cur)
 
 	#create a test time entry with testProject and testArchitect and add it to the time_entries table
-	testTimeEntry = TimeEntry("01-01-2025 12:00:00", "01-01-2025 12:30:00", 
-		30, testProject, testArchitect, notes= "Note", invoice_id= 1)
+	testTimeEntry = TimeEntry("01-01-2025 12:00:00", 30, testProject, testArchitect.architect_id,
+		notes= "Note", invoice_id= 1)
 	time_entry_id = add_time_entry(testTimeEntry, cur)
 
 	#commit and return the created objects as a dictionary 
@@ -310,7 +310,6 @@ def test_create_time_entries_table_names(table_info):
 	assert 'architect_id' in column_names
 	assert 'phase_id' in column_names
 	assert 'start_time' in column_names
-	assert 'end_time' in column_names
 	assert 'duration_minutes' in column_names
 	assert 'notes' in column_names
 	assert 'invoice_id' in column_names
@@ -325,7 +324,6 @@ def test_create_time_entries_table_types(table_info):
 	assert column_types['architect_id'] == 'INTEGER'
 	assert column_types['phase_id'] == 'INTEGER'
 	assert column_types['start_time'] == 'TEXT'
-	assert column_types['end_time'] == 'TEXT'
 	assert column_types['duration_minutes'] == 'INTEGER'
 	assert column_types['notes'] == 'TEXT'
 	assert column_types['invoice_id'] == 'INTEGER'
@@ -470,7 +468,6 @@ def test_add_time_entries(test_conn, table_initialize):
 	assert architect_id == table_initialize['architect'].architect_id
 	assert phase_id == table_initialize['project'].current_phase_id
 	assert start_time == "01-01-2025 12:00:00"
-	assert end_time == "01-01-2025 12:30:00"
 	assert duration_minutes == 30
 	assert notes == "Note"
 	assert invoice_id == 1
@@ -745,10 +742,9 @@ def test_load_time_entry(test_conn, table_initialize):
 
 	#test if all columns were correctly loaded into TimeEntry object
 	assert testTimeEntry.start_time == "01-01-2025 12:00:00"
-	assert testTimeEntry.end_time == "01-01-2025 12:30:00"
 	assert testTimeEntry.duration_minutes == 30
-	assert testTimeEntry.project.project_id == table_initialize['project'].project_id
-	assert testTimeEntry.architect.architect_id == table_initialize['architect'].architect_id
+	assert testTimeEntry.project_id == table_initialize['project'].project_id
+	assert testTimeEntry.architect_id == table_initialize['architect'].architect_id
 	assert testTimeEntry.phase_id == 1
 	assert testTimeEntry.notes == "Note"
 	assert testTimeEntry.invoice_id == 1
@@ -764,8 +760,10 @@ def test_load_all_project_time_entries(test_conn, table_initialize):
 	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", "02-02-2025")
 	add_project(second_project, cur)
 	test_conn.commit()
-	testTimeEntry2 = TimeEntry("01-01-2025 1:00:00", "01-01-2025 1:45:00", 45, project, architect)
-	testTimeEntry3 = TimeEntry("02-02-2025 12:00:00", "02-02-2025 1:00:00", 60, second_project, architect)
+	testTimeEntry2 = TimeEntry("01-01-2025 1:00:00", 45, project.project_id, 
+		architect.architect_id)
+	testTimeEntry3 = TimeEntry("02-02-2025 12:00:00", 60, second_project.project_id, 
+		architect.architect_id)
 	add_time_entry(testTimeEntry2, cur)
 	add_time_entry(testTimeEntry3, cur)
 	test_conn.commit()
@@ -799,8 +797,10 @@ def test_load_all_architect_time_entries(test_conn, table_initialize):
 	add_architect(second_architect, cur)
 	add_project(second_project, cur)
 	test_conn.commit()
-	testTimeEntry2 = TimeEntry("01-01-2025 1:00:00", "01-01-2025 1:45:00", 45, second_project, architect)
-	testTimeEntry3 = TimeEntry("02-02-2025 12:00:00", "02-02-2025 1:00:00", 60, project, second_architect)
+	testTimeEntry2 = TimeEntry("01-01-2025 1:00:00", 45, second_project.project_id, 
+		architect.architect_id)
+	testTimeEntry3 = TimeEntry("02-02-2025 12:00:00", 60, project.project_id, 
+		second_architect.architect_id)
 	add_time_entry(testTimeEntry2, cur)
 	add_time_entry(testTimeEntry3, cur)
 	test_conn.commit()
@@ -830,12 +830,12 @@ def test_load_invoice_time_entries(test_conn, table_initialize):
 	project = table_initialize['project']
 	testInvoice2 = Invoice(2, "02-02-2025", project)
 	add_invoice(testInvoice2, cur)
-	testTimeEntry2 = TimeEntry("01-01-2025 1:00:00", "01-01-2025 1:45:00", 45, 
-		project, architect, invoice_id=1)
-	testTimeEntry3 = TimeEntry("02-02-2025 12:00:00", "02-02-2025 1:00:00", 60, 
-		project, architect, invoice_id=2)
-	testTimeEntry4 = TimeEntry("03-03-2025 3:00:00", "03-03-2025 5:00:00", 120, 
-		project, architect, invoice_id=None)
+	testTimeEntry2 = TimeEntry("01-01-2025 1:00:00", 45, project.project_id, 
+		architect.architect_id, invoice_id=1)
+	testTimeEntry3 = TimeEntry("02-02-2025 12:00:00", 60, project.project_id, 
+		architect.architect_id, invoice_id=2)
+	testTimeEntry4 = TimeEntry("03-03-2025 3:00:00", 120, project.project_id, 
+		architect.architect_id, invoice_id=None)
 	add_time_entry(testTimeEntry2, cur)
 	add_time_entry(testTimeEntry3, cur)
 	add_time_entry(testTimeEntry4, cur)
@@ -866,15 +866,19 @@ def test_load_all_time_entries(test_conn, table_initialize):
 	cur = test_conn.cursor()
 	architect = table_initialize['architect']
 	project = table_initialize['project']
-	second_architect = Architect("Name 2", "LicenseNumber02", "987-654-3210", "email2@domain.com",
-		"Company 2")
-	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", "02-02-2025")
+	second_architect = Architect("Name 2", "LicenseNumber02", "987-654-3210", 
+		"email2@domain.com","Company 2")
+	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", 
+		"02-02-2025")
 	add_architect(second_architect, cur)
 	add_project(second_project, cur)
 	test_conn.commit()
-	testTimeEntry2 = TimeEntry("01-01-2025 1:00:00", "01-01-2025 1:45:00", 45, second_project, architect)
-	testTimeEntry3 = TimeEntry("02-02-2025 12:00:00", "02-02-2025 1:00:00", 60, project, second_architect)
-	testTimeEntry4 = TimeEntry("03-03-2025 3:00:00", "03-03-2025 5:00:00", 120, None, second_architect)
+	testTimeEntry2 = TimeEntry("01-01-2025 1:00:00", 45, second_project.project_id,
+		architect.architect_id)
+	testTimeEntry3 = TimeEntry("02-02-2025 12:00:00", 60, project.project_id, 
+		second_architect.architect_id)
+	testTimeEntry4 = TimeEntry("03-03-2025 3:00:00", 120, None, 
+		second_architect.architect_id)
 	add_time_entry(testTimeEntry2, cur)
 	add_time_entry(testTimeEntry3, cur)
 	add_time_entry(testTimeEntry4, cur)
@@ -913,12 +917,12 @@ def test_load_nonproject_phases_time_entries(test_conn, table_initialize):
 	architect_name, phase_id"""
 	cur = test_conn.cursor()
 	architect = table_initialize['architect']
-	testTimeEntry2 = TimeEntry("01-01-2025 1:00:00", "01-01-2025 1:45:00", 45, None, 
-		architect, phase_id = 8)
-	testTimeEntry3 = TimeEntry("02-02-2025 12:00:00", "02-02-2025 1:00:00", 60, None, 
-		architect, phase_id = 8)
-	testTimeEntry4 = TimeEntry("03-03-2025 3:00:00", "03-03-2025 5:00:00", 120, None, 
-		architect, phase_id = 9)
+	testTimeEntry2 = TimeEntry("01-01-2025 1:00:00", 45, None, architect.architect_id,
+		phase_id = 8)
+	testTimeEntry3 = TimeEntry("02-02-2025 12:00:00", 60, None, architect.architect_id, 
+		phase_id = 8)
+	testTimeEntry4 = TimeEntry("03-03-2025 3:00:00", 120, None, architect.architect_id, 
+		phase_id = 9)
 	add_time_entry(testTimeEntry2, cur)
 	add_time_entry(testTimeEntry3, cur)
 	add_time_entry(testTimeEntry4, cur)
@@ -1103,7 +1107,6 @@ def test_update_time_entry(test_conn, table_initialize):
 	time_entry = update_time_entry('architect_id', time_entry, 2, cur)
 	time_entry = update_time_entry('phase_id', time_entry, 2, cur)
 	time_entry = update_time_entry('start_time', time_entry, '02-02-2025 1:00:00', cur)
-	time_entry = update_time_entry('end_time', time_entry, '02-02-2025 2:00:00', cur)
 	time_entry = update_time_entry('duration_minutes', time_entry, 60, cur)
 	time_entry = update_time_entry('notes', time_entry, 'New Note', cur)
 	time_entry = update_time_entry('invoice_id', time_entry, 1, cur)
@@ -1122,14 +1125,12 @@ def test_update_time_entry(test_conn, table_initialize):
 	assert architect_id == 2
 	assert phase_id == 2
 	assert start_time == "02-02-2025 1:00:00"
-	assert end_time == "02-02-2025 2:00:00"
 	assert duration_minutes == 60
 	assert notes == "New Note"
 	assert invoice_id == 1
 
 	#test if all object attributes where correctly updated
 	assert time_entry.start_time == "02-02-2025 1:00:00"
-	assert time_entry.end_time == "02-02-2025 2:00:00"
 	assert time_entry.duration_minutes == 60
 	assert time_entry.project.project_id == 2
 	assert time_entry.architect.architect_id == 2
@@ -1183,8 +1184,8 @@ def test_delete_time_entry(test_conn, table_initialize):
 	cur = test_conn.cursor()
 	architect = table_initialize['architect']
 	project = table_initialize['project']
-	testTimeEntry2 = TimeEntry("01-01-2025 1:00:00", "01-01-2025 1:45:00", 45, project, 
-		architect, phase_id = 8)
+	testTimeEntry2 = TimeEntry("01-01-2025 1:00:00", 45, project.project_id, 
+		architect.architect_id, phase_id = 8)
 	add_time_entry(testTimeEntry2, cur)
 	test_conn.commit()
 	pre_delete_time_entries = load_all_time_entries(cur)

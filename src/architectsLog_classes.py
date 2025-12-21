@@ -38,15 +38,14 @@ class Invoice:
 
 
 class TimeEntry:
-	def __init__(self, start_time: str, end_time: str, duration_minutes: int, 
-		project: Project = None, architect: Architect = None, phase_id: int = 1, 
+	def __init__(self, start_time: str, duration_minutes: int, 
+		project_id: int = None, architect_id: int = None, phase_id: int = 1, 
 		notes: str = None, invoice_id: int = None, time_entry_id: int = None,) -> None:
 		self.start_time = start_time
-		self.end_time = end_time
 		self.duration_minutes = duration_minutes
-		self.project = project
-		self.architect = architect
-		self.phase_id = project.current_phase_id if project else phase_id
+		self.project_id = project_id
+		self.architect_id = architect_id
+		self.phase_id = phase_id
 		self.notes = notes
 		self.invoice_id = invoice_id
 		self.time_entry_id = time_entry_id

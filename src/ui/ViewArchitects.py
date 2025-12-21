@@ -54,6 +54,11 @@ class Ui_ViewArchitectsWindow(object):
 
         self.architectsTableView = QTableView(ViewArchitectsWindow)
         self.architectsTableView.setObjectName(u"architectsTableView")
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.architectsTableView.sizePolicy().hasHeightForWidth())
+        self.architectsTableView.setSizePolicy(sizePolicy)
         self.architectsTableView.setMinimumSize(QSize(850, 0))
         self.architectsTableView.setStyleSheet(u"QTableView{\n"
 "	color: #89D5D2;\n"

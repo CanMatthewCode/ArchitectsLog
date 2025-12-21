@@ -54,6 +54,11 @@ class Ui_ViewProjectsWindow(object):
 
         self.projectsTableView = QTableView(ViewProjectsWindow)
         self.projectsTableView.setObjectName(u"projectsTableView")
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.projectsTableView.sizePolicy().hasHeightForWidth())
+        self.projectsTableView.setSizePolicy(sizePolicy)
         self.projectsTableView.setMinimumSize(QSize(980, 0))
         self.projectsTableView.setStyleSheet(u"QTableView{\n"
 "	color: #89D5D2;\n"

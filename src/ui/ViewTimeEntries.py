@@ -22,7 +22,12 @@ class Ui_ViewTimeEntriesWindow(object):
     def setupUi(self, ViewTimeEntriesWindow):
         if not ViewTimeEntriesWindow.objectName():
             ViewTimeEntriesWindow.setObjectName(u"ViewTimeEntriesWindow")
-        ViewTimeEntriesWindow.resize(1000, 450)
+        ViewTimeEntriesWindow.resize(1124, 461)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(ViewTimeEntriesWindow.sizePolicy().hasHeightForWidth())
+        ViewTimeEntriesWindow.setSizePolicy(sizePolicy)
         ViewTimeEntriesWindow.setMinimumSize(QSize(1000, 450))
         ViewTimeEntriesWindow.setStyleSheet(u"QWidget{\n"
 "	background-color: #1E2E34;\n"
@@ -54,7 +59,12 @@ class Ui_ViewTimeEntriesWindow(object):
 
         self.timeEntriesTableView = QTableView(ViewTimeEntriesWindow)
         self.timeEntriesTableView.setObjectName(u"timeEntriesTableView")
-        self.timeEntriesTableView.setMinimumSize(QSize(980, 0))
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Expanding)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.timeEntriesTableView.sizePolicy().hasHeightForWidth())
+        self.timeEntriesTableView.setSizePolicy(sizePolicy1)
+        self.timeEntriesTableView.setMinimumSize(QSize(1100, 0))
         self.timeEntriesTableView.setStyleSheet(u"QTableView{\n"
 "	color: #89D5D2;\n"
 "}")

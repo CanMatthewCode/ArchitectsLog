@@ -5,7 +5,7 @@ from __future__ import annotations
 
 class Architect:
 	def __init__(self, name: str, license_number: str, phone_number: str, email: str,
-		company_name: str, status: str = "active", architect_id: int = None) -> None:
+		company_name: str, status: str = "Active", architect_id: int = None) -> None:
 		self.architect_id = architect_id
 		self.name = name
 		self.license_number = license_number
@@ -17,7 +17,7 @@ class Architect:
 
 class Project:
 	def __init__(self, project_name: str, client_name: str, client_address: str, start_date: str,
-		current_phase_id: int = 1, status: str = "active", project_id: int = None) -> None:
+		current_phase_id: int = 1, status: str = "Active", project_id: int = None) -> None:
 		self.project_name = project_name
 		self.client_name = client_name
 		self.client_address = client_address
@@ -29,7 +29,7 @@ class Project:
 
 class Invoice:
 	def __init__(self, invoice_number: int, created_date: str, project: Project = None,
-		status: str = "draft", invoice_id: int = None) -> None:
+		status: str = "Draft", invoice_id: int = None) -> None:
 		self.invoice_number = invoice_number
 		self.created_date = created_date
 		self.project = project

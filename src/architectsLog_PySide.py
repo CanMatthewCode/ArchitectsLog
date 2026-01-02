@@ -6,10 +6,11 @@ import re
 from datetime import datetime
 
 from PySide6.QtWidgets import (QMainWindow, QApplication, QDialog, QMessageBox,
-	QStyledItemDelegate, QComboBox, QWidget, QLCDNumber)
+	QStyledItemDelegate, QLineEdit, QComboBox, QWidget, QLCDNumber)
 from PySide6.QtSql import (QSqlDatabase, QSqlTableModel, QSqlRelationalTableModel, 
 	QSqlRelation, QSqlRelationalDelegate)
-from PySide6.QtCore import Qt, QDate, QModelIndex, QTimer, QTime
+from PySide6.QtCore import Qt, QDate, QModelIndex, QTimer, QTime, QRegularExpression
+from PySide6.QtGui import QRegularExpressionValidator
 
 from ui.MainWindow import Ui_MainWindow
 from ui.AddArchitect import Ui_AddArchitectDialog
@@ -18,6 +19,7 @@ from ui.ViewArchitects import Ui_ViewArchitectsWindow
 from ui.ViewProjects import Ui_ViewProjectsWindow
 from ui.ViewTimeEntries import Ui_ViewTimeEntriesWindow
 from ui.TimeNotes import Ui_TimeNotesDialog
+from ui.AddTimeEntry import Ui_AddTimeDialog
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry 
 from architectsLog_constants import	(PHASES, ARCHITECT_STATUSES, PROJECT_STATUSES, 
@@ -67,6 +69,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.AddArchitectBtn.clicked.connect(self.addArchitect)
 		self.AddProjectBtn.clicked.connect(self.addProject)
 		self.LogTimeBtn.clicked.connect(self.logTime)
+		self.AddTimeBtn.clicked.connect(self.addTime)
 		
 		self.ViewArchitectsBtn.clicked.connect(self.viewArchitects)
 		self.ViewProjectsBtn.clicked.connect(self.viewProjects)
@@ -138,7 +141,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			phase_id = model.data(model.index(phase_index, 0))
 			# Turn the QDate object into a string
 			start_date = proj_window.projectStartDate.date()
-			start_date_str = start_date.toString("MM-dd-yyyy")
+			start_date_str = start_date.toString("MM/dd/yyyy")
 			new_project = Project(project_name = proj_window.projectNameInput.text(),
 				client_name = proj_window.clientInput.text(),
 				client_address = proj_window.projectAddressInput.text(),
@@ -170,7 +173,50 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.log_time = TimeLogger(self)
 		self.showMinimized()
 
-		
+	def addTime(self) -> None:
+		"""Method to activate ManualTimeLogger window and input
+		manual information into the time_entries database"""
+		manual_log_time = ManualTimeLogger(self)
+		result = manual_log_time.exec()
+		if result == QDialog.Accepted:
+			# Get id's for architect, project, phase
+			arch_index = manual_log_time.ArchitectComboBox.currentIndex()
+			arch_model = manual_log_time.ArchitectComboBox.model()
+			arch_id = arch_model.data(arch_model.index(arch_index, 0))
+
+			proj_index = manual_log_time.ProjectComboBox.currentIndex()
+			proj_model = manual_log_time.ProjectComboBox.model()
+			proj_id = proj_model.data(proj_model.index(proj_index, 0))
+
+			phase_index = manual_log_time.PhaseComboBox.currentIndex()
+			phase_model = manual_log_time.PhaseComboBox.model()
+			phase_id = phase_model.data(phase_model.index(phase_index, 0))
+
+			# Get start date and time and concatenate into one string
+			start_date = manual_log_time.timeStartDate.date()
+			start_date_str = start_date.toString("MM/dd/yyyy")
+			start_time = manual_log_time.timeEdit.time()
+			start_time_str = start_time.toString("hh:mm A")
+			time_log_start_time = start_date_str + " " + start_time_str
+
+			# Check duration input and ensure it is in minutes and not hour:min format
+			duration = manual_log_time.durationLineEdit.text()
+			total_duration = 0
+			if ":" in duration:
+				hour_min_duration = duration.split(":")
+				hour, minute = hour_min_duration
+				total_duration = int(hour) * 60 + int(minute)
+			else:
+				total_duration = int(duration)
+
+			new_time_entry = TimeEntry(start_time = time_log_start_time,
+				duration_minutes = total_duration,
+				project_id = proj_id, architect_id = arch_id, phase_id = phase_id,
+				notes = manual_log_time.notesTextEdit.toPlainText())
+			with get_db_connection() as conn:
+				cur = conn.cursor()
+				add_time_entry(new_time_entry, cur)
+
 
 class ArchitectWindow(QDialog, Ui_AddArchitectDialog):
 	def __init__(self) -> None:
@@ -178,13 +224,23 @@ class ArchitectWindow(QDialog, Ui_AddArchitectDialog):
 		self.setupUi(self)
 		self.setFixedSize(self.size())
 
+		# set validators on phone and email patterns to sanitize user input
+		phone_regex = QRegularExpression(r'\(*(\d{3})\)*(\s|.)?(\d{3})(\s|.)?(\d{4})')
+		phone_validator = QRegularExpressionValidator(phone_regex, self.phoneInput)
+		self.phoneInput.setValidator(phone_validator)
+
+		email_regex = QRegularExpression(
+			r'^[a-zA-Z0-9_.+-]+@[a-zA-z0-9-]+\.[a-zA-Z0-9-.]+$')
+		email_validator = QRegularExpressionValidator(email_regex, self.emailInput)
+		self.emailInput.setValidator(email_validator)
+
 	def accept(self) -> None:
 		"""Method to verify all forms were entered with correct syntax; 
-		set phone to chosen (xxx) xxx.xxxx style"""
+		set phone to chosen (xxx) xxx-xxxx style"""
 		architect_name = self.architectNameInput.text()
 		license_number = self.licenseInput.text()
 
-		phone_pattern = re.compile(r'\(*(\d{3})\)*(\s|.)(\d{3})(\s|.)(\d{4})')
+		phone_pattern = re.compile(r'\(*(\d{3})\)*(\s|.)?(\d{3})(\s|.)?(\d{4})')
 		phone_result = phone_pattern.search(self.phoneInput.text())
 
 		email_pattern = re.compile(r'^[a-zA-Z0-9_.+-]+@[a-zA-z0-9-]+\.[a-zA-Z0-9-.]+$')
@@ -420,7 +476,7 @@ class ViewProjects(QWidget, Ui_ViewProjectsWindow):
 		self.projectsTableView.setColumnWidth(3, 320)
 		self.projectsTableView.setColumnWidth(4, 90)
 		self.projectsTableView.setColumnWidth(5, 180)
-		self.projectsTableView.setColumnWidth(6, 60)
+		self.projectsTableView.setColumnWidth(6, 80)
 
 		# set original sort by project name
 		index = self.model.fieldIndex("project_name")
@@ -462,11 +518,11 @@ class ViewProjects(QWidget, Ui_ViewProjectsWindow):
 			self.model.select()
 			self.projectsTableView.setColumnHidden(self.model.fieldIndex("status"), 
 				True)
-			self.projectsTableView.setColumnWidth(1, 165)
-			self.projectsTableView.setColumnWidth(2, 175)
-			self.projectsTableView.setColumnWidth(3, 335)
+			self.projectsTableView.setColumnWidth(1, 170)
+			self.projectsTableView.setColumnWidth(2, 180)
+			self.projectsTableView.setColumnWidth(3, 340)
 			self.projectsTableView.setColumnWidth(4, 90)
-			self.projectsTableView.setColumnWidth(5, 195)
+			self.projectsTableView.setColumnWidth(5, 202)
 
 		else:
 			self.model.setFilter("")
@@ -478,7 +534,7 @@ class ViewProjects(QWidget, Ui_ViewProjectsWindow):
 			self.projectsTableView.setColumnWidth(3, 320)
 			self.projectsTableView.setColumnWidth(4, 90)
 			self.projectsTableView.setColumnWidth(5, 180)
-			self.projectsTableView.setColumnWidth(6, 60)
+			self.projectsTableView.setColumnWidth(6, 80)
 
 		self.model.select()
 
@@ -497,7 +553,7 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 		self.setFixedSize(self.size())
 
 		# create a relational table model and set its relation to the phases table
-		self.model = QSqlRelationalTableModel()
+		self.model = TimeEntriesRelationalTableModel()
 		self.timeEntriesTableView.setModel(self.model)
 		self.model.setTable("time_entries")
 
@@ -515,16 +571,18 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 		arch_relation = QSqlRelation("architects", "architect_id", "name")
 		self.model.setRelation(self.model.fieldIndex("architect_id"), arch_relation)
 
-		#add relation between 'time_entries' table and 'projects' with dropdown menu
+		# add relation between 'time_entries' table and 'projects' with dropdown menu
 		project_relation = QSqlRelation("projects", "project_id", "project_name")
 		self.model.setRelation(self.model.fieldIndex("project_id"), project_relation)
 
-		#add relation between 'time_entries' table and 'invoices' with dropdown menu
-		#project_relation = QSqlRelation("invoices", "invoice_id", "invoice_number")
-		#self.model.setRelation(self.model.fieldIndex("invoice_id"), project_relation)
-
 		self.timeEntriesTableView.setItemDelegate(QSqlRelationalDelegate(
 			self.timeEntriesTableView))
+
+		# set duration delegate
+		duration_column_index = self.model.fieldIndex("duration_minutes")
+		self.timeEntriesTableView.setItemDelegateForColumn(
+			duration_column_index, DurationDelegate(
+				self.timeEntriesTableView))
 
 		# create and set column headers
 		column_titles = {
@@ -557,10 +615,10 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 		# set column widths
 		self.timeEntriesTableView.setColumnWidth(1, 140)
 		self.timeEntriesTableView.setColumnWidth(2, 140)
-		self.timeEntriesTableView.setColumnWidth(3, 150)
+		self.timeEntriesTableView.setColumnWidth(3, 180)
 		self.timeEntriesTableView.setColumnWidth(4, 152)
 		self.timeEntriesTableView.setColumnWidth(5, 80)
-		self.timeEntriesTableView.setColumnWidth(6, 595)
+		self.timeEntriesTableView.setColumnWidth(6, 565)
 		self.timeEntriesTableView.setColumnWidth(7, 100)
 
 		# click box activation
@@ -571,16 +629,16 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 	def hideInvoicedTimes(self, signal):
 		"""Filter out time log entries attached to an invoice"""
 		if signal == 2:
-			self.model.setFilter("invoice_id LIKE ''")
+			self.model.setFilter("invoice_id IS NULL")
 			self.model.select()
 			self.timeEntriesTableView.setColumnHidden(self.model.fieldIndex(
 				"invoice_id"), True)
 			self.timeEntriesTableView.setColumnWidth(1, 155)
 			self.timeEntriesTableView.setColumnWidth(2, 155)
-			self.timeEntriesTableView.setColumnWidth(3, 165)
+			self.timeEntriesTableView.setColumnWidth(3, 180)
 			self.timeEntriesTableView.setColumnWidth(4, 170)
 			self.timeEntriesTableView.setColumnWidth(5, 100)
-			self.timeEntriesTableView.setColumnWidth(6, 612)
+			self.timeEntriesTableView.setColumnWidth(6, 597)
 
 		else:
 			self.model.setFilter("")
@@ -589,10 +647,10 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 				"invoice_id"), False)
 			self.timeEntriesTableView.setColumnWidth(1, 140)
 			self.timeEntriesTableView.setColumnWidth(2, 140)
-			self.timeEntriesTableView.setColumnWidth(3, 150)
+			self.timeEntriesTableView.setColumnWidth(3, 180)
 			self.timeEntriesTableView.setColumnWidth(4, 152)
 			self.timeEntriesTableView.setColumnWidth(5, 80)
-			self.timeEntriesTableView.setColumnWidth(6, 595)
+			self.timeEntriesTableView.setColumnWidth(6, 565)
 			self.timeEntriesTableView.setColumnWidth(7, 100)
 
 		self.model.select()
@@ -717,10 +775,13 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 		phase_id = self.phase_model.data(self.phase_model.index(phase_index, 0))
 
 		time_notes = self.timeNotes.notesTextEdit.toPlainText()
+		total_minutes = total_time // 60
+		if total_time % 60 > 0:
+			total_minutes += 15
 
 		# Create TimeEntry object with created data
 		new_time_entry = TimeEntry(start_time = string_time, 
-			duration_minutes = total_time, project_id = proj_id, 
+			duration_minutes = total_minutes, project_id = proj_id, 
 			architect_id = arch_id, phase_id = phase_id, notes = time_notes)
 
 		with get_db_connection() as conn:
@@ -754,15 +815,182 @@ class TimeEntriesNotesWindow(QDialog, Ui_TimeNotesDialog):
 		self.setFixedSize(self.size())
 
 
+class ManualTimeLogger(QDialog, Ui_AddTimeDialog):
+	"""Class for a user to manually input a time entry with duration validation"""
+	def __init__(self, main_window) -> None:
+		super(ManualTimeLogger, self).__init__()
+		self.setupUi(self)
+		self.setFixedSize(self.size())
+		self.main_window = main_window
+		
+		# Set models
+		self.architect_model = QSqlTableModel()
+		self.architect_model.setTable("architects")
+		self.architect_model.select()
+		self.ArchitectComboBox.setModel(self.architect_model)
+		self.ArchitectComboBox.setModelColumn(1)				
+		setLinkedComboBox(self.main_window.ArchitectsComboBox,
+			self.ArchitectComboBox)
+
+		self.project_model = QSqlTableModel()
+		self.project_model.setTable("projects")
+		self.project_model.select()
+		self.ProjectComboBox.setModel(self.project_model)
+		self.ProjectComboBox.setModelColumn(1)					
+		setLinkedComboBox(self.main_window.ArchitectsComboBox,
+			self.ArchitectComboBox)
+		
+		self.phase_model = QSqlTableModel()
+		self.phase_model.setTable("phases")
+		self.phase_model.select()
+		self.PhaseComboBox.setModel(self.phase_model)
+		self.PhaseComboBox.setModelColumn(1)
+		setLinkedComboBox(self.main_window.PhasesComboBox, 
+			self.PhaseComboBox)
+		self.PhaseComboBox.currentIndexChanged.connect(self.phaseChanged)
+
+		# Set current date onto the calendar drop down
+		self.timeStartDate.setDate(QDate.currentDate())
+
+		# Set current time onto the time edit drop down
+		self.timeEdit.setTime(QTime.currentTime())
+
+		# Set validator on duration input
+		duration_regex = QRegularExpression(r"^(\d+)?(:\d{0,2})?$")
+		validator = QRegularExpressionValidator(duration_regex, self.durationLineEdit)
+		self.durationLineEdit.setValidator(validator)
+
+	def phaseChanged(self):
+		# Get current index and phase_id from phases combo box
+		phase_index = self.PhaseComboBox.currentIndex()
+		phase_id = self.phase_model.data(self.phase_model.index(phase_index, 0))
+
+		# Disable projects ComboBox if phase is Business Development or Administration
+		if phase_id in (8, 9):
+			self.ProjectComboBox.setEnabled(False)
+		else:
+			self.ProjectComboBox.setEnabled(True)
+
+	def accept(self) -> None:
+		"""Method to verify all forms were entered with correct syntax"""
+		duration_patter = re.compile(r"^(\d+)?(:\d{0,2})?$")
+		duration_result = duration_patter.search(self.durationLineEdit.text())
+		
+		if not duration_result:
+			QMessageBox.warning(self, "Invalid Time Duration", 
+				"Please Add Event Duration")
+			return
+
+		super().accept()
+
 class NoDeleteTableModel(QSqlTableModel):
-	"""Class to dissalow deletions of entire rows in table views"""
+	"""Class to dissalow deletions of entire rows in table views and to 
+	check for valid email address and phone number on user edit"""
 	def removeRows(self, row, count, parent=None) -> bool:
 		return False
 
+	def setData(self, index, value, role = Qt.EditRole):
+		# Get column database names to safetey desired column entries by user
+		field_name = self.record().fieldName(index.column())
+
+		# Check Phone Number and Email to make sure they are valid, re-format phone
+		if field_name == "phone_number":
+			if value:
+				phone_pattern = re.compile(
+					r'\(*(\d{3})\)*(\s|.)?(\d{3})(\s|.)?(\d{4})')
+				phone_result = phone_pattern.search(value)
+				if not phone_result: 
+					QMessageBox.warning(self, "Invalid Phone Number", 
+						"Invalid Phone Number, Please Correct")
+					return False
+				else:
+					value = phone_pattern.sub(r"(\g<1>) \g<3>-\g<5>", original_text)
+
+		if field_name == "email":
+			if value:
+				email_pattern = re.compile(
+					r'^[a-zA-Z0-9_.+-]+@[a-zA-z0-9-]+\.[a-zA-Z0-9-.]+$')
+				email_result = email_pattern.search(value)
+				if not email_result:
+					QMessageBox.warning(self, "Invalid Email", "Invalid Email, \
+						Please Correct")
+					return False
+
+		return super().setData(index, value, role)
+
+
 class NonDeletableRelationalTableModel(QSqlRelationalTableModel):
-	"""Class to dissalow deletions of entire rows in relational table views"""
+	"""Class to dissalow deletions of entire rows in relational table views 
+	and to check and reformat date on user edit"""
 	def removeRows(self, row, count, parent=None):
 		return False
+
+	def setData(self, index, value, role = Qt.EditRole):
+		# Get column database names to safetey desired column entries by user
+		field_name = self.record().fieldName(index.column())
+
+		# Check start date is a valid date and reformat to chosen syntax
+		if field_name == "start_date":
+			if value:
+				try:
+					for fmt in ['%m-%d-%Y', '%m/%d/%Y', '%d-%m-%Y', '%d/%m/%Y']:
+						try:
+							date_obj = datetime.strptime(value, fmt)
+							formatted_date = date_obj.strftime('%m/%d/%Y')
+							value = formatted_date
+							break
+						except ValueError:
+							continue
+					else:
+						QMessageBox.warning(self, "Invalid Date", "Invalid Date", 
+							"Invalid Date, Please Correct")
+						return False
+				except Exception:
+					QMessageBox.warning(self, "Invalid Date", "Invalid Date", 
+							"Invalid Date, Please Correct")
+					return False
+
+		return super().setData(index, value, role)
+
+class TimeEntriesRelationalTableModel(QSqlRelationalTableModel):
+	"""Class to make invoice_id column read only in ViewTimeEntries window,
+	display duration time in hour:minute format instead of total minutes,
+	and reformat user duration input from hour:min to total minutes"""
+	def flags(self, index):
+		# Get the default flags
+		default_flag = super().flags(index)
+		# If its invoice_id column remove the editable flag
+		if self.record().fieldName(index.column()) == "invoice_id":
+			return default_flag & ~Qt.ItemIsEditable
+
+		return default_flag
+
+	def data(self, index, role = Qt.DisplayRole):
+		# Get column database names to change display of time duration
+		if role != Qt.DisplayRole:
+			return super().data(index, role)
+
+		field_name = self.record().fieldName(index.column())
+		value = super().data(index, role)
+
+		if field_name == "duration_minutes" and value is not None:
+			hour = value // 60
+			minute = value % 60
+			value = f"{hour:02d}:{minute:02d}"
+		return value
+
+	def setData(self, index, value, role = Qt.EditRole):
+		# Reset a user's entered duration from xx:xx to just minutes
+		field_name = self.record().fieldName(index.column())
+		if field_name == "duration_minutes":
+			if isinstance (value, str) and ":" in value:
+				try:
+					hours, minutes = value.split(":")
+					value = int(hours) * 60 + int(minutes)
+				except ValueError:
+					return False
+
+		return super().setData(index, value, role)
 
 
 class StatusDelegate(QStyledItemDelegate):
@@ -789,6 +1017,17 @@ class StatusDelegate(QStyledItemDelegate):
 		# save the value back to the model
 		value = editor.currentText()
 		model.setData(index, value)
+
+class DurationDelegate(QStyledItemDelegate):
+	"""Class to validate manual time duration input by user to allow
+	total minutes or hour:minutes input"""
+	def createEditor(self, parent, options, index):
+		editor = QLineEdit(parent)
+		regex = QRegularExpression(r"^(\d+)?(:\d{0,2})?$")
+		validator = QRegularExpressionValidator(regex, editor)
+		editor.setValidator(validator)
+
+		return editor
 
 
 def setCrossComboBox(source_combo: QComboBox, target_combo: QComboBox, 

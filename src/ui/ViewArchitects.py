@@ -63,7 +63,7 @@ class Ui_ViewArchitectsWindow(object):
         self.architectsTableView.setStyleSheet(u"QTableView{\n"
 "	color: #89D5D2;\n"
 "}")
-        self.architectsTableView.setAlternatingRowColors(False)
+        self.architectsTableView.setAlternatingRowColors(True)
 
         self.verticalLayout.addWidget(self.architectsTableView)
 

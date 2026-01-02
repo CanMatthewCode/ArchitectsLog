@@ -97,10 +97,10 @@ class Ui_AddArchitectDialog(object):
 
         self.company_layout.addWidget(self.companyName)
 
-        self.companyNameInput = QLineEdit(AddArchitectDialog)
-        self.companyNameInput.setObjectName(u"companyNameInput")
+        self.companyInput = QLineEdit(AddArchitectDialog)
+        self.companyInput.setObjectName(u"companyInput")
 
-        self.company_layout.addWidget(self.companyNameInput)
+        self.company_layout.addWidget(self.companyInput)
 
 
         self.input_layout.addLayout(self.company_layout)

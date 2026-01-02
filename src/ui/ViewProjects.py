@@ -22,7 +22,7 @@ class Ui_ViewProjectsWindow(object):
     def setupUi(self, ViewProjectsWindow):
         if not ViewProjectsWindow.objectName():
             ViewProjectsWindow.setObjectName(u"ViewProjectsWindow")
-        ViewProjectsWindow.resize(1000, 450)
+        ViewProjectsWindow.resize(1034, 450)
         ViewProjectsWindow.setMinimumSize(QSize(1000, 450))
         ViewProjectsWindow.setStyleSheet(u"QWidget{\n"
 "	background-color: #1E2E34;\n"
@@ -59,11 +59,11 @@ class Ui_ViewProjectsWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.projectsTableView.sizePolicy().hasHeightForWidth())
         self.projectsTableView.setSizePolicy(sizePolicy)
-        self.projectsTableView.setMinimumSize(QSize(980, 0))
+        self.projectsTableView.setMinimumSize(QSize(1010, 0))
         self.projectsTableView.setStyleSheet(u"QTableView{\n"
 "	color: #89D5D2;\n"
 "}")
-        self.projectsTableView.setAlternatingRowColors(False)
+        self.projectsTableView.setAlternatingRowColors(True)
 
         self.verticalLayout.addWidget(self.projectsTableView)
 

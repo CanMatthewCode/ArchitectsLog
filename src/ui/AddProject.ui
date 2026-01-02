@@ -158,9 +158,9 @@
          </property>
          <property name="minimumDate">
           <date>
-           <year>2025</year>
-           <month>1</month>
-           <day>1</day>
+           <year>2024</year>
+           <month>12</month>
+           <day>31</day>
           </date>
          </property>
          <property name="currentSection">

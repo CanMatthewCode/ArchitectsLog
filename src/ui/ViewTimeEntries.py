@@ -68,7 +68,7 @@ class Ui_ViewTimeEntriesWindow(object):
         self.timeEntriesTableView.setStyleSheet(u"QTableView{\n"
 "	color: #89D5D2;\n"
 "}")
-        self.timeEntriesTableView.setAlternatingRowColors(False)
+        self.timeEntriesTableView.setAlternatingRowColors(True)
 
         self.verticalLayout.addWidget(self.timeEntriesTableView)
 

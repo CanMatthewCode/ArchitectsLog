@@ -126,7 +126,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="companyNameInput"/>
+        <widget class="QLineEdit" name="companyInput"/>
        </item>
       </layout>
      </item>

@@ -199,15 +199,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			start_time_str = start_time.toString("hh:mm A")
 			time_log_start_time = start_date_str + " " + start_time_str
 
-			# Check duration input and ensure it is in minutes and not hour:min format
+			# Get duration input and validate it with validation function
 			duration = manual_log_time.durationLineEdit.text()
-			total_duration = 0
-			if ":" in duration:
-				hour_min_duration = duration.split(":")
-				hour, minute = hour_min_duration
-				total_duration = int(hour) * 60 + int(minute)
-			else:
-				total_duration = int(duration)
+			total_duration = validate_duration(duration)
 
 			new_time_entry = TimeEntry(start_time = time_log_start_time,
 				duration_minutes = total_duration,
@@ -897,14 +891,14 @@ class NoDeleteTableModel(QSqlTableModel):
 		if field_name == "phone_number":
 			if value:
 				phone_pattern = re.compile(
-					r'\(*(\d{3})\)*(\s|.)?(\d{3})(\s|.)?(\d{4})')
+					r'\(*(\d{3})\)*(\s|.)?(\d{3})(\s|.)?(\d{4})$')
 				phone_result = phone_pattern.search(value)
 				if not phone_result: 
-					QMessageBox.warning(self, "Invalid Phone Number", 
+					QMessageBox.warning(None, "Invalid Phone Number", 
 						"Invalid Phone Number, Please Correct")
 					return False
 				else:
-					value = phone_pattern.sub(r"(\g<1>) \g<3>-\g<5>", original_text)
+					value = phone_pattern.sub(r"(\g<1>) \g<3>-\g<5>", value)
 
 		if field_name == "email":
 			if value:
@@ -912,7 +906,7 @@ class NoDeleteTableModel(QSqlTableModel):
 					r'^[a-zA-Z0-9_.+-]+@[a-zA-z0-9-]+\.[a-zA-Z0-9-.]+$')
 				email_result = email_pattern.search(value)
 				if not email_result:
-					QMessageBox.warning(self, "Invalid Email", "Invalid Email, \
+					QMessageBox.warning(None, "Invalid Email", "Invalid Email, \
 						Please Correct")
 					return False
 
@@ -942,11 +936,11 @@ class NonDeletableRelationalTableModel(QSqlRelationalTableModel):
 						except ValueError:
 							continue
 					else:
-						QMessageBox.warning(self, "Invalid Date", "Invalid Date", 
+						QMessageBox.warning(None, "Invalid Date", 
 							"Invalid Date, Please Correct")
 						return False
 				except Exception:
-					QMessageBox.warning(self, "Invalid Date", "Invalid Date", 
+					QMessageBox.warning(None, "Invalid Date", 
 							"Invalid Date, Please Correct")
 					return False
 
@@ -983,12 +977,10 @@ class TimeEntriesRelationalTableModel(QSqlRelationalTableModel):
 		# Reset a user's entered duration from xx:xx to just minutes
 		field_name = self.record().fieldName(index.column())
 		if field_name == "duration_minutes":
-			if isinstance (value, str) and ":" in value:
-				try:
-					hours, minutes = value.split(":")
-					value = int(hours) * 60 + int(minutes)
-				except ValueError:
-					return False
+			try:
+				value = validate_duration(value)
+			except ValueError:
+				return False
 
 		return super().setData(index, value, role)
 
@@ -1049,3 +1041,26 @@ def setLinkedComboBox(source_combo: QComboBox, target_combo: QComboBox) -> None:
 	"""Function to set a target ComboBox to the chosen value in the target,
 	both combo boxes must hold the same table and column"""
 	target_combo.setCurrentIndex(source_combo.currentIndex())
+
+
+def validate_duration(duration: str) -> int:
+	"""Function to parse duration input and return it as a total minutes int"""
+	minutes = 0
+	hours = 0
+	if isinstance (duration, str) and ":" in duration:
+		if duration.count(":") != 1:
+			raise ValueError
+		if duration[0] == ":":
+			minutes = int(duration[1:])
+		else:
+			hours, minutes = duration.split(":")
+			hours = int(hours)
+			minutes = int(minutes)
+	else:
+		minutes = int(duration)
+	quarter_hours = minutes // 15
+	if minutes % 15:
+		quarter_hours += 1
+	minutes = quarter_hours * 15
+
+	return hours * 60 + minutes

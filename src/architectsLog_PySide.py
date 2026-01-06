@@ -192,6 +192,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			phase_model = manual_log_time.PhaseComboBox.model()
 			phase_id = phase_model.data(phase_model.index(phase_index, 0))
 
+			if phase_id in (8, 9):
+				proj_id = None
+
 			# Get start date and time and concatenate into one string
 			start_date = manual_log_time.timeStartDate.date()
 			start_date_str = start_date.toString("MM/dd/yyyy")
@@ -201,6 +204,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 			# Get duration input and validate it with validation function
 			duration = manual_log_time.durationLineEdit.text()
+			if not duration:
+				return
 			total_duration = validate_duration(duration)
 
 			new_time_entry = TimeEntry(start_time = time_log_start_time,
@@ -762,11 +767,12 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 
 		proj_index = self.ProjectComboBox.currentIndex()
 		proj_id = self.project_model.data(self.project_model.index(proj_index, 0))
-		if proj_id in (8, 9):
-			proj_id = None
 
 		phase_index = self.PhaseComboBox.currentIndex()
 		phase_id = self.phase_model.data(self.phase_model.index(phase_index, 0))
+
+		if phase_id in (8, 9):
+			proj_id = None
 
 		time_notes = self.timeNotes.notesTextEdit.toPlainText()
 		total_minutes = total_time // 60
@@ -1045,6 +1051,8 @@ def setLinkedComboBox(source_combo: QComboBox, target_combo: QComboBox) -> None:
 
 def validate_duration(duration: str) -> int:
 	"""Function to parse duration input and return it as a total minutes int"""
+	if not duration:
+		return
 	minutes = 0
 	hours = 0
 	if isinstance (duration, str) and ":" in duration:

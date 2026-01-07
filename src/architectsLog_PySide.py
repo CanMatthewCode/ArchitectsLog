@@ -9,7 +9,8 @@ from PySide6.QtWidgets import (QMainWindow, QApplication, QDialog, QMessageBox,
 	QStyledItemDelegate, QLineEdit, QComboBox, QWidget, QLCDNumber)
 from PySide6.QtSql import (QSqlDatabase, QSqlTableModel, QSqlRelationalTableModel, 
 	QSqlRelation, QSqlRelationalDelegate)
-from PySide6.QtCore import Qt, QDate, QModelIndex, QTimer, QTime, QRegularExpression
+from PySide6.QtCore import (Qt, QDate, QDateTime, QModelIndex, QTimer, QTime, 
+	QRegularExpression)
 from PySide6.QtGui import QRegularExpressionValidator
 
 from ui.MainWindow import Ui_MainWindow
@@ -122,7 +123,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 				license_number = arch_window.licenseInput.text(), 
 				phone_number = arch_window.phoneInput.text(),
 				email = arch_window.emailInput.text(), 
-				company_name = arch_window.companyNameInput.text())
+				company_name = arch_window.companyInput.text())
 			with get_db_connection() as conn:
 				cur = conn.cursor()
 				add_architect(new_architect, cur)
@@ -195,12 +196,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			if phase_id in (8, 9):
 				proj_id = None
 
-			# Get start date and time and concatenate into one string
+			# Get start date and time and turn into a timestamp int for database
 			start_date = manual_log_time.timeStartDate.date()
-			start_date_str = start_date.toString("MM/dd/yyyy")
 			start_time = manual_log_time.timeEdit.time()
-			start_time_str = start_time.toString("hh:mm A")
-			time_log_start_time = start_date_str + " " + start_time_str
+			qDatetime = QDateTime(start_date, start_time)
+			pyDatetime = qDatetime.toPython()
+			time_log_start_time = int(pyDatetime.timestamp())
 
 			# Get duration input and validate it with validation function
 			duration = manual_log_time.durationLineEdit.text()
@@ -215,6 +216,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			with get_db_connection() as conn:
 				cur = conn.cursor()
 				add_time_entry(new_time_entry, cur)
+
+			self.model.select()
 
 
 class ArchitectWindow(QDialog, Ui_AddArchitectDialog):
@@ -583,6 +586,12 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 			duration_column_index, DurationDelegate(
 				self.timeEntriesTableView))
 
+		# set start time delegate
+		start_time_column_index = self.model.fieldIndex("start_time")
+		self.timeEntriesTableView.setItemDelegateForColumn(
+			start_time_column_index, TimeStartDelegate(
+				self.timeEntriesTableView))
+
 		# create and set column headers
 		column_titles = {
 			"project_id" : "Project Name",
@@ -756,7 +765,8 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 			self.time_log.timer_state = "paused"
 		total_time = ((end_time - self.time_log.start_time).total_seconds() - 
 			self.time_log.total_pause_duration)
-		string_time = self.time_log.start_time.strftime("%m/%d/%Y %I:%M%p")
+		# Convert to int to store in database
+		start_time = int(self.time_log.start_time.timestamp())
 
 		# Pop up notes dialog
 		self.timeNotes = TimeEntriesNotesWindow()
@@ -776,17 +786,21 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 
 		time_notes = self.timeNotes.notesTextEdit.toPlainText()
 		total_minutes = total_time // 60
-		if total_time % 60 > 0:
-			total_minutes += 15
+		quarter_hours = total_minutes // 15
+		if total_minutes % 15 > 0:
+			quarter_hours += 1
+		total_time_logged = quarter_hours * 15
 
 		# Create TimeEntry object with created data
-		new_time_entry = TimeEntry(start_time = string_time, 
-			duration_minutes = total_minutes, project_id = proj_id, 
+		new_time_entry = TimeEntry(start_time = start_time, 
+			duration_minutes = total_time_logged, project_id = proj_id, 
 			architect_id = arch_id, phase_id = phase_id, notes = time_notes)
 
 		with get_db_connection() as conn:
 			cur = conn.cursor()
 			add_time_entry(new_time_entry, cur)
+
+		self.model.select()
 
 		self.main_window.showNormal()
 		self.close()
@@ -954,8 +968,10 @@ class NonDeletableRelationalTableModel(QSqlRelationalTableModel):
 
 class TimeEntriesRelationalTableModel(QSqlRelationalTableModel):
 	"""Class to make invoice_id column read only in ViewTimeEntries window,
-	display duration time in hour:minute format instead of total minutes,
-	and reformat user duration input from hour:min to total minutes"""
+	display duration time in hour:minute format instead of total minutes, 
+	display start_time as mm/dd/yyyy hh:mm am/pm,
+	reformat user duration input from hour:min to total minutes,
+	reformat user start_time input from mm/dd/yyyy hh:mm am/pm to total ints"""
 	def flags(self, index):
 		# Get the default flags
 		default_flag = super().flags(index)
@@ -973,20 +989,43 @@ class TimeEntriesRelationalTableModel(QSqlRelationalTableModel):
 		field_name = self.record().fieldName(index.column())
 		value = super().data(index, role)
 
+		# Display duration in hours:minutes
 		if field_name == "duration_minutes" and value is not None:
 			hour = value // 60
 			minute = value % 60
 			value = f"{hour:02d}:{minute:02d}"
+
+		# Display start time in month/day/year hour:minute AM/PM
+		if field_name == "start_time" and value is not None:
+			date_time = datetime.fromtimestamp(value)
+			value = date_time.strftime("%m/%d/%Y %I:%M %p")
+
 		return value
 
 	def setData(self, index, value, role = Qt.EditRole):
-		# Reset a user's entered duration from xx:xx to just minutes
 		field_name = self.record().fieldName(index.column())
+
+		# Reset a user's entered duration from xx:xx to just minutes
 		if field_name == "duration_minutes":
 			try:
 				value = validate_duration(value)
 			except ValueError:
 				return False
+
+		# Reset a user's entered start date and time to an int
+		if field_name == "start_time":
+			value = value.replace("-", "/")
+			try: 
+				date_time = datetime.strptime(value, "%m/%d/%Y %I:%M %p")
+			except ValueError:
+				try:
+					date_time = datetime.strptime(value, "%m/%d/%y %I:%M %p")
+				except ValueError:
+					QMessageBox.warning(self.parent(), "Invalid Start Date/Time",
+						"Invalid Start Date/Time \
+						Must Be In Month/Day/Year Hour:Minute AM/PM Format")
+					return False
+			value = int(date_time.timestamp())
 
 		return super().setData(index, value, role)
 
@@ -1021,7 +1060,19 @@ class DurationDelegate(QStyledItemDelegate):
 	total minutes or hour:minutes input"""
 	def createEditor(self, parent, options, index):
 		editor = QLineEdit(parent)
-		regex = QRegularExpression(r"^(\d+)?(:\d{0,2})?$")
+		regex = QRegularExpression(r"^(\d+)?(:\d{2})?$")
+		validator = QRegularExpressionValidator(regex, editor)
+		editor.setValidator(validator)
+
+		return editor
+
+class TimeStartDelegate(QStyledItemDelegate):
+	"""Class to validate manual date/time input by user"""
+	def createEditor(self, parent, options, index):
+		editor = QLineEdit(parent)
+		regex = QRegularExpression(
+			r"^\d{1,2}(-|\/)\d{1,2}(-|\/)(\d{2}|\d{4})\s+(([0]?[1-9])|([1][0-2]))\
+			:[0-5]\d\s(AM|PM|am|pm])$")
 		validator = QRegularExpressionValidator(regex, editor)
 		editor.setValidator(validator)
 
@@ -1050,7 +1101,8 @@ def setLinkedComboBox(source_combo: QComboBox, target_combo: QComboBox) -> None:
 
 
 def validate_duration(duration: str) -> int:
-	"""Function to parse duration input and return it as a total minutes int"""
+	"""Function to parse duration input and return it as a total minutes int
+	rounded up to the next 15 minute increment"""
 	if not duration:
 		return
 	minutes = 0

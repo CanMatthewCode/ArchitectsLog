@@ -85,7 +85,7 @@ def create_invoices_table(cur: sqlite3.Cursor) -> None:
 		CREATE TABLE IF NOT EXISTS invoices (
 			invoice_id INTEGER PRIMARY KEY AUTOINCREMENT,
 			project_id INTEGER NOT NULL,
-			created_date TEXT NOT NULL,
+			created_date INTEGER NOT NULL,
 			invoice_number INTEGER,
 			status TEXT DEFAULT 'Draft',
 			FOREIGN KEY (project_id) REFERENCES projects (project_id)
@@ -100,7 +100,7 @@ def create_time_entries_table(cur: sqlite3.Cursor) -> None:
 			project_id INTEGER,
 			architect_id INTEGER NOT NULL,
 			phase_id INTEGER NOT NULL,
-			start_time TEXT NOT NULL,
+			start_time INTEGER NOT NULL,
 			duration_minutes INTEGER NOT NULL,
 			notes TEXT,
 			invoice_id INTEGER,
@@ -228,7 +228,7 @@ def load_architect(architect_id: int, cur: sqlite3.Cursor) -> Architect:
 def load_all_active_architects(cur: sqlite3.Cursor) -> list[tuple[int, str]]:
 	"""Load all active architect names and architect_ids from architects table, 
 	return list of tuples containing both"""
-	sql = """SELECT architect_id, name FROM architects WHERE status = 'active' 
+	sql = """SELECT architect_id, name FROM architects WHERE status = 'Active' 
 		ORDER BY name ASC"""
 	cur.execute(sql)
 	architect_list = cur.fetchall()
@@ -259,7 +259,7 @@ def load_project(project_id: int, cur: sqlite3.Cursor) -> Project:
 def load_all_active_projects(cur:sqlite3.Cursor) -> list[tuple[int, str]]:
 	"""Load all the active project names and project_ids from the projects table,
 	return list of tuples containing both"""
-	sql = """SELECT project_id, project_name FROM projects WHERE status = 'active' 
+	sql = """SELECT project_id, project_name FROM projects WHERE status = 'Active' 
 		ORDER BY project_name ASC"""
 	cur.execute(sql)
 	project_list = cur.fetchall()
@@ -332,8 +332,8 @@ def load_time_entry(time_entry_id: int, cur: sqlite3.Cursor) -> TimeEntry:
 	t_e_info = cur.fetchone()
 	project = load_project(t_e_info[1], cur)
 	architect = load_architect(t_e_info[2], cur)
-	loaded_time_entry = TimeEntry(t_e_info[4], t_e_info[5], t_e_info[6], project,
-		architect, t_e_info[3], t_e_info[7], t_e_info[8], t_e_info[0])
+	loaded_time_entry = TimeEntry(t_e_info[4], t_e_info[5], t_e_info[1],
+		t_e_info[2], t_e_info[3], t_e_info[6], t_e_info[7], t_e_info[0])
 
 	return loaded_time_entry
 
@@ -429,16 +429,19 @@ def update_architect(column_name: str, architect: Architect, value: int | str,
 	return architect
 
 
-def update_project(column_name: str, project_id: int, value: int | str,
+def update_project(column_name: str, project: Project, value: int | str,
 	cur: sqlite3.Cursor) -> None:
 	"""Update one column for a row which exists in the projects table, set newly
 	changed attribute value to the Project object, return Project object"""
 	if column_name not in UPDATABLE_PROJECTS_COLUMNS:
 		raise ValueError(f"Invalid column: {column_name}")
 	sql = f"UPDATE projects SET {column_name} = ? WHERE project_id = ?"
-	update_values = (value, project_id)
+	update_values = (value, project.project_id)
 
 	cur.execute(sql, update_values)
+	setattr(project, column_name, value)
+
+	return project
 
 
 def update_invoice(column_name: str, invoice: Invoice, value: int | str,

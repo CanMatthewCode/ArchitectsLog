@@ -4,6 +4,8 @@ import pytest
 import os
 import sqlite3
 
+from datetime import datetime
+
 from architectsLog_db import get_connection, create_architect_table, create_project_table, \
  create_phases_table, create_invoices_table, create_time_entries_table, add_architect, \
  initialize_phases, add_project, add_invoice, add_time_entry, load_all_active_architects, \
@@ -52,7 +54,8 @@ def table_initialize(test_conn):
 	test_conn.commit()
 
 	#add an architect to Architect table to get architect_id assigned
-	testArchitect = Architect("Name", "LicenseNumber01", "123-456-7890", "email@domain.com", "MyCompany")
+	testArchitect = Architect("Name", "LicenseNumber01", "123-456-7890",
+		"email@domain.com", "MyCompany")
 	architect_id = add_architect(testArchitect, cur)
 
 	#initialize the phases table
@@ -63,12 +66,18 @@ def table_initialize(test_conn):
 	project_id = add_project(testProject, cur)
 
 	#create a test invoice with testProject and add it to the invoice table
-	testInvoice = Invoice(1, "01-01-2025", testProject)
+	date = "01-01-2025"
+	invoice_date = datetime.strptime(date, "%m-%d-%Y")
+	int_date = int(invoice_date.timestamp())
+	testInvoice = Invoice(1, int_date, testProject)
 	invoice_id = add_invoice(testInvoice, cur)
 
 	#create a test time entry with testProject and testArchitect and add it to the time_entries table
-	testTimeEntry = TimeEntry("01-01-2025 12:00:00", 30, testProject, testArchitect.architect_id,
-		notes= "Note", invoice_id= 1)
+	date_time = "01-01-2025 12:00:00"
+	time_entry_date_time = datetime.strptime(date_time, "%m-%d-%Y %I:%M:%S")
+	int_date_time = int(time_entry_date_time.timestamp())
+	testTimeEntry = TimeEntry(int_date_time, 30, testProject.project_id, 
+		testArchitect.architect_id, notes= "Note", invoice_id= 1)
 	time_entry_id = add_time_entry(testTimeEntry, cur)
 
 	#commit and return the created objects as a dictionary 
@@ -295,7 +304,7 @@ def test_create_invoices_table_column_types(table_info):
 
 	assert column_types['invoice_id'] == 'INTEGER'
 	assert column_types['project_id'] == 'INTEGER'
-	assert column_types['created_date'] == 'TEXT'
+	assert column_types['created_date'] == 'INTEGER'
 	assert column_types['invoice_number'] == 'INTEGER'
 	assert column_types['status'] == 'TEXT'
 
@@ -323,7 +332,7 @@ def test_create_time_entries_table_types(table_info):
 	assert column_types['project_id'] == 'INTEGER'
 	assert column_types['architect_id'] == 'INTEGER'
 	assert column_types['phase_id'] == 'INTEGER'
-	assert column_types['start_time'] == 'TEXT'
+	assert column_types['start_time'] == 'INTEGER'
 	assert column_types['duration_minutes'] == 'INTEGER'
 	assert column_types['notes'] == 'TEXT'
 	assert column_types['invoice_id'] == 'INTEGER'
@@ -356,7 +365,7 @@ def test_add_architect(test_conn, table_initialize):
 	assert phone == "123-456-7890"
 	assert email == "email@domain.com"
 	assert company == "MyCompany"
-	assert status == "active"
+	assert status == "Active"
 
 	#test if architect object was updated with architect_id
 	assert table_initialize['architect'].architect_id == 1
@@ -414,7 +423,7 @@ def test_add_project(test_conn, table_initialize):
 	assert client_address == "123ClientStreet"
 	assert start_date == "01-01-2025"
 	assert current_phase_id == 1
-	assert status == "active"
+	assert status == "Active"
 
 	#test if project object was updated with project_id
 	assert table_initialize['project'].project_id == 1
@@ -436,12 +445,16 @@ def test_add_invoice(test_conn, table_initialize):
 	#unpack row for readability
 	invoice_id, project_id, created_date, invoice_number, status = row
 
+	#turn date into a timestamp int
+	date = "01-01-2025"
+	invoice_date = datetime.strptime(date, "%m-%d-%Y")
+	int_date = int(invoice_date.timestamp())
 	#test table columns for correct insertion 
 	assert invoice_id == 1
 	assert project_id == table_initialize['project'].project_id
-	assert created_date == "01-01-2025"
+	assert created_date == int_date
 	assert invoice_number == 1
-	assert status == "draft"
+	assert status == "Draft"
 
 	#test if invoice object was updated with invoice_id
 	assert table_initialize['invoice'].invoice_id == 1
@@ -457,8 +470,11 @@ def test_add_time_entries(test_conn, table_initialize):
 	cur.execute(sql, (table_initialize['time_entry_id'],))
 	row = cur.fetchone()
 
-	time_entry_id, project_id, architect_id, phase_id, start_time, end_time, duration_minutes, notes, invoice_id = row
+	time_entry_id, project_id, architect_id, phase_id, start_time, duration_minutes, notes, invoice_id = row
 
+	date_time = "01-01-2025 12:00:00"
+	time_entry_date_time = datetime.strptime(date_time, "%m-%d-%Y %I:%M:%S")
+	int_date_time = int(time_entry_date_time.timestamp())
 	#test if row was created - if so, it validates the add_time_entry function's return value
 	assert row is not None
 
@@ -467,7 +483,7 @@ def test_add_time_entries(test_conn, table_initialize):
 	assert project_id == table_initialize['project'].project_id
 	assert architect_id == table_initialize['architect'].architect_id
 	assert phase_id == table_initialize['project'].current_phase_id
-	assert start_time == "01-01-2025 12:00:00"
+	assert start_time == int_date_time
 	assert duration_minutes == 30
 	assert notes == "Note"
 	assert invoice_id == 1
@@ -491,7 +507,7 @@ def test_load_architect(test_conn, table_initialize):
 	assert testArchitect.phone_number == "123-456-7890"
 	assert testArchitect.email =="email@domain.com"
 	assert testArchitect.company_name == "MyCompany"
-	assert testArchitect.status == "active"
+	assert testArchitect.status == "Active"
 	assert testArchitect.architect_id == 1
 
 #Test if the load_all_active_architects function correctly loads and returns all the architect names and ids
@@ -502,7 +518,7 @@ def test_load_all_active_architects(test_conn, table_initialize):
 	second_architect = Architect("Name 2", "LicenseNumber02", "987-654-3210", "email2@domain.com",
 		"Company 2")
 	third_architect = Architect("Name 3", "LicenseNumber03", "987-654-3211", "email3@domain.com",
-		"Company 3", status = 'inactive')
+		"Company 3", status = 'Inactive')
 	add_architect(second_architect, cur)
 	add_architect(third_architect, cur)
 	test_conn.commit()
@@ -525,7 +541,7 @@ def test_load_all_architects(test_conn, table_initialize):
 	second_architect = Architect("Name 2", "LicenseNumber02", "987-654-3210", "email2@domain.com",
 		"Company 2")
 	third_architect = Architect("Name 3", "LicenseNumber03", "987-654-3211", "email3@domain.com",
-		"Company 3", status = 'inactive')
+		"Company 3", status = 'Inactive')
 	add_architect(second_architect, cur)
 	add_architect(third_architect, cur)
 	test_conn.commit()
@@ -537,13 +553,13 @@ def test_load_all_architects(test_conn, table_initialize):
 	#test if all architects in the architect table were returned
 	assert testArchitectList[0][0] == 1
 	assert testArchitectList[0][1] == "Name"
-	assert testArchitectList[0][2] == "active"
+	assert testArchitectList[0][2] == "Active"
 	assert testArchitectList[1][0] == 2
 	assert testArchitectList[1][1] == "Name 2"
-	assert testArchitectList[1][2] == "active"
+	assert testArchitectList[1][2] == "Active"
 	assert testArchitectList[2][0] == 3
 	assert testArchitectList[2][1] == "Name 3"
-	assert testArchitectList[2][2] == "inactive"
+	assert testArchitectList[2][2] == "Inactive"
 
 
 #Test if the load_projects function correctly loads a project object from the project table"""
@@ -558,7 +574,7 @@ def test_load_project(test_conn, table_initialize):
 	assert testProject.client_address == "123ClientStreet"
 	assert testProject.start_date == "01-01-2025"
 	assert testProject.current_phase_id == 1
-	assert testProject.status == "active"
+	assert testProject.status == "Active"
 	assert testProject.project_id == 1
 
 #Test if the load_all_active_projects function correctly loads and returns all the project names and ids"
@@ -568,7 +584,7 @@ def test_load_all_active_projects(test_conn, table_initialize):
 	cur = test_conn.cursor()
 	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", "02-02-2025")
 	third_project = Project("NewProject3", "NewClient3", "678ClientStreet", "03-03-2025",
-		status = 'completed')
+		status = 'Completed')
 	add_project(second_project, cur)
 	add_project(third_project, cur)
 	test_conn.commit()
@@ -590,7 +606,7 @@ def test_load_all_projects(test_conn, table_initialize):
 	cur = test_conn.cursor()
 	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", "02-02-2025")
 	third_project = Project("NewProject3", "NewClient3", "678ClientStreet", "03-03-2025",
-		status = 'completed')
+		status = 'Completed')
 	add_project(second_project, cur)
 	add_project(third_project, cur)
 	test_conn.commit()
@@ -602,13 +618,13 @@ def test_load_all_projects(test_conn, table_initialize):
 	#test if all the projects in the project table were returned
 	assert testProjectList[0][0] == 1
 	assert testProjectList[0][1] == "NewProject"
-	assert testProjectList[0][2] == "active"
+	assert testProjectList[0][2] == "Active"
 	assert testProjectList[1][0] == 2
 	assert testProjectList[1][1] == "NewProject2"
-	assert testProjectList[1][2] == "active"
+	assert testProjectList[1][2] == "Active"
 	assert testProjectList[2][0] == 3
 	assert testProjectList[2][1] == "NewProject3"
-	assert testProjectList[2][2] == "completed"
+	assert testProjectList[2][2] == "Completed"
 
 
 #Test if the load_invoice function correctly loads an Invoice object from the invoices table
@@ -618,11 +634,16 @@ def test_load_invoice(test_conn, table_initialize):
 
 	testInvoice = load_invoice(1, cur)
 
+	#turn date into a timestamp int
+	date = "01-01-2025"
+	invoice_date = datetime.strptime(date, "%m-%d-%Y")
+	int_date = int(invoice_date.timestamp())
+
 	#test if all columns were correctly loaded into Invoice object
 	assert testInvoice.invoice_number == 1
-	assert testInvoice.created_date == "01-01-2025"
+	assert testInvoice.created_date == int_date
 	assert testInvoice.project.project_id == 1
-	assert testInvoice.status == "draft"
+	assert testInvoice.status == "Draft"
 	assert testInvoice.invoice_id == 1
 
 #Test if the load_project_invoices correctly loads all project invoices rows
@@ -633,9 +654,24 @@ def test_load_project_invoices(test_conn, table_initialize):
 	project = table_initialize['project']
 	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", "02-02-2025")
 	add_project(second_project, cur)
-	testInvoice2 = Invoice(2, "02-02-2025", project)
-	testInvoice3 = Invoice(3, "03-03-2025", project, status = "billed")
-	testInvoice4 = Invoice(4, "04-04-2025", second_project)
+
+	#turn dates into a timestamp ints
+	date = "01-01-2025"
+	invoice_date = datetime.strptime(date, "%m-%d-%Y")
+	int_date = int(invoice_date.timestamp())
+	date2 = "02-02-2025"
+	invoice_date2 = datetime.strptime(date2, "%m-%d-%Y")
+	int_date2 = int(invoice_date.timestamp())
+	date3 = "03-03-2025"
+	invoice_date3 = datetime.strptime(date3, "%m-%d-%Y")
+	int_date3 = int(invoice_date.timestamp())
+	date4 = "03-03-2025"
+	invoice_date4 = datetime.strptime(date4, "%m-%d-%Y")
+	int_date4 = int(invoice_date.timestamp())
+
+	testInvoice2 = Invoice(2, int_date2, project)
+	testInvoice3 = Invoice(3, int_date3, project, status = "Billed")
+	testInvoice4 = Invoice(4, int_date4, second_project)
 	add_invoice(testInvoice2, cur)
 	add_invoice(testInvoice3, cur)
 	add_invoice(testInvoice4, cur)
@@ -648,16 +684,16 @@ def test_load_project_invoices(test_conn, table_initialize):
 	#test if all the columns were correctly loaded into the tuples in the correct order
 	assert testInvoices[0][0] == 3
 	assert testInvoices[0][1] == 3
-	assert testInvoices[0][2] == "03-03-2025"
-	assert testInvoices[0][3] == "billed"
+	assert testInvoices[0][2] == int_date3
+	assert testInvoices[0][3] == "Billed"
 	assert testInvoices[1][0] == 1
 	assert testInvoices[1][1] == 1
-	assert testInvoices[1][2] == "01-01-2025"
-	assert testInvoices[1][3] == "draft"
+	assert testInvoices[1][2] == int_date
+	assert testInvoices[1][3] == "Draft"
 	assert testInvoices[2][0] == 2
 	assert testInvoices[2][1] == 2
-	assert testInvoices[2][2] == "02-02-2025"
-	assert testInvoices[2][3] == "draft"
+	assert testInvoices[2][2] == int_date2
+	assert testInvoices[2][3] == "Draft"
 
 def test_load_status_invoices(test_conn, table_initialize):
 	"""Test that all invoices associated with a status are returned as a list of tuples 
@@ -666,15 +702,30 @@ def test_load_status_invoices(test_conn, table_initialize):
 	project = table_initialize['project']
 	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", "02-02-2025")
 	add_project(second_project, cur)
-	testInvoice2 = Invoice(2, "02-02-2025", project)
-	testInvoice3 = Invoice(3, "03-03-2025", project, status = "billed")
-	testInvoice4 = Invoice(4, "04-04-2025", second_project, status = "billed")
+
+	#turn dates into a timestamp ints
+	date = "01-01-2025"
+	invoice_date = datetime.strptime(date, "%m-%d-%Y")
+	int_date = int(invoice_date.timestamp())
+	date2 = "02-02-2025"
+	invoice_date2 = datetime.strptime(date2, "%m-%d-%Y")
+	int_date2 = int(invoice_date.timestamp())
+	date3 = "03-03-2025"
+	invoice_date3 = datetime.strptime(date3, "%m-%d-%Y")
+	int_date3 = int(invoice_date.timestamp())
+	date4 = "03-03-2025"
+	invoice_date4 = datetime.strptime(date4, "%m-%d-%Y")
+	int_date4 = int(invoice_date.timestamp())
+
+	testInvoice2 = Invoice(2, int_date2, project)
+	testInvoice3 = Invoice(3, int_date3, project, status = "Billed")
+	testInvoice4 = Invoice(4, int_date4, second_project, status = "Billed")
 	add_invoice(testInvoice2, cur)
 	add_invoice(testInvoice3, cur)
 	add_invoice(testInvoice4, cur)
 	test_conn.commit()
-	testDraftInvoices = load_status_invoices("draft", cur)
-	testBilledInvoices = load_status_invoices("billed", cur)
+	testDraftInvoices = load_status_invoices("Draft", cur)
+	testBilledInvoices = load_status_invoices("Billed", cur)
 
 	#test if the returned number of invoices matches the number in the invoices table
 	assert len(testDraftInvoices) == 2
@@ -683,15 +734,15 @@ def test_load_status_invoices(test_conn, table_initialize):
 	#test if all columns were correctly loaded into the tuples in the correct order
 	assert testDraftInvoices[0][0] == 1
 	assert testDraftInvoices[0][1] == 1
-	assert testDraftInvoices[0][2] == "01-01-2025"
+	assert testDraftInvoices[0][2] == int_date
 	assert testDraftInvoices[0][3] == "NewProject"
 	assert testBilledInvoices[0][0] == 3
 	assert testBilledInvoices[0][1] == 3
-	assert testBilledInvoices[0][2] == "03-03-2025"
+	assert testBilledInvoices[0][2] == int_date3
 	assert testBilledInvoices[0][3] == "NewProject"
 	assert testBilledInvoices[1][0] == 4
 	assert testBilledInvoices[1][1] == 4
-	assert testBilledInvoices[1][2] == "04-04-2025"
+	assert testBilledInvoices[1][2] == int_date4
 	assert testBilledInvoices[1][3] == "NewProject2"
 
 def test_load_status_invoices_invalid_column(test_conn, table_initialize):
@@ -709,9 +760,24 @@ def test_load_all_invoices(test_conn, table_initialize):
 	project = table_initialize['project']
 	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", "02-02-2025")
 	add_project(second_project, cur)
-	testInvoice2 = Invoice(2, "02-02-2025", project, status = "paid")
-	testInvoice3 = Invoice(3, "03-03-2025", second_project, status = "billed")
-	testInvoice4 = Invoice(4, "04-04-2025", second_project, status = "paid")
+
+	#turn dates into a timestamp ints
+	date = "01-01-2025"
+	invoice_date = datetime.strptime(date, "%m-%d-%Y")
+	int_date = int(invoice_date.timestamp())
+	date2 = "02-02-2025"
+	invoice_date2 = datetime.strptime(date2, "%m-%d-%Y")
+	int_date2 = int(invoice_date.timestamp())
+	date3 = "03-03-2025"
+	invoice_date3 = datetime.strptime(date3, "%m-%d-%Y")
+	int_date3 = int(invoice_date.timestamp())
+	date4 = "03-03-2025"
+	invoice_date4 = datetime.strptime(date4, "%m-%d-%Y")
+	int_date4 = int(invoice_date.timestamp())
+
+	testInvoice2 = Invoice(2, int_date2, project, status = "Paid")
+	testInvoice3 = Invoice(3, int_date3, second_project, status = "Billed")
+	testInvoice4 = Invoice(4, int_date4, second_project, status = "Paid")
 	add_invoice(testInvoice2, cur)
 	add_invoice(testInvoice3, cur)
 	add_invoice(testInvoice4, cur)
@@ -724,14 +790,14 @@ def test_load_all_invoices(test_conn, table_initialize):
 	#test if all columns were correctly loaded into the tuples in the correct order
 	assert testInvoices[0][0] == 1
 	assert testInvoices[0][1] == "NewProject"
-	assert testInvoices[0][2] == "01-01-2025"
+	assert testInvoices[0][2] == int_date
 	assert testInvoices[0][3] == 1
-	assert testInvoices[0][4] == "draft"
+	assert testInvoices[0][4] == "Draft"
 	assert testInvoices[3][0] == 4
 	assert testInvoices[3][1] == "NewProject2"
-	assert testInvoices[3][2] == "04-04-2025"
+	assert testInvoices[3][2] == int_date4
 	assert testInvoices[3][3] == 4
-	assert testInvoices[3][4] == "paid"
+	assert testInvoices[3][4] == "Paid"
 
 
 #Test if the load_time_entry function correctly loads a TimeEntry object from the time_entry table
@@ -740,8 +806,12 @@ def test_load_time_entry(test_conn, table_initialize):
 	cur = test_conn.cursor()
 	testTimeEntry = load_time_entry(1, cur)
 
+	date_time = "01-01-2025 12:00:00"
+	time_entry_date_time = datetime.strptime(date_time, "%m-%d-%Y %I:%M:%S")
+	int_date_time = int(time_entry_date_time.timestamp())
+
 	#test if all columns were correctly loaded into TimeEntry object
-	assert testTimeEntry.start_time == "01-01-2025 12:00:00"
+	assert testTimeEntry.start_time == int_date_time
 	assert testTimeEntry.duration_minutes == 30
 	assert testTimeEntry.project_id == table_initialize['project'].project_id
 	assert testTimeEntry.architect_id == table_initialize['architect'].architect_id
@@ -760,9 +830,20 @@ def test_load_all_project_time_entries(test_conn, table_initialize):
 	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", "02-02-2025")
 	add_project(second_project, cur)
 	test_conn.commit()
-	testTimeEntry2 = TimeEntry("01-01-2025 1:00:00", 45, project.project_id, 
+
+	date_time = "01-01-2025 12:00:00"
+	time_entry_date_time = datetime.strptime(date_time, "%m-%d-%Y %I:%M:%S")
+	int_date_time = int(time_entry_date_time.timestamp())
+	date_time2 = "01-01-2025 1:00:00"
+	time_entry_date_time2 = datetime.strptime(date_time2, "%m-%d-%Y %I:%M:%S")
+	int_date_time2 = int(time_entry_date_time2.timestamp())
+	date_time3 = "02-02-2025 12:00:00"
+	time_entry_date_time3 = datetime.strptime(date_time3, "%m-%d-%Y %I:%M:%S")
+	int_date_time3 = int(time_entry_date_time2.timestamp())
+
+	testTimeEntry2 = TimeEntry(int_date_time2, 45, project.project_id, 
 		architect.architect_id)
-	testTimeEntry3 = TimeEntry("02-02-2025 12:00:00", 60, second_project.project_id, 
+	testTimeEntry3 = TimeEntry(int_date_time3, 60, second_project.project_id, 
 		architect.architect_id)
 	add_time_entry(testTimeEntry2, cur)
 	add_time_entry(testTimeEntry3, cur)
@@ -776,11 +857,11 @@ def test_load_all_project_time_entries(test_conn, table_initialize):
 
 	#test if all the columns were correctly loaded into the tuples
 	assert testTimeEntries[0][0] == 1
-	assert testTimeEntries[0][1] == "01-01-2025 12:00:00"
+	assert testTimeEntries[0][1] == int_date_time
 	assert testTimeEntries[0][2] == 30
 	assert testTimeEntries[0][3] == "Name"
 	assert testTimeEntries[1][0] == 2
-	assert testTimeEntries[1][1] == "01-01-2025 1:00:00"
+	assert testTimeEntries[1][1] == int_date_time2
 	assert testTimeEntries[1][2] == 45
 	assert testTimeEntries[1][3] == "Name"
 
@@ -797,9 +878,20 @@ def test_load_all_architect_time_entries(test_conn, table_initialize):
 	add_architect(second_architect, cur)
 	add_project(second_project, cur)
 	test_conn.commit()
-	testTimeEntry2 = TimeEntry("01-01-2025 1:00:00", 45, second_project.project_id, 
+
+	date_time = "01-01-2025 12:00:00"
+	time_entry_date_time = datetime.strptime(date_time, "%m-%d-%Y %I:%M:%S")
+	int_date_time = int(time_entry_date_time.timestamp())
+	date_time2 = "01-01-2025 1:00:00"
+	time_entry_date_time2 = datetime.strptime(date_time2, "%m-%d-%Y %I:%M:%S")
+	int_date_time2 = int(time_entry_date_time2.timestamp())
+	date_time3 = "02-02-2025 12:00:00"
+	time_entry_date_time3 = datetime.strptime(date_time3, "%m-%d-%Y %I:%M:%S")
+	int_date_time3 = int(time_entry_date_time3.timestamp())
+
+	testTimeEntry2 = TimeEntry(date_time2, 45, second_project.project_id, 
 		architect.architect_id)
-	testTimeEntry3 = TimeEntry("02-02-2025 12:00:00", 60, project.project_id, 
+	testTimeEntry3 = TimeEntry(int_date_time3, 60, project.project_id, 
 		second_architect.architect_id)
 	add_time_entry(testTimeEntry2, cur)
 	add_time_entry(testTimeEntry3, cur)
@@ -812,11 +904,11 @@ def test_load_all_architect_time_entries(test_conn, table_initialize):
 
 	#test if all the columns were correctly loaded into the tuples
 	assert testTimeEntries[0][0] == 1
-	assert testTimeEntries[0][1] == "01-01-2025 12:00:00"
+	assert testTimeEntries[0][1] == int_date_time
 	assert testTimeEntries[0][2] == 30
 	assert testTimeEntries[0][3] == "NewProject"
 	assert testTimeEntries[1][0] == 2
-	assert testTimeEntries[1][1] == "01-01-2025 1:00:00"
+	assert testTimeEntries[1][1] == date_time2
 	assert testTimeEntries[1][2] == 45
 	assert testTimeEntries[1][3] == "NewProject2"
 
@@ -828,13 +920,31 @@ def test_load_invoice_time_entries(test_conn, table_initialize):
 	cur = test_conn.cursor()
 	architect = table_initialize['architect']
 	project = table_initialize['project']
-	testInvoice2 = Invoice(2, "02-02-2025", project)
+
+	date2 = "02-02-2025"
+	invoice_date2 = datetime.strptime(date2, "%m-%d-%Y")
+	int_date2 = int(invoice_date2.timestamp())
+	testInvoice2 = Invoice(2, int_date2, project)
 	add_invoice(testInvoice2, cur)
-	testTimeEntry2 = TimeEntry("01-01-2025 1:00:00", 45, project.project_id, 
+
+	date_time = "01-01-2025 12:00:00"
+	time_entry_date_time = datetime.strptime(date_time, "%m-%d-%Y %I:%M:%S")
+	int_date_time = int(time_entry_date_time.timestamp())
+	date_time2 = "01-01-2025 1:00:00"
+	time_entry_date_time2 = datetime.strptime(date_time2, "%m-%d-%Y %I:%M:%S")
+	int_date_time2 = int(time_entry_date_time2.timestamp())
+	date_time3 = "02-02-2025 12:00:00"
+	time_entry_date_time3 = datetime.strptime(date_time3, "%m-%d-%Y %I:%M:%S")
+	int_date_time3 = int(time_entry_date_time3.timestamp())
+	date_time4 = "02-02-2025 12:00:00"
+	time_entry_date_time4 = datetime.strptime(date_time4, "%m-%d-%Y %I:%M:%S")
+	int_date_time4 = int(time_entry_date_time4.timestamp())
+
+	testTimeEntry2 = TimeEntry(int_date_time2, 45, project.project_id, 
 		architect.architect_id, invoice_id=1)
-	testTimeEntry3 = TimeEntry("02-02-2025 12:00:00", 60, project.project_id, 
+	testTimeEntry3 = TimeEntry(int_date_time3, 60, project.project_id, 
 		architect.architect_id, invoice_id=2)
-	testTimeEntry4 = TimeEntry("03-03-2025 3:00:00", 120, project.project_id, 
+	testTimeEntry4 = TimeEntry(int_date_time4, 120, project.project_id, 
 		architect.architect_id, invoice_id=None)
 	add_time_entry(testTimeEntry2, cur)
 	add_time_entry(testTimeEntry3, cur)
@@ -849,12 +959,12 @@ def test_load_invoice_time_entries(test_conn, table_initialize):
 
 	#test if all the columns were correctly loaded into the tuples in the correct order
 	assert testTimeEntries[0][0] == 1
-	assert testTimeEntries[0][1] == "01-01-2025 12:00:00"
+	assert testTimeEntries[0][1] == int_date_time
 	assert testTimeEntries[0][2] == 30
 	assert testTimeEntries[0][3] == 1
 	assert testTimeEntries[0][4] == "Note"
 	assert testTimeEntries[1][0] == 2
-	assert testTimeEntries[1][1] == "01-01-2025 1:00:00"
+	assert testTimeEntries[1][1] == int_date_time2
 	assert testTimeEntries[1][2] == 45
 	assert testTimeEntries[1][3] == 1
 	assert testTimeEntries[1][4] == None
@@ -873,11 +983,28 @@ def test_load_all_time_entries(test_conn, table_initialize):
 	add_architect(second_architect, cur)
 	add_project(second_project, cur)
 	test_conn.commit()
-	testTimeEntry2 = TimeEntry("01-01-2025 1:00:00", 45, second_project.project_id,
+
+	date_time = "01-01-2025 12:00:00"
+	time_entry_date_time = datetime.strptime(date_time, "%m-%d-%Y %I:%M:%S")
+	int_date_time = int(time_entry_date_time.timestamp())
+
+	date_time2 = "02-02-2025 12:00:00"
+	time_entry_date_time2 = datetime.strptime(date_time2, "%m-%d-%Y %I:%M:%S")
+	int_date_time2 = int(time_entry_date_time2.timestamp())
+
+	date_time3 = "01-01-2025 1:00:00"
+	time_entry_date_time3 = datetime.strptime(date_time3, "%m-%d-%Y %I:%M:%S")
+	int_date_time3 = int(time_entry_date_time3.timestamp())
+
+	date_time4 = "03-03-2025 3:00:00"
+	time_entry_date_time4 = datetime.strptime(date_time4, "%m-%d-%Y %I:%M:%S")
+	int_date_time4 = int(time_entry_date_time4.timestamp())
+
+	testTimeEntry2 = TimeEntry(int_date_time2, 45, second_project.project_id,
 		architect.architect_id)
-	testTimeEntry3 = TimeEntry("02-02-2025 12:00:00", 60, project.project_id, 
+	testTimeEntry3 = TimeEntry(int_date_time3, 60, project.project_id, 
 		second_architect.architect_id)
-	testTimeEntry4 = TimeEntry("03-03-2025 3:00:00", 120, None, 
+	testTimeEntry4 = TimeEntry(int_date_time4, 120, None, 
 		second_architect.architect_id)
 	add_time_entry(testTimeEntry2, cur)
 	add_time_entry(testTimeEntry3, cur)
@@ -890,22 +1017,22 @@ def test_load_all_time_entries(test_conn, table_initialize):
 
 	#test if all the columns were correctly loaded into the tuples
 	assert testTimeEntries[0][0] == 1
-	assert testTimeEntries[0][1] == "01-01-2025 12:00:00"
+	assert testTimeEntries[0][1] == int_date_time
 	assert testTimeEntries[0][2] == 30
 	assert testTimeEntries[0][3] == "NewProject"
 	assert testTimeEntries[0][4] == "Name"
 	assert testTimeEntries[1][0] == 3
-	assert testTimeEntries[1][1] == "02-02-2025 12:00:00"
+	assert testTimeEntries[1][1] == int_date_time3
 	assert testTimeEntries[1][2] == 60
 	assert testTimeEntries[1][3] == "NewProject"
 	assert testTimeEntries[1][4] == "Name 2"
 	assert testTimeEntries[2][0] == 2
-	assert testTimeEntries[2][1] == "01-01-2025 1:00:00"
+	assert testTimeEntries[2][1] == int_date_time2
 	assert testTimeEntries[2][2] == 45
 	assert testTimeEntries[2][3] == "NewProject2"
 	assert testTimeEntries[2][4] == "Name"
 	assert testTimeEntries[3][0] == 4
-	assert testTimeEntries[3][1] == "03-03-2025 3:00:00"
+	assert testTimeEntries[3][1] == int_date_time4
 	assert testTimeEntries[3][2] == 120
 	assert testTimeEntries[3][3] == None
 	assert testTimeEntries[3][4] == "Name 2"
@@ -1009,7 +1136,7 @@ def test_update_project(test_conn, table_initialize):
 	project = update_project('client_address', project, "345ClientStreet", cur)
 	project = update_project('start_date', project, "02-02-2025", cur)
 	project = update_project('current_phase_id', project, 2, cur)
-	project = update_project('status', project, 'completed', cur)
+	project = update_project('status', project, 'Completed', cur)
 	test_conn.commit()
 
 	#test if all column values were correctly updated
@@ -1025,7 +1152,7 @@ def test_update_project(test_conn, table_initialize):
 	assert client_address == "345ClientStreet"
 	assert start_date == "02-02-2025"
 	assert current_phase_id == 2
-	assert status == 'completed'
+	assert status == 'Completed'
 
 	#test if all object attributes where correctly updated
 	assert project.project_name == "NewProject2"
@@ -1033,7 +1160,7 @@ def test_update_project(test_conn, table_initialize):
 	assert project.client_address == "345ClientStreet"
 	assert project.start_date == "02-02-2025"
 	assert project.current_phase_id == 2
-	assert project.status == 'completed'
+	assert project.status == 'Completed'
 
 #Test if the update_project function raises an exception to an incorrect column name
 def test_update_project_invalid_column(test_conn, table_initialize):
@@ -1118,7 +1245,7 @@ def test_update_time_entry(test_conn, table_initialize):
 	row = cur.fetchone()
 
 	#unpack row for readability
-	time_entry_id, project_id, architect_id, phase_id, start_time, end_time, \
+	time_entry_id, project_id, architect_id, phase_id, start_time, \
 		duration_minutes, notes, invoice_id = row
 
 	assert project_id == 2

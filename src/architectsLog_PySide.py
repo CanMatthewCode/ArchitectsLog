@@ -4,6 +4,7 @@ import sys
 import os
 import re
 from datetime import datetime
+import sqlite3
 
 from PySide6.QtWidgets import (QMainWindow, QApplication, QDialog, QMessageBox,
 	QStyledItemDelegate, QLineEdit, QComboBox, QWidget, QLCDNumber)
@@ -65,6 +66,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		setCrossComboBox(self.ProjectsComboBox, self.PhasesComboBox, 5)
 		self.ProjectsComboBox.currentIndexChanged.connect(self.projectChanged)
 		self.PhasesComboBox.currentIndexChanged.connect(self.phaseChanged)
+
+		# set architect and project combo boxes on most recently added time entry
+		arch_proj_ids = get_most_recent_archid_and_projid()
+		arch_id, proj_id = arch_proj_ids
+		arch_match = self.architect_model.match(self.architect_model.index(0,0), 
+			Qt.EditRole, arch_id)
+		if arch_match:
+			row = arch_match[0].row()
+			self.ArchitectsComboBox.setCurrentIndex(row)
+		proj_match = self.project_model.match(self.project_model.index(0,0),
+			Qt.EditRole, proj_id)
+		if proj_match:
+			row = proj_match[0].row()
+			self.ProjectsComboBox.setCurrentIndex(row)
 
 		# enable button clicks
 		self.AddArchitectBtn.clicked.connect(self.addArchitect)
@@ -1197,3 +1212,14 @@ def validate_duration(duration: str) -> int:
 	minutes = quarter_hours * 15
 
 	return hours * 60 + minutes
+
+
+def get_most_recent_archid_and_projid() -> list[tuple[int, int]]:
+	"""Function to retrieve the most recent architect and project from the
+	time_entries table in the database"""
+	query = "SELECT architect_id, project_id FROM time_entries\
+		ORDER BY start_time DESC LIMIT 1"
+	with get_db_connection() as conn:
+		cur = conn.cursor()
+		cur.execute(query)
+		return cur.fetchone()

@@ -75,7 +75,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.view_arch_window = None
 		self.view_proj_window = None
 		self.view_time_entries_window = None
-		
+
 		self.ViewArchitectsBtn.clicked.connect(self.viewArchitects)
 		self.ViewProjectsBtn.clicked.connect(self.viewProjects)
 		self.ViewTimeLogsBtn.clicked.connect(self.viewTimeEntries)
@@ -734,7 +734,9 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 		self.PhaseComboBox.setModelColumn(1)
 		setLinkedComboBox(self.main_window.PhasesComboBox, 
 			self.PhaseComboBox)
+
 		self.PhaseComboBox.currentIndexChanged.connect(self.phaseChanged)
+		self.ProjectComboBox.currentIndexChanged.connect(self.projectChanged)
 
 		# link buttons
 		self.startPauseTimer.clicked.connect(self.startPauseTime)
@@ -744,16 +746,37 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 
 		self.show()
 
+	def projectChanged(self) -> None:
+		"""Method to set phase combo box to phase attached to project"""
+		self.PhaseComboBox.blockSignals(True)
+		setCrossComboBox(self.ProjectComboBox, self.PhaseComboBox, 5)
+		
+		# Block phases combo box if proj_id is for administrative work
+		proj_index = self.ProjectComboBox.currentIndex()
+		proj_id = self.project_model.data(self.project_model.index(proj_index, 0))
+		if proj_id < 0:
+			self.PhaseComboBox.setEnabled(False)
+		else:
+			self.PhaseComboBox.setEnabled(True)
+
+		self.PhaseComboBox.blockSignals(False)
+
 	def phaseChanged(self):
 		# Get current index and phase_id from phases combo box
 		phase_index = self.PhaseComboBox.currentIndex()
 		phase_id = self.phase_model.data(self.phase_model.index(phase_index, 0))
 
-		# Disable projects ComboBox if phase is Business Development or Administration
+		# Set project ComboBox and disable phase ComboBox if phase is 
+		# 	Business Development or Administration
 		if phase_id in (8, 9):
-			self.ProjectComboBox.setEnabled(False)
+			self.PhaseComboBox.setEnabled(False)
+			if phase_id == 8:
+				self.ProjectComboBox.setCurrentIndex(1)
+			else:
+				self.ProjectComboBox.setCurrentIndex(0)
+			return
 		else:
-			self.ProjectComboBox.setEnabled(True)
+			self.PhaseComboBox.setEnabled(True)
 
 	def startPauseTime(self):
 		if self.time_log.timer_state == "inactive":
@@ -878,8 +901,8 @@ class ManualTimeLogger(QDialog, Ui_AddTimeDialog):
 		self.project_model.select()
 		self.ProjectComboBox.setModel(self.project_model)
 		self.ProjectComboBox.setModelColumn(1)					
-		setLinkedComboBox(self.main_window.ArchitectsComboBox,
-			self.ArchitectComboBox)
+		setLinkedComboBox(self.main_window.ProjectsComboBox,
+			self.ProjectComboBox)
 		
 		self.phase_model = QSqlTableModel()
 		self.phase_model.setTable("phases")
@@ -888,6 +911,8 @@ class ManualTimeLogger(QDialog, Ui_AddTimeDialog):
 		self.PhaseComboBox.setModelColumn(1)
 		setLinkedComboBox(self.main_window.PhasesComboBox, 
 			self.PhaseComboBox)
+
+		self.ProjectComboBox.currentIndexChanged.connect(self.projectChanged)
 		self.PhaseComboBox.currentIndexChanged.connect(self.phaseChanged)
 
 		# Set current date onto the calendar drop down
@@ -901,16 +926,37 @@ class ManualTimeLogger(QDialog, Ui_AddTimeDialog):
 		validator = QRegularExpressionValidator(duration_regex, self.durationLineEdit)
 		self.durationLineEdit.setValidator(validator)
 
+	def projectChanged(self) -> None:
+		"""Method to set phase combo box to phase attached to project"""
+		self.PhaseComboBox.blockSignals(True)
+		setCrossComboBox(self.ProjectComboBox, self.PhaseComboBox, 5)
+		
+		# Block phases combo box if proj_id is for administrative work
+		proj_index = self.ProjectComboBox.currentIndex()
+		proj_id = self.project_model.data(self.project_model.index(proj_index, 0))
+		if proj_id < 0:
+			self.PhaseComboBox.setEnabled(False)
+		else:
+			self.PhaseComboBox.setEnabled(True)
+
+		self.PhaseComboBox.blockSignals(False)
+
 	def phaseChanged(self):
 		# Get current index and phase_id from phases combo box
 		phase_index = self.PhaseComboBox.currentIndex()
 		phase_id = self.phase_model.data(self.phase_model.index(phase_index, 0))
 
-		# Disable projects ComboBox if phase is Business Development or Administration
+		# Set project ComboBox and disable phase ComboBox if phase is 
+		# 	Business Development or Administration
 		if phase_id in (8, 9):
-			self.ProjectComboBox.setEnabled(False)
+			self.PhaseComboBox.setEnabled(False)
+			if phase_id == 8:
+				self.ProjectComboBox.setCurrentIndex(1)
+			else:
+				self.ProjectComboBox.setCurrentIndex(0)
+			return
 		else:
-			self.ProjectComboBox.setEnabled(True)
+			self.PhaseComboBox.setEnabled(True)
 
 	def accept(self) -> None:
 		"""Method to verify all forms were entered with correct syntax"""

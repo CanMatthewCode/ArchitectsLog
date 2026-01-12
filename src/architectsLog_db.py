@@ -127,7 +127,41 @@ def sqltable_initialize() -> None:
 		create_invoices_table(cur)
 		create_time_entries_table(cur)
 		initialize_phases(cur)
+		initialize_projects(cur)
 
+
+def initialize_phases(cur: sqlite3.Cursor) -> None:
+	"""Initialize the phases table with the PHASES dictionary if not done so already"""
+	query = "SELECT COUNT(*) FROM phases"
+	cur.execute(query)
+
+	#check if the PHASES are already in the phases table - fetchone() returns tuple
+	number_of_phases = cur.fetchone()[0]
+	if number_of_phases > 0:
+		return
+	#if not, loop through PHASES dictionary and add values to match PHASES order
+	else:
+		sql = "INSERT INTO phases (project_phase) VALUES (?)"
+		for phase_id, phase_name in PHASES.items():
+			cur.execute(sql, (phase_name,))
+
+def initialize_projects(cur: sqlite3.Cursor) -> None:
+	"""Initialize projects table with non-project based work flows: 
+	Business Development (id = -1) and Administration (id = -2)"""
+	cur.execute("SELECT COUNT(*) FROM projects WHERE project_id IN (-1, -2)")
+	#return if these already exist in database table
+	if cur.fetchone()[0] > 0:
+		return
+	# add Business Development as id -1
+	cur.execute("""INSERT INTO projects (project_id, project_name, client_name,
+		client_address, start_date, current_phase_id)
+		VALUES(-1, "Business Development", "Internal", "N/A", "01/01/1900", 8)
+		""")
+	# add Administration as id -2
+	cur.execute("""INSERT INTO projects (project_id, project_name, client_name,
+		client_address, start_date, current_phase_id)
+		VALUES(-2, "Administration", "Internal", "N/A2", "01/01/1900", 9)
+		""")
 
 
 #	~~~TABLE INSERTION FUNCTIONS~~~
@@ -146,22 +180,6 @@ def add_architect(architect: Architect, cur: sqlite3.Cursor) -> int:
 	architect.architect_id = architect_id
 
 	return architect_id
-
-
-def initialize_phases(cur: sqlite3.Cursor) -> None:
-	"""Initialize the phases table with the PHASES dictionary if not done so already"""
-	query = "SELECT COUNT(*) FROM phases"
-	cur.execute(query)
-
-	#check if the PHASES are already in the phases table - fetchone() returns tuple
-	number_of_phases = cur.fetchone()[0]
-	if number_of_phases > 0:
-		return
-	#if not, loop through PHASES dictionary and add values to match PHASES order
-	else:
-		sql = "INSERT INTO phases (project_phase) VALUES (?)"
-		for phase_id, phase_name in PHASES.items():
-			cur.execute(sql, (phase_name,))
 
 
 def add_project(project: Project, cur: sqlite3.Cursor) -> int:
@@ -330,8 +348,6 @@ def load_time_entry(time_entry_id: int, cur: sqlite3.Cursor) -> TimeEntry:
 	sql = "SELECT * FROM time_entries WHERE time_entry_id = ?"
 	cur.execute(sql, (time_entry_id,))
 	t_e_info = cur.fetchone()
-	project = load_project(t_e_info[1], cur)
-	architect = load_architect(t_e_info[2], cur)
 	loaded_time_entry = TimeEntry(t_e_info[4], t_e_info[5], t_e_info[1],
 		t_e_info[2], t_e_info[3], t_e_info[6], t_e_info[7], t_e_info[0])
 
@@ -429,19 +445,17 @@ def update_architect(column_name: str, architect: Architect, value: int | str,
 	return architect
 
 
-def update_project(column_name: str, project: Project, value: int | str,
+def update_project(column_name: str, project_id: int, value: int | str,
 	cur: sqlite3.Cursor) -> None:
 	"""Update one column for a row which exists in the projects table, set newly
 	changed attribute value to the Project object, return Project object"""
 	if column_name not in UPDATABLE_PROJECTS_COLUMNS:
 		raise ValueError(f"Invalid column: {column_name}")
 	sql = f"UPDATE projects SET {column_name} = ? WHERE project_id = ?"
-	update_values = (value, project.project_id)
+	update_values = (value, project_id)
 
 	cur.execute(sql, update_values)
-	setattr(project, column_name, value)
 
-	return project
 
 
 def update_invoice(column_name: str, invoice: Invoice, value: int | str,

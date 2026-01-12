@@ -72,6 +72,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.LogTimeBtn.clicked.connect(self.logTime)
 		self.AddTimeBtn.clicked.connect(self.addTime)
 		
+		self.view_arch_window = None
+		self.view_proj_window = None
+		self.view_time_entries_window = None
+		
 		self.ViewArchitectsBtn.clicked.connect(self.viewArchitects)
 		self.ViewProjectsBtn.clicked.connect(self.viewProjects)
 		self.ViewTimeLogsBtn.clicked.connect(self.viewTimeEntries)
@@ -82,23 +86,36 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		"""Method to set phase combo box to phase attached to project"""
 		self.PhasesComboBox.blockSignals(True)
 		setCrossComboBox(self.ProjectsComboBox, self.PhasesComboBox, 5)
+		
+		# Block phases combo box if proj_id is for administrative work
+		proj_index = self.ProjectsComboBox.currentIndex()
+		proj_id = self.project_model.data(self.project_model.index(proj_index, 0))
+		if proj_id < 0:
+			self.PhasesComboBox.setEnabled(False)
+		else:
+			self.PhasesComboBox.setEnabled(True)
+
 		self.PhasesComboBox.blockSignals(False)
 
 	def phaseChanged(self) -> None:
-		"""Method to set a newly chosen phase as the project's upadted current_phase"""
+		"""Method to set a newly chosen phase as the project's updated current_phase"""
 		phase_index = self.PhasesComboBox.currentIndex()
 		phase_id = self.phase_model.data(self.phase_model.index(phase_index, 0))
-
-		# Disable projects ComboBox if phase is Business Development or Administration
-		if phase_id in (8, 9):
-			self.ProjectsComboBox.setEnabled(False)
-			return
-		else:
-			self.ProjectsComboBox.setEnabled(True)
-
-		# Get current index of project combo box and phases column from projets table
+		
+		# Get current index of project combo box and phases column from projects table
 		proj_index = self.ProjectsComboBox.currentIndex()
 		proj_id = self.project_model.data(self.project_model.index(proj_index, 0))
+		
+		# Disable PhasesComboBox if phase is Business Development or Administration
+		if phase_id in (8, 9):
+			self.PhasesComboBox.setEnabled(False)
+			if phase_id == 8:
+				self.ProjectsComboBox.setCurrentIndex(1)
+			else:
+				self.ProjectsComboBox.setCurrentIndex(0)
+			return
+		else:
+			self.PhasesComboBox.setEnabled(True)
 
 		# Update project with new phase in project table
 		with get_db_connection() as conn:
@@ -185,16 +202,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			arch_model = manual_log_time.ArchitectComboBox.model()
 			arch_id = arch_model.data(arch_model.index(arch_index, 0))
 
-			proj_index = manual_log_time.ProjectComboBox.currentIndex()
-			proj_model = manual_log_time.ProjectComboBox.model()
-			proj_id = proj_model.data(proj_model.index(proj_index, 0))
-
 			phase_index = manual_log_time.PhaseComboBox.currentIndex()
 			phase_model = manual_log_time.PhaseComboBox.model()
 			phase_id = phase_model.data(phase_model.index(phase_index, 0))
 
-			if phase_id in (8, 9):
-				proj_id = None
+			if phase_id == 8:
+				proj_id = -1
+			elif phase_id == 9:
+				proj_id = -2
+			else:
+				proj_index = manual_log_time.ProjectComboBox.currentIndex()
+				proj_model = manual_log_time.ProjectComboBox.model()
+				proj_id = proj_model.data(proj_model.index(proj_index, 0))
 
 			# Get start date and time and turn into a timestamp int for database
 			start_date = manual_log_time.timeStartDate.date()
@@ -472,6 +491,8 @@ class ViewProjects(QWidget, Ui_ViewProjectsWindow):
 		self.projectsTableView.setColumnHidden(
 			self.model.fieldIndex("project_id"), True)
 
+		self.model.setFilter("project_id > 0")
+
 		# set column widths
 		self.projectsTableView.setColumnWidth(1, 150)
 		self.projectsTableView.setColumnWidth(2, 160)
@@ -618,7 +639,7 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 
 		# set original sort by start time
 		index = self.model.fieldIndex("start_time")
-		self.timeEntriesTableView.sortByColumn(index, Qt.AscendingOrder)
+		self.timeEntriesTableView.sortByColumn(index, Qt.DescendingOrder)
 
 		# set column widths
 		self.timeEntriesTableView.setColumnWidth(1, 140)
@@ -703,8 +724,8 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 		self.project_model.select()
 		self.ProjectComboBox.setModel(self.project_model)
 		self.ProjectComboBox.setModelColumn(1)					
-		setLinkedComboBox(self.main_window.ArchitectsComboBox,
-			self.ArchitectComboBox)
+		setLinkedComboBox(self.main_window.ProjectsComboBox,
+			self.ProjectComboBox)
 		
 		self.phase_model = QSqlTableModel()
 		self.phase_model.setTable("phases")
@@ -767,6 +788,17 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 			self.time_log.total_pause_duration)
 		# Convert to int to store in database
 		start_time = int(self.time_log.start_time.timestamp())
+		
+		total_minutes = total_time // 60
+		quarter_hours = total_minutes // 15
+		if total_minutes % 15 > 0:
+			quarter_hours += 1
+		total_time_logged = quarter_hours * 15
+
+		if total_time_logged == 0:
+			self.main_window.showNormal()
+			self.close()
+			return
 
 		# Pop up notes dialog
 		self.timeNotes = TimeEntriesNotesWindow()
@@ -775,21 +807,18 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 		arch_index = self.ArchitectComboBox.currentIndex()
 		arch_id = self.architect_model.data(self.architect_model.index(arch_index, 0))
 
-		proj_index = self.ProjectComboBox.currentIndex()
-		proj_id = self.project_model.data(self.project_model.index(proj_index, 0))
-
 		phase_index = self.PhaseComboBox.currentIndex()
 		phase_id = self.phase_model.data(self.phase_model.index(phase_index, 0))
 
-		if phase_id in (8, 9):
-			proj_id = None
+		if phase_id == 8:
+			proj_id = -1
+		elif phase_id == 9:
+			proj_id = -2
+		else:
+			proj_index = self.ProjectComboBox.currentIndex()
+			proj_id = self.project_model.data(self.project_model.index(proj_index, 0))
 
 		time_notes = self.timeNotes.notesTextEdit.toPlainText()
-		total_minutes = total_time // 60
-		quarter_hours = total_minutes // 15
-		if total_minutes % 15 > 0:
-			quarter_hours += 1
-		total_time_logged = quarter_hours * 15
 
 		# Create TimeEntry object with created data
 		new_time_entry = TimeEntry(start_time = start_time, 
@@ -799,8 +828,6 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 		with get_db_connection() as conn:
 			cur = conn.cursor()
 			add_time_entry(new_time_entry, cur)
-
-		self.model.select()
 
 		self.main_window.showNormal()
 		self.close()

@@ -1125,6 +1125,37 @@ class TimeEntriesRelationalTableModel(QSqlRelationalTableModel):
 					return False
 			value = int(date_time.timestamp())
 
+		# Safety a Business Dev or Admin project from having an incorrect status
+		if field_name == "project_name":
+			# On project name change setData fires twice, 
+			# 	ignore first one where value is str, only use 2nd where value is int
+			if isinstance(value, str):
+				return super().setData(index, value, role)
+
+			old_proj_id = self.data(index, role)
+			new_proj_id = value
+			
+			phase_id = None
+			if new_proj_id < 0:
+				phase_id = 9 if new_proj_id == -2 else 8
+
+			# if the phase id is currently 8 or 9, then change it to whatever the last phase was for the project in the database
+			elif old_proj_id == "Administration" or old_proj_id == "Business Development":
+				with get_db_connection() as conn:
+					cur = conn.cursor()
+					phase_id = get_most_recent_project_phase(new_proj_id, cur)
+				# If project has no previous time entries
+				if not phase_id:
+					phase_id = 1
+			else:
+				phase_id = None
+			if phase_id is not None:
+				phase_column = self.fieldIndex("project_phase")
+				phase_index = self.index(index.row(), phase_column)
+				super().setData(phase_index, phase_id, role)
+
+
+
 		return super().setData(index, value, role)
 
 

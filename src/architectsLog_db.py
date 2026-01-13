@@ -176,8 +176,12 @@ def get_most_recent_project_phase(project_id: int, cur: sqlite3.Cursor) -> int:
 	using a project_id"""
 	query = "SELECT phase_id FROM time_entries WHERE project_id = ?\
 		ORDER BY start_time DESC LIMIT 1"
-	cur.execute(query, project_id)
-	return cur.fetchone()
+	cur.execute(query, (project_id,))
+	value = cur.fetchone()
+	if value:
+		return value[0]
+	else:
+		return None
 
 
 #	~~~TABLE INSERTION FUNCTIONS~~~

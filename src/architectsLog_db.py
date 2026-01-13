@@ -163,6 +163,22 @@ def initialize_projects(cur: sqlite3.Cursor) -> None:
 		VALUES(-2, "Administration", "Internal", "N/A2", "01/01/1900", 9)
 		""")
 
+def get_most_recent_archid_and_projid(cur: sqlite3.Cursor) -> list[tuple[int, int]]:
+	"""Function to retrieve the most recent architect and project from the
+	time_entries table in the database"""
+	query = "SELECT architect_id, project_id FROM time_entries\
+		ORDER BY start_time DESC LIMIT 1"
+	cur.execute(query)
+	return cur.fetchone()
+
+def get_most_recent_project_phase(project_id: int, cur: sqlite3.Cursor) -> int:
+	"""Get a projects most recently used phase from the time_entries table
+	using a project_id"""
+	query = "SELECT phase_id FROM time_entries WHERE project_id = ?\
+		ORDER BY start_time DESC LIMIT 1"
+	cur.execute(query, project_id)
+	return cur.fetchone()
+
 
 #	~~~TABLE INSERTION FUNCTIONS~~~
 

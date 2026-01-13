@@ -27,7 +27,8 @@ from architectsLog_classes import Architect, Project, Invoice, TimeEntry
 from architectsLog_constants import	(PHASES, ARCHITECT_STATUSES, PROJECT_STATUSES, 
 	INVOICE_STATUSES)
 from architectsLog_db import (DB_FILE, get_db_connection, add_architect, add_project,
-	add_time_entry, add_invoice, update_project)
+	add_time_entry, add_invoice, update_project, get_most_recent_archid_and_projid,
+	get_most_recent_project_phase)
 
 
 def initialize_database(DB_FILE: str) -> None:
@@ -68,7 +69,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.PhasesComboBox.currentIndexChanged.connect(self.phaseChanged)
 
 		# set architect and project combo boxes on most recently added time entry
-		arch_proj_ids = get_most_recent_archid_and_projid()
+		with get_db_connection() as conn:
+			cur = conn.cursor()
+			arch_proj_ids = get_most_recent_archid_and_projid(cur)
 		arch_id, proj_id = arch_proj_ids
 		arch_match = self.architect_model.match(self.architect_model.index(0,0), 
 			Qt.EditRole, arch_id)
@@ -251,7 +254,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 				cur = conn.cursor()
 				add_time_entry(new_time_entry, cur)
 
-			self.model.select()
+			if self.view_time_entries_window is not None:
+				self.view_time_entries_window.model.select()
 
 
 class ArchitectWindow(QDialog, Ui_AddArchitectDialog):
@@ -1219,13 +1223,3 @@ def validate_duration(duration: str) -> int:
 
 	return hours * 60 + minutes
 
-
-def get_most_recent_archid_and_projid() -> list[tuple[int, int]]:
-	"""Function to retrieve the most recent architect and project from the
-	time_entries table in the database"""
-	query = "SELECT architect_id, project_id FROM time_entries\
-		ORDER BY start_time DESC LIMIT 1"
-	with get_db_connection() as conn:
-		cur = conn.cursor()
-		cur.execute(query)
-		return cur.fetchone()

@@ -44,13 +44,13 @@ class Ui_ViewProjectsWindow(object):
 
         self.verticalLayout.addWidget(self.MainTitle)
 
-        self.hideProjectCheckBox = QCheckBox(ViewProjectsWindow)
-        self.hideProjectCheckBox.setObjectName(u"hideProjectCheckBox")
-        self.hideProjectCheckBox.setStyleSheet(u"QCheckBox{\n"
+        self.showProjectCheckBox = QCheckBox(ViewProjectsWindow)
+        self.showProjectCheckBox.setObjectName(u"showProjectCheckBox")
+        self.showProjectCheckBox.setStyleSheet(u"QCheckBox{\n"
 "	color: #35B5AC;\n"
 "}")
 
-        self.verticalLayout.addWidget(self.hideProjectCheckBox, 0, Qt.AlignmentFlag.AlignRight)
+        self.verticalLayout.addWidget(self.showProjectCheckBox, 0, Qt.AlignmentFlag.AlignRight)
 
         self.projectsTableView = QTableView(ViewProjectsWindow)
         self.projectsTableView.setObjectName(u"projectsTableView")
@@ -76,6 +76,6 @@ class Ui_ViewProjectsWindow(object):
     def retranslateUi(self, ViewProjectsWindow):
         ViewProjectsWindow.setWindowTitle(QCoreApplication.translate("ViewProjectsWindow", u"Form", None))
         self.MainTitle.setText(QCoreApplication.translate("ViewProjectsWindow", u"Projects", None))
-        self.hideProjectCheckBox.setText(QCoreApplication.translate("ViewProjectsWindow", u"Hide Completed", None))
+        self.showProjectCheckBox.setText(QCoreApplication.translate("ViewProjectsWindow", u"Show Completed / Change Status", None))
     # retranslateUi
 

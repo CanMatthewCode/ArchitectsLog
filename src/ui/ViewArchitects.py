@@ -44,13 +44,13 @@ class Ui_ViewArchitectsWindow(object):
 
         self.verticalLayout.addWidget(self.MainTitle)
 
-        self.hideArchitectCheckBox = QCheckBox(ViewArchitectsWindow)
-        self.hideArchitectCheckBox.setObjectName(u"hideArchitectCheckBox")
-        self.hideArchitectCheckBox.setStyleSheet(u"QCheckBox{\n"
+        self.showArchitectCheckBox = QCheckBox(ViewArchitectsWindow)
+        self.showArchitectCheckBox.setObjectName(u"showArchitectCheckBox")
+        self.showArchitectCheckBox.setStyleSheet(u"QCheckBox{\n"
 "	color: #35B5AC;\n"
 "}")
 
-        self.verticalLayout.addWidget(self.hideArchitectCheckBox, 0, Qt.AlignmentFlag.AlignRight)
+        self.verticalLayout.addWidget(self.showArchitectCheckBox, 0, Qt.AlignmentFlag.AlignRight)
 
         self.architectsTableView = QTableView(ViewArchitectsWindow)
         self.architectsTableView.setObjectName(u"architectsTableView")
@@ -76,6 +76,6 @@ class Ui_ViewArchitectsWindow(object):
     def retranslateUi(self, ViewArchitectsWindow):
         ViewArchitectsWindow.setWindowTitle(QCoreApplication.translate("ViewArchitectsWindow", u"Form", None))
         self.MainTitle.setText(QCoreApplication.translate("ViewArchitectsWindow", u"Architects", None))
-        self.hideArchitectCheckBox.setText(QCoreApplication.translate("ViewArchitectsWindow", u"Hide Inactive", None))
+        self.showArchitectCheckBox.setText(QCoreApplication.translate("ViewArchitectsWindow", u"Show Inactive / Change Status", None))
     # retranslateUi
 

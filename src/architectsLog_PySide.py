@@ -366,8 +366,8 @@ class ViewArchitects(QWidget, Ui_ViewArchitectsWindow):
 		self.model.setTable("architects")
 
 		# set my view state reset function onto the model
-		self.model.modelReset.connect(self.applyViewState)
-		self.model.layoutChanged.connect(self.applyViewState)
+		#self.model.modelReset.connect(self.applyViewState)
+		#self.model.layoutChanged.connect(self.applyViewState)
 
 		# set my model on my view
 		self.architectsTableView.setModel(self.model)
@@ -395,16 +395,20 @@ class ViewArchitects(QWidget, Ui_ViewArchitectsWindow):
 			self.model.fieldIndex("architect_id"), True)
 
 		# set column widths
-		self.architectsTableView.setColumnWidth(1, 150)
-		self.architectsTableView.setColumnWidth(2, 100)
-		self.architectsTableView.setColumnWidth(3, 120)
-		self.architectsTableView.setColumnWidth(4, 200)
-		self.architectsTableView.setColumnWidth(5, 150)
-		self.architectsTableView.setColumnWidth(6, 80)
+		self.model.setFilter("status != 'Inactive'")
+		self.model.select()
+		self.architectsTableView.setColumnHidden(self.model.fieldIndex("status"), 
+			True)
+		self.architectsTableView.setColumnWidth(1, 165)
+		self.architectsTableView.setColumnWidth(2, 115)
+		self.architectsTableView.setColumnWidth(3, 135)
+		self.architectsTableView.setColumnWidth(4, 215)
+		self.architectsTableView.setColumnWidth(5, 170)
 
 		# move license number to after company name
 		header = self.architectsTableView.horizontalHeader()
 		header.moveSection(5, 2) 			# move company name to 2nd column
+		#self.model.select()
 
 		# set original sort by architect name
 		index = self.model.fieldIndex("name")
@@ -421,24 +425,13 @@ class ViewArchitects(QWidget, Ui_ViewArchitectsWindow):
 			status_delegate)
 		
 		# set checkbox button to hide inactive architects
-		self.hideArchitectCheckBox.stateChanged.connect(self.hideInactiveArchitects)
+		self.showArchitectCheckBox.stateChanged.connect(self.showInactiveArchitects)
 		
 		self.show()
 
-	def hideInactiveArchitects(self, state) -> None:
+	def showInactiveArchitects(self, state) -> None:
 		# create filter to hide inactive architects and status column
 		if state == 2:
-			self.model.setFilter("status != 'Inactive'")
-			self.model.select()
-			self.architectsTableView.setColumnHidden(self.model.fieldIndex("status"), 
-				True)
-			self.architectsTableView.setColumnWidth(1, 165)
-			self.architectsTableView.setColumnWidth(2, 115)
-			self.architectsTableView.setColumnWidth(3, 135)
-			self.architectsTableView.setColumnWidth(4, 215)
-			self.architectsTableView.setColumnWidth(5, 170)
-	
-		else:
 			self.model.setFilter("")
 			self.model.select()
 			self.architectsTableView.setColumnHidden(self.model.fieldIndex("status"), 
@@ -449,12 +442,24 @@ class ViewArchitects(QWidget, Ui_ViewArchitectsWindow):
 			self.architectsTableView.setColumnWidth(4, 200)
 			self.architectsTableView.setColumnWidth(5, 150)
 			self.architectsTableView.setColumnWidth(6, 80)
+	
+		else:
+			self.model.setFilter("status != 'Inactive'")
+			self.model.select()
+			self.architectsTableView.setColumnHidden(self.model.fieldIndex("status"), 
+				True)
+			self.architectsTableView.setColumnWidth(1, 165)
+			self.architectsTableView.setColumnWidth(2, 115)
+			self.architectsTableView.setColumnWidth(3, 135)
+			self.architectsTableView.setColumnWidth(4, 215)
+			self.architectsTableView.setColumnWidth(5, 170)
+			
 
 	def applyViewState(self) -> None:
 		# conditionally hide/show status column based on checkbox
 		status_column = self.model.fieldIndex("status")
 		if status_column != -1:
-			hide_status = self.hideArchitectCheckBox.isChecked()
+			hide_status = not self.hideArchitectCheckBox.isChecked()
 			self.architectsTableView.setColumnHidden(status_column, hide_status)
 
 
@@ -481,8 +486,8 @@ class ViewProjects(QWidget, Ui_ViewProjectsWindow):
 
 
 		# set my view state reset function onto the model
-		self.model.modelReset.connect(self.applyViewState)
-		self.model.layoutChanged.connect(self.applyViewState)
+		#self.model.modelReset.connect(self.applyViewState)
+		#self.model.layoutChanged.connect(self.applyViewState)
 
 		# allow editing of project information
 		self.model.setEditStrategy(QSqlRelationalTableModel.OnFieldChange)
@@ -506,15 +511,16 @@ class ViewProjects(QWidget, Ui_ViewProjectsWindow):
 		self.projectsTableView.setColumnHidden(
 			self.model.fieldIndex("project_id"), True)
 
-		self.model.setFilter("project_id > 0")
-
 		# set column widths
-		self.projectsTableView.setColumnWidth(1, 150)
-		self.projectsTableView.setColumnWidth(2, 160)
-		self.projectsTableView.setColumnWidth(3, 320)
+		self.model.setFilter("status != 'Completed' and project_id > 0")
+		self.model.select()
+		self.projectsTableView.setColumnHidden(self.model.fieldIndex("status"), 
+			True)
+		self.projectsTableView.setColumnWidth(1, 170)
+		self.projectsTableView.setColumnWidth(2, 180)
+		self.projectsTableView.setColumnWidth(3, 340)
 		self.projectsTableView.setColumnWidth(4, 90)
-		self.projectsTableView.setColumnWidth(5, 180)
-		self.projectsTableView.setColumnWidth(6, 80)
+		self.projectsTableView.setColumnWidth(5, 202)
 
 		# set original sort by project name
 		index = self.model.fieldIndex("project_name")
@@ -530,7 +536,7 @@ class ViewProjects(QWidget, Ui_ViewProjectsWindow):
 			status_delegate)
 
 		# set checkbox button to show completed projects
-		self.hideProjectCheckBox.stateChanged.connect(self.hideCompletedProjects)
+		self.showProjectCheckBox.stateChanged.connect(self.showCompletedProjects)
 
 		# set the main window phases combo box when user changes project phase
 		self.model.dataChanged.connect(self.dataChanged)
@@ -549,21 +555,10 @@ class ViewProjects(QWidget, Ui_ViewProjectsWindow):
 			setCrossComboBox(self.main_window.ProjectsComboBox, 
 				self.main_window.PhasesComboBox, 5)
 
-	def hideCompletedProjects(self, signal) -> None:
+	def showCompletedProjects(self, signal) -> None:
 		"""create filter to hide completed projects and status column"""
 		if signal == 2:
-			self.model.setFilter("status != 'Completed'")
-			self.model.select()
-			self.projectsTableView.setColumnHidden(self.model.fieldIndex("status"), 
-				True)
-			self.projectsTableView.setColumnWidth(1, 170)
-			self.projectsTableView.setColumnWidth(2, 180)
-			self.projectsTableView.setColumnWidth(3, 340)
-			self.projectsTableView.setColumnWidth(4, 90)
-			self.projectsTableView.setColumnWidth(5, 202)
-
-		else:
-			self.model.setFilter("")
+			self.model.setFilter("project_id > 0")
 			self.model.select()
 			self.projectsTableView.setColumnHidden(self.model.fieldIndex("status"), 
 				False)
@@ -574,13 +569,24 @@ class ViewProjects(QWidget, Ui_ViewProjectsWindow):
 			self.projectsTableView.setColumnWidth(5, 180)
 			self.projectsTableView.setColumnWidth(6, 80)
 
+		else:
+			self.model.setFilter("status != 'Completed' and project_id > 0")
+			self.model.select()
+			self.projectsTableView.setColumnHidden(self.model.fieldIndex("status"), 
+				True)
+			self.projectsTableView.setColumnWidth(1, 170)
+			self.projectsTableView.setColumnWidth(2, 180)
+			self.projectsTableView.setColumnWidth(3, 340)
+			self.projectsTableView.setColumnWidth(4, 90)
+			self.projectsTableView.setColumnWidth(5, 202)
+
 		self.model.select()
 
 	def applyViewState(self) -> None:
 		# conditionally hide/show status column based on checkbox
 		status_column = self.model.fieldIndex("status")
 		if status_column != -1:
-			hide_status = self.hideProjectCheckBox.isChecked()
+			hide_status = self.showProjectCheckBox.isChecked()
 			self.projectsTableView.setColumnHidden(status_column, hide_status)
 
 

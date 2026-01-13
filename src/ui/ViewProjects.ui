@@ -54,14 +54,14 @@
     </widget>
    </item>
    <item alignment="Qt::AlignmentFlag::AlignRight">
-    <widget class="QCheckBox" name="hideProjectCheckBox">
+    <widget class="QCheckBox" name="showProjectCheckBox">
      <property name="styleSheet">
       <string notr="true">QCheckBox{
 	color: #35B5AC;
 }</string>
      </property>
      <property name="text">
-      <string>Hide Completed</string>
+      <string>Show Completed / Change Status</string>
      </property>
     </widget>
    </item>

@@ -86,7 +86,7 @@ def create_invoices_table(cur: sqlite3.Cursor) -> None:
 			invoice_id INTEGER PRIMARY KEY AUTOINCREMENT,
 			project_id INTEGER NOT NULL,
 			created_date INTEGER NOT NULL,
-			invoice_number INTEGER,
+			invoice_number TEXT,
 			status TEXT DEFAULT 'Draft',
 			FOREIGN KEY (project_id) REFERENCES projects (project_id)
 		)
@@ -128,6 +128,7 @@ def sqltable_initialize() -> None:
 		create_time_entries_table(cur)
 		initialize_phases(cur)
 		initialize_projects(cur)
+		initialize_invoices(cur)
 
 
 def initialize_phases(cur: sqlite3.Cursor) -> None:
@@ -162,6 +163,16 @@ def initialize_projects(cur: sqlite3.Cursor) -> None:
 		client_address, start_date, current_phase_id)
 		VALUES(-2, "Administration", "Internal", "N/A2", "01/01/1900", 9)
 		""")
+
+def initialize_invoices(cur: sqlite3.Cursor) -> None:
+	"""Initialize the invoices table with a 0 id, None named invoice for default
+	time entries"""
+	cur.execute("SELECT COUNT(*) FROM invoices WHERE invoice_id IS 0")
+	if cur.fetchone()[0] > 0:
+		return
+	cur.execute("""INSERT INTO invoices (invoice_id, project_id, 
+		created_date, invoice_number)
+		VALUES (0,0,0,'Not Invoiced')""")
 
 def get_most_recent_archid_and_projid(cur: sqlite3.Cursor) -> list[tuple[int, int]]:
 	"""Function to retrieve the most recent architect and project from the

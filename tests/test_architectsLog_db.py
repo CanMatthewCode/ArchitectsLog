@@ -305,7 +305,7 @@ def test_create_invoices_table_column_types(table_info):
 	assert column_types['invoice_id'] == 'INTEGER'
 	assert column_types['project_id'] == 'INTEGER'
 	assert column_types['created_date'] == 'INTEGER'
-	assert column_types['invoice_number'] == 'INTEGER'
+	assert column_types['invoice_number'] == 'TEXT'
 	assert column_types['status'] == 'TEXT'
 
 

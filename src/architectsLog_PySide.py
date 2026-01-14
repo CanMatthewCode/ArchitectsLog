@@ -244,7 +244,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			duration = manual_log_time.durationLineEdit.text()
 			if not duration:
 				return
-			total_duration = validate_duration(duration)
+			total_duration = validateDuration(duration)
 
 			new_time_entry = TimeEntry(start_time = time_log_start_time,
 				duration_minutes = total_duration,
@@ -998,7 +998,7 @@ class ManualTimeLogger(QDialog, Ui_AddTimeDialog):
 		super().accept()
 
 class NoDeleteTableModel(QSqlTableModel):
-	"""Class to dissalow deletions of entire rows in table views and to 
+	"""Class to disallow deletions of entire rows in table views and to 
 	check for valid email address and phone number on user edit"""
 	def removeRows(self, row, count, parent=None) -> bool:
 		return False
@@ -1108,7 +1108,7 @@ class TimeEntriesRelationalTableModel(QSqlRelationalTableModel):
 		# Reset a user's entered duration from xx:xx to just minutes
 		if field_name == "duration_minutes":
 			try:
-				value = validate_duration(value)
+				value = validateDuration(value)
 			except ValueError:
 				return False
 
@@ -1213,8 +1213,10 @@ class TimeStartDelegate(QStyledItemDelegate):
 	def createEditor(self, parent, options, index):
 		editor = QLineEdit(parent)
 		regex = QRegularExpression(
-			r"^\d{1,2}(-|\/)\d{1,2}(-|\/)(\d{2}|\d{4})\s+(([0]?[1-9])|([1][0-2]))\
-			:[0-5]\d\s(AM|PM|am|pm])$")
+			r"^(([0]?[1-9])|([1][1-2]))(-|\/)(([0]?[1-9])|([1-2][0-9])|([3][0-1]))"
+			r"(-|\/)(\d{2}|(20\d{2}))\s+(([0]?[1-9])|([1][0-2])):[0-5]"
+			r"\d\s(AM|PM|am|pm])$"
+			)
 		validator = QRegularExpressionValidator(regex, editor)
 		editor.setValidator(validator)
 
@@ -1242,7 +1244,7 @@ def setLinkedComboBox(source_combo: QComboBox, target_combo: QComboBox) -> None:
 	target_combo.setCurrentIndex(source_combo.currentIndex())
 
 
-def validate_duration(duration: str) -> int:
+def validateDuration(duration: str) -> int:
 	"""Function to parse duration input and return it as a total minutes int
 	rounded up to the next 15 minute increment"""
 	if not duration:

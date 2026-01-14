@@ -667,34 +667,24 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 		self.timeEntriesTableView.sortByColumn(index, Qt.DescendingOrder)
 
 		# set column widths
-		self.timeEntriesTableView.setColumnWidth(1, 140)
-		self.timeEntriesTableView.setColumnWidth(2, 140)
+		self.model.setFilter("invoice_id IS NULL")
+		self.timeEntriesTableView.setColumnHidden(self.model.fieldIndex(
+			"invoice_id"), True)
+		self.timeEntriesTableView.setColumnWidth(1, 155)
+		self.timeEntriesTableView.setColumnWidth(2, 155)
 		self.timeEntriesTableView.setColumnWidth(3, 180)
-		self.timeEntriesTableView.setColumnWidth(4, 152)
-		self.timeEntriesTableView.setColumnWidth(5, 80)
-		self.timeEntriesTableView.setColumnWidth(6, 565)
-		self.timeEntriesTableView.setColumnWidth(7, 100)
+		self.timeEntriesTableView.setColumnWidth(4, 170)
+		self.timeEntriesTableView.setColumnWidth(5, 100)
+		self.timeEntriesTableView.setColumnWidth(6, 597)
 
 		# click box activation
-		self.hideInvoicedCheckBox.stateChanged.connect(self.hideInvoicedTimes)
+		self.showInvoicedCheckBox.stateChanged.connect(self.showInvoicedTimes)
 
 		self.show()
 
-	def hideInvoicedTimes(self, signal):
+	def showInvoicedTimes(self, signal):
 		"""Filter out time log entries attached to an invoice"""
 		if signal == 2:
-			self.model.setFilter("invoice_id IS NULL")
-			self.model.select()
-			self.timeEntriesTableView.setColumnHidden(self.model.fieldIndex(
-				"invoice_id"), True)
-			self.timeEntriesTableView.setColumnWidth(1, 155)
-			self.timeEntriesTableView.setColumnWidth(2, 155)
-			self.timeEntriesTableView.setColumnWidth(3, 180)
-			self.timeEntriesTableView.setColumnWidth(4, 170)
-			self.timeEntriesTableView.setColumnWidth(5, 100)
-			self.timeEntriesTableView.setColumnWidth(6, 597)
-
-		else:
 			self.model.setFilter("")
 			self.model.select()
 			self.timeEntriesTableView.setColumnHidden(self.model.fieldIndex(
@@ -706,6 +696,18 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 			self.timeEntriesTableView.setColumnWidth(5, 80)
 			self.timeEntriesTableView.setColumnWidth(6, 565)
 			self.timeEntriesTableView.setColumnWidth(7, 100)
+
+		else:
+			self.model.setFilter("invoice_id IS NULL")
+			self.model.select()
+			self.timeEntriesTableView.setColumnHidden(self.model.fieldIndex(
+				"invoice_id"), True)
+			self.timeEntriesTableView.setColumnWidth(1, 155)
+			self.timeEntriesTableView.setColumnWidth(2, 155)
+			self.timeEntriesTableView.setColumnWidth(3, 180)
+			self.timeEntriesTableView.setColumnWidth(4, 170)
+			self.timeEntriesTableView.setColumnWidth(5, 100)
+			self.timeEntriesTableView.setColumnWidth(6, 597)	
 
 		self.model.select()
 

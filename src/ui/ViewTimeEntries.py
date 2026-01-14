@@ -49,13 +49,13 @@ class Ui_ViewTimeEntriesWindow(object):
 
         self.verticalLayout.addWidget(self.MainTitle)
 
-        self.hideInvoicedCheckBox = QCheckBox(ViewTimeEntriesWindow)
-        self.hideInvoicedCheckBox.setObjectName(u"hideInvoicedCheckBox")
-        self.hideInvoicedCheckBox.setStyleSheet(u"QCheckBox{\n"
+        self.showInvoicedCheckBox = QCheckBox(ViewTimeEntriesWindow)
+        self.showInvoicedCheckBox.setObjectName(u"showInvoicedCheckBox")
+        self.showInvoicedCheckBox.setStyleSheet(u"QCheckBox{\n"
 "	color: #35B5AC;\n"
 "}")
 
-        self.verticalLayout.addWidget(self.hideInvoicedCheckBox, 0, Qt.AlignmentFlag.AlignRight)
+        self.verticalLayout.addWidget(self.showInvoicedCheckBox, 0, Qt.AlignmentFlag.AlignRight)
 
         self.timeEntriesTableView = QTableView(ViewTimeEntriesWindow)
         self.timeEntriesTableView.setObjectName(u"timeEntriesTableView")
@@ -64,7 +64,7 @@ class Ui_ViewTimeEntriesWindow(object):
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.timeEntriesTableView.sizePolicy().hasHeightForWidth())
         self.timeEntriesTableView.setSizePolicy(sizePolicy1)
-        self.timeEntriesTableView.setMinimumSize(QSize(1375, 0))
+        self.timeEntriesTableView.setMinimumSize(QSize(1400, 0))
         self.timeEntriesTableView.setStyleSheet(u"QTableView{\n"
 "	color: #89D5D2;\n"
 "}")
@@ -81,6 +81,6 @@ class Ui_ViewTimeEntriesWindow(object):
     def retranslateUi(self, ViewTimeEntriesWindow):
         ViewTimeEntriesWindow.setWindowTitle(QCoreApplication.translate("ViewTimeEntriesWindow", u"Form", None))
         self.MainTitle.setText(QCoreApplication.translate("ViewTimeEntriesWindow", u"Time Logs", None))
-        self.hideInvoicedCheckBox.setText(QCoreApplication.translate("ViewTimeEntriesWindow", u"Hide Invoiced", None))
+        self.showInvoicedCheckBox.setText(QCoreApplication.translate("ViewTimeEntriesWindow", u"Show Invoiced Logs", None))
     # retranslateUi
 

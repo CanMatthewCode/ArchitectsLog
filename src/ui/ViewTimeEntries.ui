@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1400</width>
-    <height>461</height>
+    <width>1424</width>
+    <height>650</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -92,6 +92,40 @@
      </property>
      <property name="alternatingRowColors">
       <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item alignment="Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignVCenter">
+    <widget class="QPushButton" name="createInvoiceBtn">
+     <property name="font">
+      <font>
+       <pointsize>18</pointsize>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton{
+	border-radius: 12px;
+	border: 1px solid black;
+	border-style: solid;
+	min-width: 60px;
+	min-height: 30px;
+	padding: 5px 10px;
+	margin-left: 5px;
+	margin-right: 10px;
+	background-color: #008080;
+	color: black;
+}
+
+QPushButton:hover {
+	background-color: #006666;
+}
+
+QPushButton:pressed {
+	background-color: #004D4D;
+}</string>
+     </property>
+     <property name="text">
+      <string>Create Invoice</string>
      </property>
     </widget>
    </item>

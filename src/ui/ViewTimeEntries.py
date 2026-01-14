@@ -16,13 +16,14 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QCheckBox, QHeaderView, QLabel,
-    QSizePolicy, QTableView, QVBoxLayout, QWidget)
+    QPushButton, QSizePolicy, QTableView, QVBoxLayout,
+    QWidget)
 
 class Ui_ViewTimeEntriesWindow(object):
     def setupUi(self, ViewTimeEntriesWindow):
         if not ViewTimeEntriesWindow.objectName():
             ViewTimeEntriesWindow.setObjectName(u"ViewTimeEntriesWindow")
-        ViewTimeEntriesWindow.resize(1400, 461)
+        ViewTimeEntriesWindow.resize(1424, 650)
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -72,6 +73,34 @@ class Ui_ViewTimeEntriesWindow(object):
 
         self.verticalLayout.addWidget(self.timeEntriesTableView)
 
+        self.createInvoiceBtn = QPushButton(ViewTimeEntriesWindow)
+        self.createInvoiceBtn.setObjectName(u"createInvoiceBtn")
+        font1 = QFont()
+        font1.setPointSize(18)
+        self.createInvoiceBtn.setFont(font1)
+        self.createInvoiceBtn.setStyleSheet(u"QPushButton{\n"
+"	border-radius: 12px;\n"
+"	border: 1px solid black;\n"
+"	border-style: solid;\n"
+"	min-width: 60px;\n"
+"	min-height: 30px;\n"
+"	padding: 5px 10px;\n"
+"	margin-left: 5px;\n"
+"	margin-right: 10px;\n"
+"	background-color: #008080;\n"
+"	color: black;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: #006666;\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: #004D4D;\n"
+"}")
+
+        self.verticalLayout.addWidget(self.createInvoiceBtn, 0, Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
+
 
         self.retranslateUi(ViewTimeEntriesWindow)
 
@@ -82,5 +111,6 @@ class Ui_ViewTimeEntriesWindow(object):
         ViewTimeEntriesWindow.setWindowTitle(QCoreApplication.translate("ViewTimeEntriesWindow", u"Form", None))
         self.MainTitle.setText(QCoreApplication.translate("ViewTimeEntriesWindow", u"Time Logs", None))
         self.showInvoicedCheckBox.setText(QCoreApplication.translate("ViewTimeEntriesWindow", u"Show Invoiced Logs", None))
+        self.createInvoiceBtn.setText(QCoreApplication.translate("ViewTimeEntriesWindow", u"Create Invoice", None))
     # retranslateUi
 

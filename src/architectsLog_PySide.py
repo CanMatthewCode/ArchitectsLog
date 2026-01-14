@@ -249,7 +249,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			new_time_entry = TimeEntry(start_time = time_log_start_time,
 				duration_minutes = total_duration,
 				project_id = proj_id, architect_id = arch_id, phase_id = phase_id,
-				notes = manual_log_time.notesTextEdit.toPlainText())
+				notes = manual_log_time.notesTextEdit.toPlainText(), invoice_id = 0)
 			with get_db_connection() as conn:
 				cur = conn.cursor()
 				add_time_entry(new_time_entry, cur)
@@ -553,7 +553,7 @@ class ViewProjects(QWidget, Ui_ViewProjectsWindow):
 		it in the view projects table"""
 		# topLeft.column() will read 5 & 0 instead of just 5 because .dataChanged 
 		# fires twice -> once for the RelationalTableModel and once for the relation 
-		# table. The if only picks up the 2nd which is 0 due to th combo box display 
+		# table. The if only picks up the 2nd which is 0 due to the combo box display 
 		if topLeft.column() == 0:
 			self.main_window.ProjectsComboBox.model().select()
 			setCrossComboBox(self.main_window.ProjectsComboBox, 
@@ -611,17 +611,21 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 		# allow editing of time_entries information
 		self.model.setEditStrategy(QSqlRelationalTableModel.OnFieldChange)
 
-		# add a relation between 'time_entries' table and 'phases' with dropdown menu
+		# add a relation between 'time_entries' table and 'phases' with drop-down menu
 		phase_relation = QSqlRelation("phases", "phase_id", "project_phase")
 		self.model.setRelation(self.model.fieldIndex("phase_id"), phase_relation)
 
-		# add relation between 'time_entries' table and 'architects' with dropdown menu
+		# add relation between 'time_entries' table and 'architects' with drop-down menu
 		arch_relation = QSqlRelation("architects", "architect_id", "name")
 		self.model.setRelation(self.model.fieldIndex("architect_id"), arch_relation)
 
-		# add relation between 'time_entries' table and 'projects' with dropdown menu
+		# add relation between 'time_entries' table and 'projects' with drop-down menu
 		project_relation = QSqlRelation("projects", "project_id", "project_name")
 		self.model.setRelation(self.model.fieldIndex("project_id"), project_relation)
+
+		# add relation between 'time_entries' table and 'invoices' with drop-down menu
+		invoice_relation = QSqlRelation("invoices", "invoice_id", "invoice_number")
+		self.model.setRelation(self.model.fieldIndex("invoice_id"), invoice_relation)
 
 		self.timeEntriesTableView.setItemDelegate(QSqlRelationalDelegate(
 			self.timeEntriesTableView))
@@ -667,9 +671,9 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 		self.timeEntriesTableView.sortByColumn(index, Qt.DescendingOrder)
 
 		# set column widths
-		self.model.setFilter("invoice_id IS NULL")
+		self.model.setFilter("invoice_number = 'Not Invoiced'")
 		self.timeEntriesTableView.setColumnHidden(self.model.fieldIndex(
-			"invoice_id"), True)
+			"invoice_number"), True)
 		self.timeEntriesTableView.setColumnWidth(1, 155)
 		self.timeEntriesTableView.setColumnWidth(2, 155)
 		self.timeEntriesTableView.setColumnWidth(3, 180)
@@ -688,20 +692,20 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 			self.model.setFilter("")
 			self.model.select()
 			self.timeEntriesTableView.setColumnHidden(self.model.fieldIndex(
-				"invoice_id"), False)
-			self.timeEntriesTableView.setColumnWidth(1, 140)
+				"invoice_number"), False)
+			self.timeEntriesTableView.setColumnWidth(1, 155)
 			self.timeEntriesTableView.setColumnWidth(2, 140)
 			self.timeEntriesTableView.setColumnWidth(3, 180)
 			self.timeEntriesTableView.setColumnWidth(4, 152)
 			self.timeEntriesTableView.setColumnWidth(5, 80)
-			self.timeEntriesTableView.setColumnWidth(6, 565)
+			self.timeEntriesTableView.setColumnWidth(6, 555)
 			self.timeEntriesTableView.setColumnWidth(7, 100)
 
 		else:
-			self.model.setFilter("invoice_id IS NULL")
+			self.model.setFilter("invoice_number = 'Not Invoiced'")
 			self.model.select()
 			self.timeEntriesTableView.setColumnHidden(self.model.fieldIndex(
-				"invoice_id"), True)
+				"invoice_number"), True)
 			self.timeEntriesTableView.setColumnWidth(1, 155)
 			self.timeEntriesTableView.setColumnWidth(2, 155)
 			self.timeEntriesTableView.setColumnWidth(3, 180)
@@ -873,7 +877,8 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 		# Create TimeEntry object with created data
 		new_time_entry = TimeEntry(start_time = start_time, 
 			duration_minutes = total_time_logged, project_id = proj_id, 
-			architect_id = arch_id, phase_id = phase_id, notes = time_notes)
+			architect_id = arch_id, phase_id = phase_id, notes = time_notes, 
+			invoice_id = 0)
 
 		with get_db_connection() as conn:
 			cur = conn.cursor()
@@ -1072,14 +1077,7 @@ class TimeEntriesRelationalTableModel(QSqlRelationalTableModel):
 	display start_time as mm/dd/yyyy hh:mm am/pm,
 	reformat user duration input from hour:min to total minutes,
 	reformat user start_time input from mm/dd/yyyy hh:mm am/pm to total ints"""
-	def flags(self, index):
-		# Get the default flags
-		default_flag = super().flags(index)
-		# If its invoice_id column remove the editable flag
-		if self.record().fieldName(index.column()) == "invoice_id":
-			return default_flag & ~Qt.ItemIsEditable
 
-		return default_flag
 
 	def data(self, index, role = Qt.DisplayRole):
 		# Get column database names to change display of time duration
@@ -1099,6 +1097,10 @@ class TimeEntriesRelationalTableModel(QSqlRelationalTableModel):
 		if field_name == "start_time" and value is not None:
 			date_time = datetime.fromtimestamp(value)
 			value = date_time.strftime("%m/%d/%Y %I:%M %p")
+
+		# Display a blank string if invoice_number == 0
+		if field_name == "invoice_number" and value == "Not Invoiced":
+			value = ""
 
 		return value
 
@@ -1214,8 +1216,8 @@ class TimeStartDelegate(QStyledItemDelegate):
 		editor = QLineEdit(parent)
 		regex = QRegularExpression(
 			r"^(([0]?[1-9])|([1][1-2]))(-|\/)(([0]?[1-9])|([1-2][0-9])|([3][0-1]))"
-			r"(-|\/)(\d{2}|(20\d{2}))\s+(([0]?[1-9])|([1][0-2])):[0-5]"
-			r"\d\s(AM|PM|am|pm])$"
+			r"(-|\/)(\d{2}|(20\d{2}))\s+(([0]?[1-9])|([1][0-2])):[0-5]\d"
+			r"\s(AM|PM|am|pm)$"
 			)
 		validator = QRegularExpressionValidator(regex, editor)
 		editor.setValidator(validator)

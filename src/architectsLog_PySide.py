@@ -11,7 +11,7 @@ from PySide6.QtWidgets import (QMainWindow, QApplication, QDialog, QMessageBox,
 from PySide6.QtSql import (QSqlDatabase, QSqlTableModel, QSqlRelationalTableModel, 
 	QSqlRelation, QSqlRelationalDelegate)
 from PySide6.QtCore import (Qt, QDate, QDateTime, QModelIndex, QTimer, QTime, 
-	QRegularExpression)
+	QRegularExpression, QIdentityProxyModel)
 from PySide6.QtGui import QRegularExpressionValidator
 
 from ui.MainWindow import Ui_MainWindow
@@ -330,6 +330,7 @@ class ProjectWindow(QDialog, Ui_AddProjectDialog):
 		# set first phase to the Phase QComboBox
 		self.phase_model = QSqlTableModel()
 		self.phase_model.setTable("phases")
+		self.phase_model.setFilter("phase_id < 8")
 		self.phase_model.select()
 		self.phaseComboBox.setModel(self.phase_model)
 		self.phaseComboBox.setModelColumn(1)				# Index 1 is phase names
@@ -1068,6 +1069,12 @@ class NonDeletableRelationalTableModel(QSqlRelationalTableModel):
 					QMessageBox.warning(None, "Invalid Date", 
 							"Invalid Date, Please Correct")
 					return False
+
+		if field_name == "project_phase":
+			if isinstance(value, str):
+				return super().setData(index, value, role)
+			if value > 7:
+				return False
 
 		return super().setData(index, value, role)
 

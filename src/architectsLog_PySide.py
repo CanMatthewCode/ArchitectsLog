@@ -53,6 +53,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 		self.project_model = QSqlTableModel()
 		self.project_model.setTable("projects")
+		self.project_model.setFilter("status = 'Active'")
 		self.project_model.select()
 		self.ProjectsComboBox.setModel(self.project_model)
 		self.ProjectsComboBox.setModelColumn(1)					# Index 1 is proj name
@@ -753,6 +754,7 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 
 		self.project_model = QSqlTableModel()
 		self.project_model.setTable("projects")
+		self.project_model.setFilter("status = 'Active'")
 		self.project_model.select()
 		self.ProjectComboBox.setModel(self.project_model)
 		self.ProjectComboBox.setModelColumn(1)					
@@ -931,6 +933,7 @@ class ManualTimeLogger(QDialog, Ui_AddTimeDialog):
 
 		self.project_model = QSqlTableModel()
 		self.project_model.setTable("projects")
+		self.project_model.setFilter("status = 'Active'")
 		self.project_model.select()
 		self.ProjectComboBox.setModel(self.project_model)
 		self.ProjectComboBox.setModelColumn(1)					

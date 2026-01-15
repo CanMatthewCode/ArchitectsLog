@@ -22,6 +22,7 @@ from ui.ViewProjects import Ui_ViewProjectsWindow
 from ui.ViewTimeEntries import Ui_ViewTimeEntriesWindow
 from ui.TimeNotes import Ui_TimeNotesDialog
 from ui.AddTimeEntry import Ui_AddTimeDialog
+from ui.ViewInvoices import Ui_ViewInvoicesWindow
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry 
 from architectsLog_constants import	(PHASES, ARCHITECT_STATUSES, PROJECT_STATUSES, 
@@ -94,10 +95,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.view_arch_window = None
 		self.view_proj_window = None
 		self.view_time_entries_window = None
+		self.view_invoices_window = None
 
 		self.ViewArchitectsBtn.clicked.connect(self.viewArchitects)
 		self.ViewProjectsBtn.clicked.connect(self.viewProjects)
 		self.ViewTimeLogsBtn.clicked.connect(self.viewTimeEntries)
+		self.ViewInvoicesBtn.clicked.connect(self.viewInvoices)
 
 		self.show()
 
@@ -203,6 +206,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		"""Method to view all time_entries in database table, click button 
 		to hide entries already associated with an invoice"""
 		self.view_time_entries_window = ViewTimeEntries()
+
+	def viewInvoices(self) -> None:
+		"""Method to view all invoices from the database table"""
+		self.view_invoices_window = ViewInvoices()
 
 	def logTime(self) -> None:
 		"""Method to activate TimeLogger window and store resulting 
@@ -717,6 +724,62 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 
 		self.model.select()
 
+class ViewInvoices(QWidget, Ui_ViewInvoicesWindow):
+	def __init__(self) -> None:
+		super(ViewInvoices, self).__init__()
+		self.setupUi(self)
+		self.setFixedSize(self.size())
+
+		self.model = QSqlRelationalTableModel()
+		self.invoicesTableView.setModel(self.model)
+		self.model.setTable("invoices")
+		self.model.setFilter('invoice_id > 0')
+
+		# allow table to be sorted by clicking top header tabs
+		self.invoicesTableView.setSortingEnabled(True)
+
+		# allow editing of time_entries information
+		self.model.setEditStrategy(QSqlRelationalTableModel.OnFieldChange)
+
+		# create and set column headers
+		column_titles = {
+			"project_id" : "Project Name",
+			"created_date" : "Invoice Created",
+			"invoice_number" : "Invoice Number",
+			"status" : "Status",
+		}
+		for name, title in column_titles.items():
+			index = self.model.fieldIndex(name)
+			self.model.setHeaderData(index, Qt.Horizontal, title)
+
+		self.model.select()
+
+		# hide architect_id column
+		self.invoicesTableView.setColumnHidden(
+			self.model.fieldIndex("invoice_id"), True)
+
+		header = self.invoicesTableView.horizontalHeader()
+		header.moveSection(3, 1)
+
+		# set original sort by start time
+		index = self.model.fieldIndex("created_date")
+		self.invoicesTableView.sortByColumn(index, Qt.DescendingOrder)
+
+		# set column widths
+		self.invoicesTableView.setColumnWidth(1, 200)
+		self.invoicesTableView.setColumnWidth(2, 150)
+		self.invoicesTableView.setColumnWidth(3, 150)
+		self.invoicesTableView.setColumnWidth(4, 100)
+		
+		# only allow chosen options for status column - create a combo box and set
+		# it on the column for status to allow only acceptable status options
+		status_delegate = StatusDelegate(INVOICE_STATUSES, self.invoicesTableView)
+		status_column = self.model.fieldIndex("status")
+		self.invoicesTableView.setItemDelegateForColumn(status_column, 
+			status_delegate)
+		
+		self.show()
+
 
 class TimerDisplay(QLCDNumber):
 	def __init__(self, parent = None):
@@ -1043,7 +1106,7 @@ class NoDeleteTableModel(QSqlTableModel):
 
 
 class NonDeletableRelationalTableModel(QSqlRelationalTableModel):
-	"""Class to dissalow deletions of entire rows in relational table views 
+	"""Class to disallow deletions of entire rows in relational table views 
 	and to check and reformat date on user edit"""
 	def removeRows(self, row, count, parent=None):
 		return False

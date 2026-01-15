@@ -18,17 +18,17 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QApplication, QHeaderView, QLabel, QSizePolicy,
     QTableView, QVBoxLayout, QWidget)
 
-class Ui_viewInvicesWinow(object):
-    def setupUi(self, viewInvicesWinow):
-        if not viewInvicesWinow.objectName():
-            viewInvicesWinow.setObjectName(u"viewInvicesWinow")
-        viewInvicesWinow.resize(1034, 450)
-        viewInvicesWinow.setStyleSheet(u"QWidget{\n"
+class Ui_ViewInvoicesWindow(object):
+    def setupUi(self, ViewInvoicesWindow):
+        if not ViewInvoicesWindow.objectName():
+            ViewInvoicesWindow.setObjectName(u"ViewInvoicesWindow")
+        ViewInvoicesWindow.resize(634, 450)
+        ViewInvoicesWindow.setStyleSheet(u"QWidget{\n"
 "	background-color: #1E2E34;\n"
 "}")
-        self.verticalLayout = QVBoxLayout(viewInvicesWinow)
+        self.verticalLayout = QVBoxLayout(ViewInvoicesWindow)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.invoicesLabel = QLabel(viewInvicesWinow)
+        self.invoicesLabel = QLabel(ViewInvoicesWindow)
         self.invoicesLabel.setObjectName(u"invoicesLabel")
         font = QFont()
         font.setPointSize(48)
@@ -42,19 +42,25 @@ class Ui_viewInvicesWinow(object):
 
         self.verticalLayout.addWidget(self.invoicesLabel, 0, Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignVCenter)
 
-        self.invoicesTableView = QTableView(viewInvicesWinow)
+        self.invoicesTableView = QTableView(ViewInvoicesWindow)
         self.invoicesTableView.setObjectName(u"invoicesTableView")
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.invoicesTableView.sizePolicy().hasHeightForWidth())
+        self.invoicesTableView.setSizePolicy(sizePolicy)
+        self.invoicesTableView.setMinimumSize(QSize(610, 0))
 
         self.verticalLayout.addWidget(self.invoicesTableView)
 
 
-        self.retranslateUi(viewInvicesWinow)
+        self.retranslateUi(ViewInvoicesWindow)
 
-        QMetaObject.connectSlotsByName(viewInvicesWinow)
+        QMetaObject.connectSlotsByName(ViewInvoicesWindow)
     # setupUi
 
-    def retranslateUi(self, viewInvicesWinow):
-        viewInvicesWinow.setWindowTitle(QCoreApplication.translate("viewInvicesWinow", u"Form", None))
-        self.invoicesLabel.setText(QCoreApplication.translate("viewInvicesWinow", u"Invoices", None))
+    def retranslateUi(self, ViewInvoicesWindow):
+        ViewInvoicesWindow.setWindowTitle(QCoreApplication.translate("ViewInvoicesWindow", u"Form", None))
+        self.invoicesLabel.setText(QCoreApplication.translate("ViewInvoicesWindow", u"Invoices", None))
     # retranslateUi
 

@@ -379,15 +379,15 @@ class Ui_MainWindow(object):
 
         self.logs_layout.addWidget(self.ViewTimeLogsBtn, 0, Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignVCenter)
 
-        self.ViewInvoiceLogsBtn = QPushButton(self.centralwidget)
-        self.ViewInvoiceLogsBtn.setObjectName(u"ViewInvoiceLogsBtn")
-        sizePolicy.setHeightForWidth(self.ViewInvoiceLogsBtn.sizePolicy().hasHeightForWidth())
-        self.ViewInvoiceLogsBtn.setSizePolicy(sizePolicy)
-        self.ViewInvoiceLogsBtn.setMinimumSize(QSize(150, 50))
-        self.ViewInvoiceLogsBtn.setMaximumSize(QSize(16777215, 16777215))
-        self.ViewInvoiceLogsBtn.setFont(font2)
-        self.ViewInvoiceLogsBtn.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-        self.ViewInvoiceLogsBtn.setStyleSheet(u"QPushButton{\n"
+        self.ViewInvoicesBtn = QPushButton(self.centralwidget)
+        self.ViewInvoicesBtn.setObjectName(u"ViewInvoicesBtn")
+        sizePolicy.setHeightForWidth(self.ViewInvoicesBtn.sizePolicy().hasHeightForWidth())
+        self.ViewInvoicesBtn.setSizePolicy(sizePolicy)
+        self.ViewInvoicesBtn.setMinimumSize(QSize(150, 50))
+        self.ViewInvoicesBtn.setMaximumSize(QSize(16777215, 16777215))
+        self.ViewInvoicesBtn.setFont(font2)
+        self.ViewInvoicesBtn.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+        self.ViewInvoicesBtn.setStyleSheet(u"QPushButton{\n"
 "	border-radius: 12px;\n"
 "	border: 1px solid black;\n"
 "	background-color: #008080;\n"
@@ -401,10 +401,10 @@ class Ui_MainWindow(object):
 "QPushButton:pressed {\n"
 "	background-color: #004D4D;\n"
 "}")
-        self.ViewInvoiceLogsBtn.setIconSize(QSize(10, 16))
-        self.ViewInvoiceLogsBtn.setAutoDefault(True)
+        self.ViewInvoicesBtn.setIconSize(QSize(10, 16))
+        self.ViewInvoicesBtn.setAutoDefault(True)
 
-        self.logs_layout.addWidget(self.ViewInvoiceLogsBtn, 0, Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignVCenter)
+        self.logs_layout.addWidget(self.ViewInvoicesBtn, 0, Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignVCenter)
 
 
         self.main_layout.addLayout(self.logs_layout)
@@ -439,6 +439,6 @@ class Ui_MainWindow(object):
         self.ViewArchitectsBtn.setText(QCoreApplication.translate("MainWindow", u"View Architects", None))
         self.ViewProjectsBtn.setText(QCoreApplication.translate("MainWindow", u"View Projects", None))
         self.ViewTimeLogsBtn.setText(QCoreApplication.translate("MainWindow", u"View Time Logs", None))
-        self.ViewInvoiceLogsBtn.setText(QCoreApplication.translate("MainWindow", u"View Invoices", None))
+        self.ViewInvoicesBtn.setText(QCoreApplication.translate("MainWindow", u"View Invoices", None))
     # retranslateUi
 

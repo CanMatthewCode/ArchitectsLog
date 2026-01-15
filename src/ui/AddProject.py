@@ -29,20 +29,20 @@ class Ui_AddProjectDialog(object):
 "}")
         self.verticalLayout_3 = QVBoxLayout(AddProjectDialog)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
-        self.MainTitle = QLabel(AddProjectDialog)
-        self.MainTitle.setObjectName(u"MainTitle")
-        self.MainTitle.setMinimumSize(QSize(550, 60))
+        self.addProjectLabel = QLabel(AddProjectDialog)
+        self.addProjectLabel.setObjectName(u"addProjectLabel")
+        self.addProjectLabel.setMinimumSize(QSize(550, 60))
         font = QFont()
         font.setPointSize(48)
         font.setBold(True)
         font.setUnderline(True)
-        self.MainTitle.setFont(font)
-        self.MainTitle.setStyleSheet(u"QLabel{\n"
+        self.addProjectLabel.setFont(font)
+        self.addProjectLabel.setStyleSheet(u"QLabel{\n"
 "	color: #89D5D2;\n"
 "}")
-        self.MainTitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.addProjectLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.verticalLayout_3.addWidget(self.MainTitle)
+        self.verticalLayout_3.addWidget(self.addProjectLabel)
 
         self.input_layout = QVBoxLayout()
         self.input_layout.setSpacing(15)
@@ -119,7 +119,7 @@ class Ui_AddProjectDialog(object):
         self.projectStartDate = QDateEdit(AddProjectDialog)
         self.projectStartDate.setObjectName(u"projectStartDate")
         self.projectStartDate.setMaximumDate(QDate(2100, 12, 31))
-        self.projectStartDate.setMinimumDate(QDate(2024, 12, 31))
+        self.projectStartDate.setMinimumDate(QDate(2024, 12, 30))
         self.projectStartDate.setCurrentSection(QDateTimeEdit.Section.MonthSection)
         self.projectStartDate.setCalendarPopup(True)
         self.projectStartDate.setTimeSpec(Qt.TimeSpec.LocalTime)
@@ -197,7 +197,7 @@ class Ui_AddProjectDialog(object):
 
     def retranslateUi(self, AddProjectDialog):
         AddProjectDialog.setWindowTitle(QCoreApplication.translate("AddProjectDialog", u"Dialog", None))
-        self.MainTitle.setText(QCoreApplication.translate("AddProjectDialog", u"Add Project", None))
+        self.addProjectLabel.setText(QCoreApplication.translate("AddProjectDialog", u"Add Project", None))
         self.projectName.setText(QCoreApplication.translate("AddProjectDialog", u"Project Name:", None))
         self.client.setText(QCoreApplication.translate("AddProjectDialog", u"Client Name:", None))
         self.projectAddress.setText(QCoreApplication.translate("AddProjectDialog", u"Project Address:", None))

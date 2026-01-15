@@ -35,20 +35,20 @@ class Ui_ViewTimeEntriesWindow(object):
 "}")
         self.verticalLayout = QVBoxLayout(ViewTimeEntriesWindow)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.MainTitle = QLabel(ViewTimeEntriesWindow)
-        self.MainTitle.setObjectName(u"MainTitle")
-        self.MainTitle.setMinimumSize(QSize(550, 60))
+        self.timeLogsLabel = QLabel(ViewTimeEntriesWindow)
+        self.timeLogsLabel.setObjectName(u"timeLogsLabel")
+        self.timeLogsLabel.setMinimumSize(QSize(550, 60))
         font = QFont()
         font.setPointSize(48)
         font.setBold(True)
         font.setUnderline(True)
-        self.MainTitle.setFont(font)
-        self.MainTitle.setStyleSheet(u"QLabel{\n"
+        self.timeLogsLabel.setFont(font)
+        self.timeLogsLabel.setStyleSheet(u"QLabel{\n"
 "	color: #008080;\n"
 "}")
-        self.MainTitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.timeLogsLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.verticalLayout.addWidget(self.MainTitle)
+        self.verticalLayout.addWidget(self.timeLogsLabel)
 
         self.showInvoicedCheckBox = QCheckBox(ViewTimeEntriesWindow)
         self.showInvoicedCheckBox.setObjectName(u"showInvoicedCheckBox")
@@ -109,7 +109,7 @@ class Ui_ViewTimeEntriesWindow(object):
 
     def retranslateUi(self, ViewTimeEntriesWindow):
         ViewTimeEntriesWindow.setWindowTitle(QCoreApplication.translate("ViewTimeEntriesWindow", u"Form", None))
-        self.MainTitle.setText(QCoreApplication.translate("ViewTimeEntriesWindow", u"Time Logs", None))
+        self.timeLogsLabel.setText(QCoreApplication.translate("ViewTimeEntriesWindow", u"Time Logs", None))
         self.showInvoicedCheckBox.setText(QCoreApplication.translate("ViewTimeEntriesWindow", u"Show Invoiced Logs", None))
         self.createInvoiceBtn.setText(QCoreApplication.translate("ViewTimeEntriesWindow", u"Create Invoice", None))
     # retranslateUi

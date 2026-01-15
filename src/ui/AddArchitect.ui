@@ -20,7 +20,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
-    <widget class="QLabel" name="MainTitle">
+    <widget class="QLabel" name="addArchitectLabel">
      <property name="minimumSize">
       <size>
        <width>550</width>

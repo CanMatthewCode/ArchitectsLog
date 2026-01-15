@@ -30,20 +30,20 @@ class Ui_AddTimeDialog(object):
 "}")
         self.verticalLayout_6 = QVBoxLayout(AddTimeDialog)
         self.verticalLayout_6.setObjectName(u"verticalLayout_6")
-        self.MainTitle = QLabel(AddTimeDialog)
-        self.MainTitle.setObjectName(u"MainTitle")
-        self.MainTitle.setMinimumSize(QSize(550, 60))
+        self.addTimeLabel = QLabel(AddTimeDialog)
+        self.addTimeLabel.setObjectName(u"addTimeLabel")
+        self.addTimeLabel.setMinimumSize(QSize(550, 60))
         font = QFont()
         font.setPointSize(48)
         font.setBold(True)
         font.setUnderline(True)
-        self.MainTitle.setFont(font)
-        self.MainTitle.setStyleSheet(u"QLabel{\n"
+        self.addTimeLabel.setFont(font)
+        self.addTimeLabel.setStyleSheet(u"QLabel{\n"
 "	color: #35B5AC;\n"
 "}")
-        self.MainTitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.addTimeLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.verticalLayout_6.addWidget(self.MainTitle)
+        self.verticalLayout_6.addWidget(self.addTimeLabel)
 
         self.verticalSpacer = QSpacerItem(20, 80, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
@@ -127,7 +127,7 @@ class Ui_AddTimeDialog(object):
         sizePolicy.setHeightForWidth(self.timeStartDate.sizePolicy().hasHeightForWidth())
         self.timeStartDate.setSizePolicy(sizePolicy)
         self.timeStartDate.setMaximumDate(QDate(2100, 12, 31))
-        self.timeStartDate.setMinimumDate(QDate(2025, 1, 1))
+        self.timeStartDate.setMinimumDate(QDate(2024, 12, 31))
         self.timeStartDate.setCurrentSection(QDateTimeEdit.Section.MonthSection)
         self.timeStartDate.setCalendarPopup(True)
         self.timeStartDate.setTimeSpec(Qt.TimeSpec.LocalTime)
@@ -248,7 +248,7 @@ class Ui_AddTimeDialog(object):
 
     def retranslateUi(self, AddTimeDialog):
         AddTimeDialog.setWindowTitle(QCoreApplication.translate("AddTimeDialog", u"Dialog", None))
-        self.MainTitle.setText(QCoreApplication.translate("AddTimeDialog", u"Add Time", None))
+        self.addTimeLabel.setText(QCoreApplication.translate("AddTimeDialog", u"Add Time", None))
         self.architectLabel.setText(QCoreApplication.translate("AddTimeDialog", u"Architect", None))
         self.projectLabel.setText(QCoreApplication.translate("AddTimeDialog", u"Project", None))
         self.phaseLabel.setText(QCoreApplication.translate("AddTimeDialog", u"Phase", None))

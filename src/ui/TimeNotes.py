@@ -34,25 +34,25 @@ class Ui_TimeNotesDialog(object):
 "}")
         self.verticalLayout = QVBoxLayout(TimeNotesDialog)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.MainTitle = QLabel(TimeNotesDialog)
-        self.MainTitle.setObjectName(u"MainTitle")
+        self.notesLabel = QLabel(TimeNotesDialog)
+        self.notesLabel.setObjectName(u"notesLabel")
         sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.MainTitle.sizePolicy().hasHeightForWidth())
-        self.MainTitle.setSizePolicy(sizePolicy1)
-        self.MainTitle.setMinimumSize(QSize(400, 40))
+        sizePolicy1.setHeightForWidth(self.notesLabel.sizePolicy().hasHeightForWidth())
+        self.notesLabel.setSizePolicy(sizePolicy1)
+        self.notesLabel.setMinimumSize(QSize(400, 40))
         font = QFont()
         font.setPointSize(24)
         font.setBold(True)
         font.setUnderline(True)
-        self.MainTitle.setFont(font)
-        self.MainTitle.setStyleSheet(u"QLabel{\n"
+        self.notesLabel.setFont(font)
+        self.notesLabel.setStyleSheet(u"QLabel{\n"
 "	color: #35B5AC;\n"
 "}")
-        self.MainTitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.notesLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.verticalLayout.addWidget(self.MainTitle, 0, Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignTop)
+        self.verticalLayout.addWidget(self.notesLabel, 0, Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignTop)
 
         self.notesTextEdit = QTextEdit(TimeNotesDialog)
         self.notesTextEdit.setObjectName(u"notesTextEdit")
@@ -94,6 +94,6 @@ class Ui_TimeNotesDialog(object):
 
     def retranslateUi(self, TimeNotesDialog):
         TimeNotesDialog.setWindowTitle(QCoreApplication.translate("TimeNotesDialog", u"Dialog", None))
-        self.MainTitle.setText(QCoreApplication.translate("TimeNotesDialog", u"Notes", None))
+        self.notesLabel.setText(QCoreApplication.translate("TimeNotesDialog", u"Notes", None))
     # retranslateUi
 

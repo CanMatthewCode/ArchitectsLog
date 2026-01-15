@@ -20,7 +20,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_6">
    <item>
-    <widget class="QLabel" name="MainTitle">
+    <widget class="QLabel" name="addTimeLabel">
      <property name="minimumSize">
       <size>
        <width>550</width>
@@ -178,9 +178,9 @@
          </property>
          <property name="minimumDate">
           <date>
-           <year>2025</year>
-           <month>1</month>
-           <day>1</day>
+           <year>2024</year>
+           <month>12</month>
+           <day>31</day>
           </date>
          </property>
          <property name="currentSection">

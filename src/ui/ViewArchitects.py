@@ -29,20 +29,20 @@ class Ui_ViewArchitectsWindow(object):
 "}")
         self.verticalLayout = QVBoxLayout(ViewArchitectsWindow)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.MainTitle = QLabel(ViewArchitectsWindow)
-        self.MainTitle.setObjectName(u"MainTitle")
-        self.MainTitle.setMinimumSize(QSize(550, 60))
+        self.architectsLabel = QLabel(ViewArchitectsWindow)
+        self.architectsLabel.setObjectName(u"architectsLabel")
+        self.architectsLabel.setMinimumSize(QSize(550, 60))
         font = QFont()
         font.setPointSize(48)
         font.setBold(True)
         font.setUnderline(True)
-        self.MainTitle.setFont(font)
-        self.MainTitle.setStyleSheet(u"QLabel{\n"
+        self.architectsLabel.setFont(font)
+        self.architectsLabel.setStyleSheet(u"QLabel{\n"
 "	color: #008080;\n"
 "}")
-        self.MainTitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.architectsLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.verticalLayout.addWidget(self.MainTitle)
+        self.verticalLayout.addWidget(self.architectsLabel)
 
         self.showArchitectCheckBox = QCheckBox(ViewArchitectsWindow)
         self.showArchitectCheckBox.setObjectName(u"showArchitectCheckBox")
@@ -75,7 +75,7 @@ class Ui_ViewArchitectsWindow(object):
 
     def retranslateUi(self, ViewArchitectsWindow):
         ViewArchitectsWindow.setWindowTitle(QCoreApplication.translate("ViewArchitectsWindow", u"Form", None))
-        self.MainTitle.setText(QCoreApplication.translate("ViewArchitectsWindow", u"Architects", None))
+        self.architectsLabel.setText(QCoreApplication.translate("ViewArchitectsWindow", u"Architects", None))
         self.showArchitectCheckBox.setText(QCoreApplication.translate("ViewArchitectsWindow", u"Show Inactive / Change Status", None))
     # retranslateUi
 

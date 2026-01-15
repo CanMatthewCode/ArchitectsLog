@@ -41,20 +41,20 @@ class Ui_MainWindow(object):
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.main_layout = QVBoxLayout()
         self.main_layout.setObjectName(u"main_layout")
-        self.MainTitle = QLabel(self.centralwidget)
-        self.MainTitle.setObjectName(u"MainTitle")
-        self.MainTitle.setMinimumSize(QSize(501, 61))
+        self.theArchitectsLogLabel = QLabel(self.centralwidget)
+        self.theArchitectsLogLabel.setObjectName(u"theArchitectsLogLabel")
+        self.theArchitectsLogLabel.setMinimumSize(QSize(501, 61))
         font = QFont()
         font.setPointSize(48)
         font.setBold(True)
         font.setUnderline(True)
-        self.MainTitle.setFont(font)
-        self.MainTitle.setStyleSheet(u"QLabel{\n"
+        self.theArchitectsLogLabel.setFont(font)
+        self.theArchitectsLogLabel.setStyleSheet(u"QLabel{\n"
 "	color: #008080;\n"
 "}")
-        self.MainTitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.theArchitectsLogLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.main_layout.addWidget(self.MainTitle)
+        self.main_layout.addWidget(self.theArchitectsLogLabel)
 
         self.project_button_layout = QHBoxLayout()
         self.project_button_layout.setObjectName(u"project_button_layout")
@@ -428,7 +428,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
-        self.MainTitle.setText(QCoreApplication.translate("MainWindow", u"The Architects Log", None))
+        self.theArchitectsLogLabel.setText(QCoreApplication.translate("MainWindow", u"The Architects Log", None))
         self.Architects.setText(QCoreApplication.translate("MainWindow", u"Architect", None))
         self.AddArchitectBtn.setText(QCoreApplication.translate("MainWindow", u"Add New Architect", None))
         self.Projects.setText(QCoreApplication.translate("MainWindow", u"Project", None))

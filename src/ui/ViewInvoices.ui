@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>viewInvicesWinow</class>
+ <widget class="QWidget" name="viewInvicesWinow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1034</width>
+    <height>450</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget{
+	background-color: #1E2E34;
+}</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
+    <widget class="QLabel" name="invoicesLabel">
+     <property name="font">
+      <font>
+       <pointsize>48</pointsize>
+       <italic>false</italic>
+       <bold>true</bold>
+       <underline>true</underline>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QLabel{
+	color: #008080;
+}</string>
+     </property>
+     <property name="text">
+      <string>Invoices</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTableView" name="invoicesTableView"/>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

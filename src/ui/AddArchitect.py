@@ -29,20 +29,20 @@ class Ui_AddArchitectDialog(object):
 "}")
         self.verticalLayout_3 = QVBoxLayout(AddArchitectDialog)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
-        self.MainTitle = QLabel(AddArchitectDialog)
-        self.MainTitle.setObjectName(u"MainTitle")
-        self.MainTitle.setMinimumSize(QSize(550, 60))
+        self.addArchitectLabel = QLabel(AddArchitectDialog)
+        self.addArchitectLabel.setObjectName(u"addArchitectLabel")
+        self.addArchitectLabel.setMinimumSize(QSize(550, 60))
         font = QFont()
         font.setPointSize(48)
         font.setBold(True)
         font.setUnderline(True)
-        self.MainTitle.setFont(font)
-        self.MainTitle.setStyleSheet(u"QLabel{\n"
+        self.addArchitectLabel.setFont(font)
+        self.addArchitectLabel.setStyleSheet(u"QLabel{\n"
 "	color: #89D5D2;\n"
 "}")
-        self.MainTitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.addArchitectLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.verticalLayout_3.addWidget(self.MainTitle)
+        self.verticalLayout_3.addWidget(self.addArchitectLabel)
 
         self.input_layout = QVBoxLayout()
         self.input_layout.setSpacing(15)
@@ -192,7 +192,7 @@ class Ui_AddArchitectDialog(object):
 
     def retranslateUi(self, AddArchitectDialog):
         AddArchitectDialog.setWindowTitle(QCoreApplication.translate("AddArchitectDialog", u"Dialog", None))
-        self.MainTitle.setText(QCoreApplication.translate("AddArchitectDialog", u"Add Architect", None))
+        self.addArchitectLabel.setText(QCoreApplication.translate("AddArchitectDialog", u"Add Architect", None))
         self.architectName.setText(QCoreApplication.translate("AddArchitectDialog", u"Architect Name:", None))
         self.license.setText(QCoreApplication.translate("AddArchitectDialog", u"License Number:", None))
         self.companyName.setText(QCoreApplication.translate("AddArchitectDialog", u"Company Name:", None))

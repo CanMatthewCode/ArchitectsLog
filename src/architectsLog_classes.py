@@ -28,11 +28,11 @@ class Project:
 
 
 class Invoice:
-	def __init__(self, invoice_number: int, created_date: int, project: Project = None,
+	def __init__(self, invoice_number: int, created_date: int, project_id: int,
 		status: str = "Draft", invoice_id: int = None) -> None:
 		self.invoice_number = invoice_number
 		self.created_date = created_date
-		self.project = project
+		self.project_id = project_id
 		self.status = status
 		self.invoice_id = invoice_id
 

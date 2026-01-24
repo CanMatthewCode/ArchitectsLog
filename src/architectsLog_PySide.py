@@ -7,11 +7,12 @@ from datetime import datetime
 import sqlite3
 
 from PySide6.QtWidgets import (QMainWindow, QApplication, QDialog, QMessageBox,
-	QStyledItemDelegate, QLineEdit, QComboBox, QWidget, QLCDNumber)
+	QStyledItemDelegate, QLineEdit, QComboBox, QWidget, QLCDNumber, 
+	QStyleOptionButton, QStyle)
 from PySide6.QtSql import (QSqlDatabase, QSqlTableModel, QSqlRelationalTableModel, 
 	QSqlRelation, QSqlRelationalDelegate)
 from PySide6.QtCore import (Qt, QDate, QDateTime, QModelIndex, QTimer, QTime, 
-	QRegularExpression, QIdentityProxyModel)
+	QRegularExpression, QEvent, QRect)
 from PySide6.QtGui import QRegularExpressionValidator
 
 from ui.MainWindow import Ui_MainWindow
@@ -23,13 +24,14 @@ from ui.ViewTimeEntries import Ui_ViewTimeEntriesWindow
 from ui.TimeNotes import Ui_TimeNotesDialog
 from ui.AddTimeEntry import Ui_AddTimeDialog
 from ui.ViewInvoices import Ui_ViewInvoicesWindow
+from ui.AddInvoiceNumber import Ui_AddInvoiceDialog
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry 
 from architectsLog_constants import	(PHASES, ARCHITECT_STATUSES, PROJECT_STATUSES, 
 	INVOICE_STATUSES)
 from architectsLog_db import (DB_FILE, get_db_connection, add_architect, add_project,
-	add_time_entry, add_invoice, update_project, get_most_recent_archid_and_projid,
-	get_most_recent_project_phase)
+	add_time_entry, add_invoice, update_project, update_time_entry,
+	get_most_recent_archid_and_projid, get_most_recent_project_phase)
 
 
 def initialize_database(DB_FILE: str) -> None:
@@ -651,6 +653,12 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 			start_time_column_index, TimeStartDelegate(
 				self.timeEntriesTableView))
 
+		# set checkbox delegate
+		self.invoice_checkbox_delegate = InvoiceCheckboxDelegate(self.model, self)
+		invoice_col = self.model.fieldIndex("invoice_id")
+		self.timeEntriesTableView.setItemDelegateForColumn(invoice_col, 
+			self.invoice_checkbox_delegate)
+
 		# create and set column headers
 		column_titles = {
 			"project_id" : "Project Name",
@@ -683,15 +691,16 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 		self.model.setFilter("invoice_number = 'Not Invoiced'")
 		self.timeEntriesTableView.setColumnHidden(self.model.fieldIndex(
 			"invoice_number"), True)
-		self.timeEntriesTableView.setColumnWidth(1, 155)
-		self.timeEntriesTableView.setColumnWidth(2, 155)
-		self.timeEntriesTableView.setColumnWidth(3, 180)
-		self.timeEntriesTableView.setColumnWidth(4, 170)
-		self.timeEntriesTableView.setColumnWidth(5, 100)
-		self.timeEntriesTableView.setColumnWidth(6, 597)
+		self.expandColumns()
+
+		self.cancelInvoiceBtn.hide()
 
 		# click box activation
 		self.showInvoicedCheckBox.stateChanged.connect(self.showInvoicedTimes)
+
+		self.createInvoiceBtn.clicked.connect(self.createInvoice)
+
+		self.cancelInvoiceBtn.clicked.connect(self.cancelInvoice)
 
 		self.show()
 
@@ -702,27 +711,127 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 			self.model.select()
 			self.timeEntriesTableView.setColumnHidden(self.model.fieldIndex(
 				"invoice_number"), False)
-			self.timeEntriesTableView.setColumnWidth(1, 155)
-			self.timeEntriesTableView.setColumnWidth(2, 140)
-			self.timeEntriesTableView.setColumnWidth(3, 180)
-			self.timeEntriesTableView.setColumnWidth(4, 152)
-			self.timeEntriesTableView.setColumnWidth(5, 80)
-			self.timeEntriesTableView.setColumnWidth(6, 555)
-			self.timeEntriesTableView.setColumnWidth(7, 100)
+			self.contractColumns()
 
 		else:
 			self.model.setFilter("invoice_number = 'Not Invoiced'")
 			self.model.select()
 			self.timeEntriesTableView.setColumnHidden(self.model.fieldIndex(
 				"invoice_number"), True)
-			self.timeEntriesTableView.setColumnWidth(1, 155)
-			self.timeEntriesTableView.setColumnWidth(2, 155)
-			self.timeEntriesTableView.setColumnWidth(3, 180)
-			self.timeEntriesTableView.setColumnWidth(4, 170)
-			self.timeEntriesTableView.setColumnWidth(5, 100)
-			self.timeEntriesTableView.setColumnWidth(6, 597)	
+			self.expandColumns()	
 
 		self.model.select()
+
+	def createInvoice(self):
+		if self.invoice_checkbox_delegate.selection_mode == False:
+			self.invoice_checkbox_delegate.selection_mode = True
+			self.createInvoiceBtn.setText("Generate Invoice")
+			self.timeEntriesTableView.setColumnHidden(self.model.fieldIndex(
+				"invoice_number"), False)
+			self.contractColumns()
+			index = self.model.fieldIndex("invoice_number")
+			self.model.setHeaderData(index, Qt.Horizontal, "Select Entries")
+			self.timeEntriesTableView.horizontalHeader().headerDataChanged(
+				Qt.Horizontal, index, index)
+			self.cancelInvoiceBtn.show()
+			self.showInvoicedCheckBox.setEnabled(False)
+		else:
+			self.invoice_checkbox_delegate.selection_mode = False
+			self.createInvoiceBtn.setText("Create Invoice")
+
+			# add time_entry_ids and proj_ids to list
+			checked_invoice_time_entry_ids = []
+			checked_invoice_proj_names = set()
+			for row in self.invoice_checkbox_delegate.checked_rows:
+				time_entry_id = self.model.data(self.model.index(row, 
+					self.model.fieldIndex("time_entry_id")), Qt.EditRole)
+				proj_id = self.model.data(self.model.index(
+					row, self.model.fieldIndex("project_name")), Qt.EditRole)
+				checked_invoice_time_entry_ids.append(time_entry_id)
+				checked_invoice_proj_names.add(proj_id)
+			
+			if len(checked_invoice_proj_names) == 0:
+				self.cancelInvoice()
+				return
+			elif len(checked_invoice_proj_names) != 1:
+				# Pop up warning on ids
+				QMessageBox.warning(self, "Invalid Project",
+			 		"All Time Entries Must Be From The Same Project")
+				self.cancelInvoice()
+				return
+			else:
+				project_name = checked_invoice_proj_names.pop()
+				# Check to make sure project is real
+				if (project_name == "Administration" or 
+					project_name == "Business Development"):
+					QMessageBox.warning(self, "Invalid Project",
+			 		f"{project_name} Cannot Be Invoiced")
+					self.cancelInvoice()
+					return
+				# Pop up invoice number dialog
+				add_invoice_number = AddInvoiceNumber()
+				add_invoice_number.exec()
+				invoice_number = add_invoice_number.addInvoiceLineEdit.text()
+				date = datetime.now()
+				start_date = int(date.timestamp())
+
+				with get_db_connection() as conn:
+					cur = conn.cursor()
+					query = "SELECT project_id FROM projects WHERE project_name = ?"
+					cur.execute(query, (project_name,))
+					proj_id = cur.fetchone()[0]
+					if proj_id:
+						# Create invoice
+						new_invoice = Invoice(invoice_number, start_date, proj_id)
+						invoice_id = add_invoice(new_invoice, cur)
+						# Update time_entry invoice_id columns for selected time_entries
+						for time_entry in checked_invoice_time_entry_ids:
+							update_time_entry("invoice_id", time_entry, invoice_id, cur)
+				self.model.select()
+
+			if not self.showInvoicedCheckBox.isChecked():
+				self.timeEntriesTableView.setColumnHidden(self.model.fieldIndex(
+					"invoice_number"), True)
+				self.expandColumns()
+			index = self.model.fieldIndex("invoice_number")
+			self.model.setHeaderData(index, Qt.Horizontal, "Invoice Number")
+			self.cancelInvoiceBtn.hide()
+			self.invoice_checkbox_delegate.checked_rows.clear()
+			self.showInvoicedCheckBox.setEnabled(True)
+
+		self.timeEntriesTableView.viewport().update()
+
+	def cancelInvoice(self):
+		self.invoice_checkbox_delegate.selection_mode = False
+		self.createInvoiceBtn.setText("Create Invoice")
+		if not self.showInvoicedCheckBox.isChecked():
+			self.timeEntriesTableView.setColumnHidden(self.model.fieldIndex(
+				"invoice_number"), True)
+			self.expandColumns()
+		index = self.model.fieldIndex("invoice_number")
+		self.model.setHeaderData(index, Qt.Horizontal, "Invoice Number")
+		self.cancelInvoiceBtn.hide()
+		self.invoice_checkbox_delegate.checked_rows.clear()
+		self.showInvoicedCheckBox.setEnabled(True)
+		self.timeEntriesTableView.viewport().update()
+
+	def expandColumns(self):
+		self.timeEntriesTableView.setColumnWidth(1, 155)
+		self.timeEntriesTableView.setColumnWidth(2, 155)
+		self.timeEntriesTableView.setColumnWidth(3, 180)
+		self.timeEntriesTableView.setColumnWidth(4, 170)
+		self.timeEntriesTableView.setColumnWidth(5, 100)
+		self.timeEntriesTableView.setColumnWidth(6, 592)
+
+	def contractColumns(self):	
+		self.timeEntriesTableView.setColumnWidth(1, 155)
+		self.timeEntriesTableView.setColumnWidth(2, 140)
+		self.timeEntriesTableView.setColumnWidth(3, 180)
+		self.timeEntriesTableView.setColumnWidth(4, 152)
+		self.timeEntriesTableView.setColumnWidth(5, 80)
+		self.timeEntriesTableView.setColumnWidth(6, 550)
+		self.timeEntriesTableView.setColumnWidth(7, 100)
+
 
 class ViewInvoices(QWidget, Ui_ViewInvoicesWindow):
 	def __init__(self) -> None:
@@ -730,18 +839,18 @@ class ViewInvoices(QWidget, Ui_ViewInvoicesWindow):
 		self.setupUi(self)
 		self.setFixedSize(self.size())
 
-		self.model = QSqlRelationalTableModel()
+		self.model = InvoiceRelationalTableModel()
 		self.invoicesTableView.setModel(self.model)
 		self.model.setTable("invoices")
 		self.model.setFilter('invoice_id > 0')
 
-		# allow table to be sorted by clicking top header tabs
 		self.invoicesTableView.setSortingEnabled(True)
 
-		# allow editing of time_entries information
 		self.model.setEditStrategy(QSqlRelationalTableModel.OnFieldChange)
 
-		# create and set column headers
+		project_relation = QSqlRelation("projects", "project_id", "project_name")
+		self.model.setRelation(self.model.fieldIndex("project_id"), project_relation)
+
 		column_titles = {
 			"project_id" : "Project Name",
 			"created_date" : "Invoice Created",
@@ -754,9 +863,15 @@ class ViewInvoices(QWidget, Ui_ViewInvoicesWindow):
 
 		self.model.select()
 
-		# hide architect_id column
+		# hide invoice_id column
 		self.invoicesTableView.setColumnHidden(
 			self.model.fieldIndex("invoice_id"), True)
+
+		# set created date delegate
+		created_date_column_index = self.model.fieldIndex("created_date")
+		self.invoicesTableView.setItemDelegateForColumn(
+			created_date_column_index, CreatedDateDelegate(
+				self.invoicesTableView))
 
 		header = self.invoicesTableView.horizontalHeader()
 		header.moveSection(3, 1)
@@ -765,8 +880,7 @@ class ViewInvoices(QWidget, Ui_ViewInvoicesWindow):
 		index = self.model.fieldIndex("created_date")
 		self.invoicesTableView.sortByColumn(index, Qt.DescendingOrder)
 
-		# set column widths
-		self.invoicesTableView.setColumnWidth(1, 200)
+		self.invoicesTableView.setColumnWidth(1, 180)
 		self.invoicesTableView.setColumnWidth(2, 150)
 		self.invoicesTableView.setColumnWidth(3, 150)
 		self.invoicesTableView.setColumnWidth(4, 100)
@@ -970,7 +1084,7 @@ class TimeLog():
 				- self.total_pause_duration)
 		return self.total_time
 
-class TimeEntriesNotesWindow(QDialog, Ui_TimeNotesDialog):
+class TimeEntriesNotesWindow(QDialog, Ui_AddInvoiceDialog):
 	def __init__(self):
 		super(TimeEntriesNotesWindow, self).__init__()
 		self.setupUi(self)
@@ -1068,6 +1182,13 @@ class ManualTimeLogger(QDialog, Ui_AddTimeDialog):
 			return
 
 		super().accept()
+
+class AddInvoiceNumber(QDialog, Ui_AddInvoiceDialog):
+	def __init__(self):
+		super(AddInvoiceNumber, self).__init__()
+		self.setupUi(self)
+		self.setFixedSize(self.size())
+
 
 class NoDeleteTableModel(QSqlTableModel):
 	"""Class to disallow deletions of entire rows in table views and to 
@@ -1246,6 +1367,40 @@ class TimeEntriesRelationalTableModel(QSqlRelationalTableModel):
 
 		return super().setData(index, value, role)
 
+class InvoiceRelationalTableModel(QSqlRelationalTableModel):
+	"""Class to reformat created date for invoices"""
+	def data(self, index, role = Qt.DisplayRole):
+		field_name = self.record().fieldName(index.column())
+		value = super().data(index, role)
+
+		if (field_name == "created_date" and value is not None 
+			and role == Qt.DisplayRole):
+			date_time = datetime.fromtimestamp(value)
+			value = date_time.strftime("%m/%d/%Y")
+			return value
+
+		if (field_name == "invoice_number" and role == Qt.TextAlignmentRole):
+			return Qt.AlignCenter
+
+		return super().data(index, role)
+
+	def setData(self, index, value, role = Qt.EditRole):
+		field_name = self.record().fieldName(index.column())
+		if field_name == "created_date":
+			value = value.replace("-", "/")
+			try: 
+				date_time = datetime.strptime(value, "%m/%d/%Y")
+			except ValueError:
+				try:
+					date_time = datetime.strptime(value, "%m/%d/%y")
+				except ValueError:
+					QMessageBox.warning(self.parent(), "Invalid Creation Date",
+						"Invalid Creation Date \
+						Must Be In Month/Day/Year Format")
+					return False
+			value = int(date_time.timestamp())
+
+		return super().setData(index, value, role)
 
 class StatusDelegate(QStyledItemDelegate):
 	"""Class to allow drop down ComboBoxes for table cells where only a specific
@@ -1297,6 +1452,94 @@ class TimeStartDelegate(QStyledItemDelegate):
 
 		return editor
 
+class CreatedDateDelegate(QStyledItemDelegate):
+	"""Class to validate manual date input by user"""
+	def createEditor(self, parent, options, index):
+		editor = QLineEdit(parent)
+		regex = QRegularExpression(
+			r"^(([0]?[1-9])|([1][1-2]))(-|\/)(([0]?[1-9])|([1-2][0-9])|([3][0-1]))"
+			r"(-|\/)(\d{2}|(20\d{2}))$"
+			)
+		validator = QRegularExpressionValidator(regex, editor)
+		editor.setValidator(validator)
+
+		return editor
+
+class InvoiceCheckboxDelegate(QStyledItemDelegate):
+	"""Delegate to show checkboxes in selection mode or dropdown in normal mode"""
+	
+	def __init__(self, model, parent=None):
+		super().__init__(parent)
+		self.selection_mode = False
+		self.checked_rows = set()
+		self.model = model
+		self.relational_delegate = QSqlRelationalDelegate(parent)
+	
+	def paint(self, painter, option, index):
+		# If in selection mode and row is uninvoiced, draw checkbox
+		if self.selection_mode:
+			invoice_id = index.data(Qt.EditRole)
+			if invoice_id == "Not Invoiced":
+				# Draw checkbox
+				checkbox_rect = self.getCheckboxRect(option.rect)
+				check_state = Qt.Checked if index.row() in self.checked_rows else Qt.Unchecked
+				
+				checkbox = QStyleOptionButton()
+				checkbox.rect = checkbox_rect
+				checkbox.state = QStyle.State_Enabled
+				if check_state == Qt.Checked:
+					checkbox.state |= QStyle.State_On
+				else:
+					checkbox.state |= QStyle.State_Off
+				
+				QApplication.style().drawControl(QStyle.CE_CheckBox, checkbox, painter)
+				return
+		
+		# Otherwise, use relational delegate for dropdown display
+		self.relational_delegate.paint(painter, option, index)
+	
+	def createEditor(self, parent, option, index):
+		# If in selection mode, no editor needed for checkboxes
+		if self.selection_mode:
+			return None
+		
+		# Otherwise, use relational delegate to create dropdown
+		return self.relational_delegate.createEditor(parent, option, index)
+	
+	def setEditorData(self, editor, index):
+		# Not in selection mode, use relational delegate
+		if not self.selection_mode:
+			self.relational_delegate.setEditorData(editor, index)
+	
+	def setModelData(self, editor, model, index):
+		# Not in selection mode, use relational delegate
+		if not self.selection_mode:
+			self.relational_delegate.setModelData(editor, model, index)
+	
+	def editorEvent(self, event, model, option, index):
+		# Handle checkbox clicks in selection mode
+		if self.selection_mode:
+			invoice_id = index.data(Qt.EditRole)
+			if invoice_id == "Not Invoiced":
+				if event.type() == QEvent.MouseButtonRelease:
+					if index.row() in self.checked_rows:
+						self.checked_rows.discard(index.row())
+					else:
+						self.checked_rows.add(index.row())
+					# Trigger repaint
+					model.dataChanged.emit(index, index)
+					return True
+		
+		# Otherwise use relational delegate
+		return self.relational_delegate.editorEvent(event, model, option, index)
+	
+	def getCheckboxRect(self, rect):
+		# Center the checkbox in the cell
+		checkbox_size = 20
+		x = rect.x() + (rect.width() - checkbox_size) // 2
+		y = rect.y() + (rect.height() - checkbox_size) // 2
+		return QRect(x, y, checkbox_size, checkbox_size)
+
 
 def setCrossComboBox(source_combo: QComboBox, target_combo: QComboBox, 
 	column: int = 1) -> None:
@@ -1343,4 +1586,3 @@ def validateDuration(duration: str) -> int:
 	minutes = quarter_hours * 15
 
 	return hours * 60 + minutes
-

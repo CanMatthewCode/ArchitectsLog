@@ -235,7 +235,7 @@ def add_invoice(invoice: Invoice, cur: sqlite3.Cursor) -> int:
 	sql = "INSERT INTO invoices (project_id, created_date, invoice_number, status) \
 		VALUES (?, ?, ?, ?)"
 
-	invoice_values = (invoice.project.project_id, invoice.created_date, 
+	invoice_values = (invoice.project_id, invoice.created_date, 
 		invoice.invoice_number, invoice.status)
 
 	cur.execute(sql, invoice_values)
@@ -478,8 +478,7 @@ def update_architect(column_name: str, architect: Architect, value: int | str,
 
 def update_project(column_name: str, project_id: int, value: int | str,
 	cur: sqlite3.Cursor) -> None:
-	"""Update one column for a row which exists in the projects table, set newly
-	changed attribute value to the Project object, return Project object"""
+	"""Update one column for a row which exists in the projects table"""
 	if column_name not in UPDATABLE_PROJECTS_COLUMNS:
 		raise ValueError(f"Invalid column: {column_name}")
 	sql = f"UPDATE projects SET {column_name} = ? WHERE project_id = ?"
@@ -510,29 +509,16 @@ def update_invoice(column_name: str, invoice: Invoice, value: int | str,
 	return invoice
 
 
-def update_time_entry(column_name: str, time_entry: TimeEntry, value: int | str,
-	cur: sqlite3.Cursor) -> TimeEntry:
-	"""Update one column for a row which exists in the time_entries table, set
-	newly changed attribute value to the TimeEntry object, return TimeEntry object"""
+def update_time_entry(column_name: str, time_entry_id: int, value: int | str,
+	cur: sqlite3.Cursor) -> None:
+	"""Update one column for a row which exists in the time_entries table"""
 	if column_name not in UPDATABLE_TIME_ENTRIES_COLUMNS:
 		raise ValueError(f"Invalid column: {column_name}")
 	sql = f"UPDATE time_entries SET {column_name} = ? WHERE time_entry_id = ?"
-	update_values = (value, time_entry.time_entry_id)
+	update_values = (value, time_entry_id)
 
 	cur.execute(sql, update_values)
 
-	if column_name == "architect_id":
-		architect = load_architect(value, cur)
-		column_name = "architect"
-		value = architect
-	elif column_name == "project_id":
-		project = load_project(value, cur)
-		column_name = "project"
-		value = project
-
-	setattr(time_entry, column_name, value)
-
-	return time_entry
 
 
 #	~~~TABLE DELETE FUNCTIONS~~~

@@ -15,9 +15,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QCheckBox, QHBoxLayout, QHeaderView,
-    QLabel, QPushButton, QSizePolicy, QSpacerItem,
-    QTableView, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QHBoxLayout,
+    QHeaderView, QLabel, QPushButton, QSizePolicy,
+    QSpacerItem, QTableView, QVBoxLayout, QWidget)
 
 class Ui_ViewTimeEntriesWindow(object):
     def setupUi(self, ViewTimeEntriesWindow):
@@ -75,6 +75,28 @@ class Ui_ViewTimeEntriesWindow(object):
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.showByProjectCheckBox = QCheckBox(ViewTimeEntriesWindow)
+        self.showByProjectCheckBox.setObjectName(u"showByProjectCheckBox")
+        self.showByProjectCheckBox.setStyleSheet(u"QCheckBox{\n"
+"	color: #35B5AC;\n"
+"}")
+
+        self.horizontalLayout.addWidget(self.showByProjectCheckBox)
+
+        self.projectComboBox = QComboBox(ViewTimeEntriesWindow)
+        self.projectComboBox.setObjectName(u"projectComboBox")
+        self.projectComboBox.setMinimumSize(QSize(200, 0))
+
+        self.horizontalLayout.addWidget(self.projectComboBox)
+
+        self.showCompletedProjectsCheckBox = QCheckBox(ViewTimeEntriesWindow)
+        self.showCompletedProjectsCheckBox.setObjectName(u"showCompletedProjectsCheckBox")
+        self.showCompletedProjectsCheckBox.setStyleSheet(u"QCheckBox{\n"
+"	color: #35B5AC;\n"
+"}")
+
+        self.horizontalLayout.addWidget(self.showCompletedProjectsCheckBox)
+
         self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout.addItem(self.horizontalSpacer)
@@ -146,6 +168,8 @@ class Ui_ViewTimeEntriesWindow(object):
         ViewTimeEntriesWindow.setWindowTitle(QCoreApplication.translate("ViewTimeEntriesWindow", u"Form", None))
         self.timeLogsLabel.setText(QCoreApplication.translate("ViewTimeEntriesWindow", u"Time Logs", None))
         self.showInvoicedCheckBox.setText(QCoreApplication.translate("ViewTimeEntriesWindow", u"Show Invoiced Logs", None))
+        self.showByProjectCheckBox.setText(QCoreApplication.translate("ViewTimeEntriesWindow", u"Display By Project", None))
+        self.showCompletedProjectsCheckBox.setText(QCoreApplication.translate("ViewTimeEntriesWindow", u"Show Completed Projects", None))
         self.cancelInvoiceBtn.setText(QCoreApplication.translate("ViewTimeEntriesWindow", u"Cancel", None))
         self.createInvoiceBtn.setText(QCoreApplication.translate("ViewTimeEntriesWindow", u"Create Invoice", None))
     # retranslateUi

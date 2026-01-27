@@ -98,6 +98,40 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
+      <widget class="QCheckBox" name="showByProjectCheckBox">
+       <property name="styleSheet">
+        <string notr="true">QCheckBox{
+	color: #35B5AC;
+}</string>
+       </property>
+       <property name="text">
+        <string>Display By Project</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="projectComboBox">
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>0</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="showCompletedProjectsCheckBox">
+       <property name="styleSheet">
+        <string notr="true">QCheckBox{
+	color: #35B5AC;
+}</string>
+       </property>
+       <property name="text">
+        <string>Show Completed Projects</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Orientation::Horizontal</enum>

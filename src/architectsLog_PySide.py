@@ -638,6 +638,13 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 		invoice_relation = QSqlRelation("invoices", "invoice_id", "invoice_number")
 		self.model.setRelation(self.model.fieldIndex("invoice_id"), invoice_relation)
 
+		self.project_model = QSqlTableModel()
+		self.project_model.setTable("projects")
+		self.project_model.setFilter("status = 'Active'")
+		self.project_model.select()
+		self.projectComboBox.setModel(self.project_model)
+		self.projectComboBox.setModelColumn(1)
+
 		self.timeEntriesTableView.setItemDelegate(QSqlRelationalDelegate(
 			self.timeEntriesTableView))
 
@@ -695,8 +702,16 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 
 		self.cancelInvoiceBtn.hide()
 
+		self.projectComboBox.hide()
+		self.showCompletedProjectsCheckBox.hide()
+
 		# click box activation
 		self.showInvoicedCheckBox.stateChanged.connect(self.showInvoicedTimes)
+
+		self.showByProjectCheckBox.stateChanged.connect(self.showProjectCombo)
+		self.projectComboBox.currentIndexChanged.connect(self.updateFilter)
+		self.showCompletedProjectsCheckBox.stateChanged.connect(
+			self.showCompletedProjects)
 
 		self.createInvoiceBtn.clicked.connect(self.createInvoice)
 
@@ -707,19 +722,60 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 	def showInvoicedTimes(self, signal):
 		"""Filter out time log entries attached to an invoice"""
 		if signal == 2:
-			self.model.setFilter("")
-			self.model.select()
 			self.timeEntriesTableView.setColumnHidden(self.model.fieldIndex(
 				"invoice_number"), False)
 			self.contractColumns()
 
 		else:
-			self.model.setFilter("invoice_number = 'Not Invoiced'")
-			self.model.select()
 			self.timeEntriesTableView.setColumnHidden(self.model.fieldIndex(
 				"invoice_number"), True)
 			self.expandColumns()	
 
+		self.updateFilter()
+
+	def showProjectCombo(self, signal):
+		"""Show or hide Project ComboBox"""
+		if signal == 2:
+			self.projectComboBox.show()
+			self.showCompletedProjectsCheckBox.show()
+			self.updateFilter()
+
+		else:
+			self.projectComboBox.hide()
+			self.showCompletedProjectsCheckBox.hide()
+			self.updateFilter()
+
+	def showCompletedProjects(self, signal):
+		if signal == 2:
+			self.project_model.setFilter("")
+		else:
+			self.project_model.setFilter("status = 'Active'")
+
+	def updateFilter(self):
+		"""Filter table depending on state of showInvoicedCheckBox and 
+		showByProjectCheckBox"""
+		filters = []
+
+		# Add 'Not Invoiced' filter
+		if not self.showInvoicedCheckBox.isChecked():
+			filters.append("invoice_number = 'Not Invoiced'")
+
+		if self.showByProjectCheckBox.isChecked():
+			proj_index = self.projectComboBox.currentIndex()
+			proj_id = self.project_model.data(self.project_model.index(proj_index, 0))
+			with get_db_connection() as conn:
+				cur = conn.cursor()
+				sql = "SELECT * FROM projects WHERE project_id = ?"
+				cur.execute(sql, (proj_id,))
+				proj_row = cur.fetchone()
+			proj_name = proj_row[1]
+			filters.append(f"project_name = '{proj_name}'")
+
+		# Combine filters from both check-boxes
+		if filters:
+			self.model.setFilter(" AND ".join(filters))
+		else:
+			self.model.setFilter("")
 		self.model.select()
 
 	def createInvoice(self):

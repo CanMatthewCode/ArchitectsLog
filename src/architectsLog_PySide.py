@@ -26,6 +26,7 @@ from ui.AddTimeEntry import Ui_AddTimeDialog
 from ui.ViewInvoices import Ui_ViewInvoicesWindow
 from ui.AddInvoiceNumber import Ui_AddInvoiceDialog
 from ui.DeleteInvoiceWarning import Ui_DeleteInvoiceDialog
+from ui.DeleteTimeEntryWarning import Ui_DeleteTimeEntryDialog
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry 
 from architectsLog_constants import	(PHASES, ARCHITECT_STATUSES, PROJECT_STATUSES, 
@@ -33,7 +34,7 @@ from architectsLog_constants import	(PHASES, ARCHITECT_STATUSES, PROJECT_STATUSE
 from architectsLog_db import (DB_FILE, get_db_connection, add_architect, add_project,
 	add_time_entry, add_invoice, update_project, update_time_entry,
 	get_most_recent_archid_and_projid, get_most_recent_project_phase,
-	load_invoice_ids_no_time_entries, delete_invoice)
+	load_invoice_ids_no_time_entries, delete_invoice, delete_time_entry)
 
 
 def initialize_database(DB_FILE: str) -> None:
@@ -702,6 +703,9 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 		self.timeEntriesTableView.setColumnHidden(self.model.fieldIndex(
 			"invoice_number"), True)
 		self.expandColumns()
+		
+		# create an event filter so the table view sees delete key presses
+		self.timeEntriesTableView.installEventFilter(self)
 
 		self.cancelInvoiceBtn.hide()
 
@@ -918,6 +922,28 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 		self.timeEntriesTableView.setColumnWidth(5, 80)
 		self.timeEntriesTableView.setColumnWidth(6, 550)
 		self.timeEntriesTableView.setColumnWidth(7, 100)
+
+	def eventFilter(self, obj, event):
+		"""Method to allow row deletions"""
+		if obj == self.timeEntriesTableView and event.type() == QEvent.KeyPress:
+			if event.key() in (Qt.Key_Delete, Qt.Key_Backspace):
+				selected_indexes = self.timeEntriesTableView.selectionModel().selectedIndexes()
+				if selected_indexes:
+					selected_rows = set(index.row() for index in selected_indexes)
+					if selected_rows:
+						self.delete_time_entry = DeleteTimeEntryWarning()
+						result = self.delete_time_entry.exec()
+						if result == QDialog.Accepted:
+							for row in selected_rows:
+								time_entry_id = self.model.data(self.model.index(row, 0))
+								with get_db_connection() as conn:
+									cur = conn.cursor()
+									delete_time_entry(time_entry_id, cur)
+							self.model.select()
+						else:
+							return False
+				return True
+		return super().eventFilter(obj, event)
 
 	def closeEvent(self, event):
 		deleteEmptyInvoices()
@@ -1311,6 +1337,12 @@ class AddInvoiceNumber(QDialog, Ui_AddInvoiceDialog):
 class DeleteInvoiceWarning(QDialog, Ui_DeleteInvoiceDialog):
 	def __init__(self):
 		super(DeleteInvoiceWarning, self).__init__()
+		self.setupUi(self)
+		self.setFixedSize(self.size())
+
+class DeleteTimeEntryWarning(QDialog, Ui_DeleteTimeEntryDialog):
+	def __init__(self):
+		super(DeleteTimeEntryWarning, self).__init__()
 		self.setupUi(self)
 		self.setFixedSize(self.size())
 

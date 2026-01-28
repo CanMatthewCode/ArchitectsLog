@@ -644,8 +644,8 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 		self.project_model.setTable("projects")
 		self.project_model.setFilter("status = 'Active'")
 		self.project_model.select()
-		self.projectComboBox.setModel(self.project_model)
-		self.projectComboBox.setModelColumn(1)
+		self.ProjectComboBox.setModel(self.project_model)
+		self.ProjectComboBox.setModelColumn(1)
 
 		self.timeEntriesTableView.setItemDelegate(QSqlRelationalDelegate(
 			self.timeEntriesTableView))
@@ -704,14 +704,14 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 
 		self.cancelInvoiceBtn.hide()
 
-		self.projectComboBox.hide()
+		self.ProjectComboBox.hide()
 		self.showCompletedProjectsCheckBox.hide()
 
 		# click box activation
 		self.showInvoicedCheckBox.stateChanged.connect(self.showInvoicedTimes)
 
 		self.showByProjectCheckBox.stateChanged.connect(self.showProjectCombo)
-		self.projectComboBox.currentIndexChanged.connect(self.updateFilter)
+		self.ProjectComboBox.currentIndexChanged.connect(self.updateFilter)
 		self.showCompletedProjectsCheckBox.stateChanged.connect(
 			self.showCompletedProjects)
 
@@ -738,20 +738,31 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 	def showProjectCombo(self, signal):
 		"""Show or hide Project ComboBox"""
 		if signal == 2:
-			self.projectComboBox.show()
+			self.ProjectComboBox.show()
 			self.showCompletedProjectsCheckBox.show()
+			with get_db_connection() as conn:
+				cur = conn.cursor()
+				arch_proj_ids = get_most_recent_archid_and_projid(cur)
+			arch_id, proj_id = arch_proj_ids
+			proj_match = self.project_model.match(self.project_model.index(0,0),
+			Qt.EditRole, proj_id)
+			if proj_match:
+				row = proj_match[0].row()
+				self.ProjectComboBox.setCurrentIndex(row)
 			self.updateFilter()
 
 		else:
-			self.projectComboBox.hide()
+			self.ProjectComboBox.hide()
 			self.showCompletedProjectsCheckBox.hide()
 			self.updateFilter()
 
 	def showCompletedProjects(self, signal):
+		set_row = self.ProjectComboBox.currentIndex()
 		if signal == 2:
 			self.project_model.setFilter("")
 		else:
 			self.project_model.setFilter("status = 'Active'")
+		self.ProjectComboBox.setCurrentIndex(set_row)
 
 	def updateFilter(self):
 		"""Filter table depending on state of showInvoicedCheckBox and 
@@ -763,7 +774,7 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 			filters.append("invoice_number = 'Not Invoiced'")
 
 		if self.showByProjectCheckBox.isChecked():
-			proj_index = self.projectComboBox.currentIndex()
+			proj_index = self.ProjectComboBox.currentIndex()
 			proj_id = self.project_model.data(self.project_model.index(proj_index, 0))
 			with get_db_connection() as conn:
 				cur = conn.cursor()

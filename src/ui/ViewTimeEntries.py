@@ -83,11 +83,11 @@ class Ui_ViewTimeEntriesWindow(object):
 
         self.horizontalLayout.addWidget(self.showByProjectCheckBox)
 
-        self.projectComboBox = QComboBox(ViewTimeEntriesWindow)
-        self.projectComboBox.setObjectName(u"projectComboBox")
-        self.projectComboBox.setMinimumSize(QSize(200, 0))
+        self.ProjectComboBox = QComboBox(ViewTimeEntriesWindow)
+        self.ProjectComboBox.setObjectName(u"ProjectComboBox")
+        self.ProjectComboBox.setMinimumSize(QSize(200, 0))
 
-        self.horizontalLayout.addWidget(self.projectComboBox)
+        self.horizontalLayout.addWidget(self.ProjectComboBox)
 
         self.showCompletedProjectsCheckBox = QCheckBox(ViewTimeEntriesWindow)
         self.showCompletedProjectsCheckBox.setObjectName(u"showCompletedProjectsCheckBox")

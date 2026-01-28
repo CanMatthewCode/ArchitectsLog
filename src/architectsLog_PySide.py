@@ -1421,6 +1421,35 @@ class TimeEntriesRelationalTableModel(QSqlRelationalTableModel):
 			elif new_phase > 7:
 				return False
 
+		if field_name == "invoice_number":
+			# ignore firing twice issue
+			if isinstance(value, str):
+				return super().setData(index, value, role)
+
+			project_column = self.fieldIndex("project_name")
+			row = index.row()
+			project_index = self.index(row, project_column)
+			project_name = self.data(project_index)
+			old_invoice_num = self.data(index, role)
+
+			# Get project_id from invoice and from project to make sure they are equal
+			with get_db_connection() as conn:
+				cur = conn.cursor()
+				invoice_sql = "SELECT project_id FROM invoices WHERE invoice_id = ?"
+				cur.execute(invoice_sql, (value,))
+				invoice_result = cur.fetchone()
+				invoice_proj_id = invoice_result[0]
+
+				project_sql = "SELECT project_id FROM projects WHERE project_name = ?"
+				cur.execute(project_sql, (project_name,))
+				project_result = cur.fetchone()
+				proj_project_id = project_result[0]
+			# Allow time entries to be set to 'Not Invoiced'
+			if value == 0:
+				return super().setData(index, value, role)
+			if invoice_proj_id != proj_project_id:
+				return False
+
 		return super().setData(index, value, role)
 
 class InvoiceRelationalTableModel(QSqlRelationalTableModel):
@@ -1522,7 +1551,7 @@ class CreatedDateDelegate(QStyledItemDelegate):
 		return editor
 
 class InvoiceCheckboxDelegate(QStyledItemDelegate):
-	"""Delegate to show checkboxes in selection mode or dropdown in normal mode"""
+	"""Delegate to show check-boxes in selection mode or drop-down in normal mode"""
 	
 	def __init__(self, model, parent=None):
 		super().__init__(parent)

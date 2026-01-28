@@ -25,6 +25,7 @@ from ui.TimeNotes import Ui_TimeNotesDialog
 from ui.AddTimeEntry import Ui_AddTimeDialog
 from ui.ViewInvoices import Ui_ViewInvoicesWindow
 from ui.AddInvoiceNumber import Ui_AddInvoiceDialog
+from ui.DeleteInvoiceWarning import Ui_DeleteInvoiceDialog
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry 
 from architectsLog_constants import	(PHASES, ARCHITECT_STATUSES, PROJECT_STATUSES, 
@@ -955,6 +956,9 @@ class ViewInvoices(QWidget, Ui_ViewInvoicesWindow):
 
 		self.model.select()
 
+		# create an event filter so the table view sees delete key presses
+		self.invoicesTableView.installEventFilter(self)
+
 		# hide invoice_id column
 		self.invoicesTableView.setColumnHidden(
 			self.model.fieldIndex("invoice_id"), True)
@@ -985,6 +989,29 @@ class ViewInvoices(QWidget, Ui_ViewInvoicesWindow):
 			status_delegate)
 		
 		self.show()
+
+	def eventFilter(self, obj, event):
+		"""Method to allow row deletions"""
+		if obj == self.invoicesTableView and event.type() == QEvent.KeyPress:
+			if event.key() in (Qt.Key_Delete, Qt.Key_Backspace):
+				selected_indexes = self.invoicesTableView.selectionModel().selectedIndexes()
+				if selected_indexes:
+					selected_rows = set(index.row() for index in selected_indexes)
+					if selected_rows:
+						self.delete_invoices = DeleteInvoiceWarning()
+						result = self.delete_invoices.exec()
+						if result == QDialog.Accepted:
+							for row in selected_rows:
+								invoice_id = self.model.data(self.model.index(row, 0))
+								with get_db_connection() as conn:
+									cur = conn.cursor()
+									delete_invoice(invoice_id, cur)
+							self.model.select()
+						else:
+							return False
+
+				return True
+		return super().eventFilter(obj, event)
 
 
 class TimerDisplay(QLCDNumber):
@@ -1278,6 +1305,12 @@ class ManualTimeLogger(QDialog, Ui_AddTimeDialog):
 class AddInvoiceNumber(QDialog, Ui_AddInvoiceDialog):
 	def __init__(self):
 		super(AddInvoiceNumber, self).__init__()
+		self.setupUi(self)
+		self.setFixedSize(self.size())
+
+class DeleteInvoiceWarning(QDialog, Ui_DeleteInvoiceDialog):
+	def __init__(self):
+		super(DeleteInvoiceWarning, self).__init__()
 		self.setupUi(self)
 		self.setFixedSize(self.size())
 

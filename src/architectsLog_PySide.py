@@ -829,7 +829,7 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 				add_invoice_number.exec()
 				invoice_number = None
 				while not invoice_number:
-					invoice_number = add_invoice_number.addInvoiceLineEdit.text()
+					invoice_number = add_invoice_number.addInvoiceLineEdit.text().strip()
 					if not invoice_number:
 						QMessageBox.warning(self, "Invalid Invoice Number",
 			 				"Must Add An Invoice Number")
@@ -1478,6 +1478,7 @@ class InvoiceRelationalTableModel(QSqlRelationalTableModel):
 
 	def setData(self, index, value, role = Qt.EditRole):
 		field_name = self.record().fieldName(index.column())
+		
 		if field_name == "created_date":
 			value = value.replace("-", "/")
 			try: 
@@ -1491,6 +1492,11 @@ class InvoiceRelationalTableModel(QSqlRelationalTableModel):
 						Must Be In Month/Day/Year Format")
 					return False
 			value = int(date_time.timestamp())
+
+		if field_name == "invoice_number":
+			value = value.strip()
+			if not value:
+				return False
 
 		return super().setData(index, value, role)
 

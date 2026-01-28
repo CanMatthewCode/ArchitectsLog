@@ -458,6 +458,18 @@ def load_nonproject_phases_time_entries(
 	return time_entries_list
 
 
+def load_invoice_ids_no_time_entries(cur:sqlite3.Cursor) -> list[tuple[int]]:
+	"""Load all invoice_id's which have no time_entry objects attached to them"""
+	sql = "SELECT invoices.invoice_id FROM invoices LEFT JOIN time_entries \
+		ON invoices.invoice_id = time_entries.invoice_id \
+		WHERE time_entries.invoice_id IS NULL AND invoices.invoice_id != 0"
+
+	cur.execute(sql)
+	no_time_entries_invoices = cur.fetchall()
+
+	return  no_time_entries_invoices
+
+
 
 #	~~~TABLE UPDATE FUNCTIONS~~~
 

@@ -103,12 +103,12 @@ def create_time_entries_table(cur: sqlite3.Cursor) -> None:
 			start_time INTEGER NOT NULL,
 			duration_minutes INTEGER NOT NULL,
 			notes TEXT,
-			invoice_id INTEGER,
+			invoice_id INTEGER DEFAULT 0,
 			FOREIGN KEY (project_id) REFERENCES projects (project_id),
 			FOREIGN KEY (architect_id) REFERENCES architects (architect_id),
 			FOREIGN KEY (phase_id) REFERENCES phases (phase_id),
 			FOREIGN KEY (invoice_id) REFERENCES invoices (invoice_id) 
-				ON DELETE SET NULL
+				ON DELETE SET DEFAULT
 		)
 	''')
 

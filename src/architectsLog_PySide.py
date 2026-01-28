@@ -31,7 +31,8 @@ from architectsLog_constants import	(PHASES, ARCHITECT_STATUSES, PROJECT_STATUSE
 	INVOICE_STATUSES)
 from architectsLog_db import (DB_FILE, get_db_connection, add_architect, add_project,
 	add_time_entry, add_invoice, update_project, update_time_entry,
-	get_most_recent_archid_and_projid, get_most_recent_project_phase)
+	get_most_recent_archid_and_projid, get_most_recent_project_phase,
+	load_invoice_ids_no_time_entries, delete_invoice)
 
 
 def initialize_database(DB_FILE: str) -> None:
@@ -207,7 +208,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 	def viewTimeEntries(self) -> None:
 		"""Method to view all time_entries in database table, click button 
 		to hide entries already associated with an invoice"""
-		self.view_time_entries_window = ViewTimeEntries()
+		self.view_time_entries_window = ViewTimeEntries(self)
 
 	def viewInvoices(self) -> None:
 		"""Method to view all invoices from the database table"""
@@ -606,8 +607,9 @@ class ViewProjects(QWidget, Ui_ViewProjectsWindow):
 
 
 class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
-	def __init__(self) -> None:
+	def __init__(self, main_window) -> None:
 		super(ViewTimeEntries, self).__init__()
+		self.main_window = main_window
 		self.setupUi(self)
 		self.setFixedSize(self.size())
 
@@ -852,6 +854,16 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 							update_time_entry("invoice_id", time_entry, invoice_id, cur)
 				self.model.select()
 
+				# Refresh the invoice_number model's drop down menu
+				invoice_column_index = self.model.fieldIndex("invoice_number")
+				relation_model = self.model.relationModel(invoice_column_index)
+				if relation_model:
+					relation_model.select()
+
+				# Refresh ViewInvoices window
+				if self.main_window.view_invoices_window:
+					self.main_window.view_invoices_window.model.select()
+
 			if not self.showInvoicedCheckBox.isChecked():
 				self.timeEntriesTableView.setColumnHidden(self.model.fieldIndex(
 					"invoice_number"), True)
@@ -894,6 +906,12 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 		self.timeEntriesTableView.setColumnWidth(5, 80)
 		self.timeEntriesTableView.setColumnWidth(6, 550)
 		self.timeEntriesTableView.setColumnWidth(7, 100)
+
+	def closeEvent(self, event):
+		deleteEmptyInvoices()
+		if self.main_window.view_invoices_window:
+			self.main_window.view_invoices_window.model.select()
+		event.accept()
 
 
 class ViewInvoices(QWidget, Ui_ViewInvoicesWindow):
@@ -1684,3 +1702,12 @@ def validateDuration(duration: str) -> int:
 	minutes = quarter_hours * 15
 
 	return hours * 60 + minutes
+
+def deleteEmptyInvoices() -> None:
+	"""Delete invoices with no time_entry logs attached"""
+	with get_db_connection() as conn:
+		cur = conn.cursor()
+		no_times_invoices_tuples = load_invoice_ids_no_time_entries(cur)
+		no_times_invoices = [items[0] for items in no_times_invoices_tuples]
+		for invoice_id in no_times_invoices:
+			delete_invoice(invoice_id, cur)

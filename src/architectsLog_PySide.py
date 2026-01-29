@@ -8,7 +8,7 @@ import sqlite3
 
 from PySide6.QtWidgets import (QMainWindow, QApplication, QDialog, QMessageBox,
 	QStyledItemDelegate, QLineEdit, QComboBox, QWidget, QLCDNumber, 
-	QStyleOptionButton, QStyle)
+	QStyleOptionButton, QStyle, QAbstractItemView)
 from PySide6.QtSql import (QSqlDatabase, QSqlTableModel, QSqlRelationalTableModel, 
 	QSqlRelation, QSqlRelationalDelegate)
 from PySide6.QtCore import (Qt, QDate, QDateTime, QModelIndex, QTimer, QTime, 
@@ -27,6 +27,7 @@ from ui.ViewInvoices import Ui_ViewInvoicesWindow
 from ui.AddInvoiceNumber import Ui_AddInvoiceDialog
 from ui.DeleteInvoiceWarning import Ui_DeleteInvoiceDialog
 from ui.DeleteTimeEntryWarning import Ui_DeleteTimeEntryDialog
+from ui.ViewInvoice import Ui_ViewInvoiceWindow
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry 
 from architectsLog_constants import	(PHASES, ARCHITECT_STATUSES, PROJECT_STATUSES, 
@@ -703,7 +704,7 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 		self.timeEntriesTableView.setColumnHidden(self.model.fieldIndex(
 			"invoice_number"), True)
 		self.expandColumns()
-		
+
 		# create an event filter so the table view sees delete key presses
 		self.timeEntriesTableView.installEventFilter(self)
 
@@ -726,7 +727,7 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 
 		self.show()
 
-	def showInvoicedTimes(self, signal):
+	def showInvoicedTimes(self, signal) -> None:
 		"""Filter out time log entries attached to an invoice"""
 		if signal == 2:
 			self.timeEntriesTableView.setColumnHidden(self.model.fieldIndex(
@@ -740,7 +741,7 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 
 		self.updateFilter()
 
-	def showProjectCombo(self, signal):
+	def showProjectCombo(self, signal) -> None:
 		"""Show or hide Project ComboBox"""
 		if signal == 2:
 			self.ProjectComboBox.show()
@@ -761,7 +762,7 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 			self.showCompletedProjectsCheckBox.hide()
 			self.updateFilter()
 
-	def showCompletedProjects(self, signal):
+	def showCompletedProjects(self, signal) -> None:
 		set_row = self.ProjectComboBox.currentIndex()
 		if signal == 2:
 			self.project_model.setFilter("")
@@ -769,7 +770,7 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 			self.project_model.setFilter("status = 'Active'")
 		self.ProjectComboBox.setCurrentIndex(set_row)
 
-	def updateFilter(self):
+	def updateFilter(self) -> None:
 		"""Filter table depending on state of showInvoicedCheckBox and 
 		showByProjectCheckBox"""
 		filters = []
@@ -796,7 +797,7 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 			self.model.setFilter("")
 		self.model.select()
 
-	def createInvoice(self):
+	def createInvoice(self) -> None:
 		if self.invoice_checkbox_delegate.selection_mode == False:
 			self.invoice_checkbox_delegate.selection_mode = True
 			self.createInvoiceBtn.setText("Generate Invoice")
@@ -892,7 +893,7 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 
 		self.timeEntriesTableView.viewport().update()
 
-	def cancelInvoice(self):
+	def cancelInvoice(self) -> None:
 		self.invoice_checkbox_delegate.selection_mode = False
 		self.createInvoiceBtn.setText("Create Invoice")
 		if not self.showInvoicedCheckBox.isChecked():
@@ -906,7 +907,7 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 		self.showInvoicedCheckBox.setEnabled(True)
 		self.timeEntriesTableView.viewport().update()
 
-	def expandColumns(self):
+	def expandColumns(self) -> None:
 		self.timeEntriesTableView.setColumnWidth(1, 155)
 		self.timeEntriesTableView.setColumnWidth(2, 155)
 		self.timeEntriesTableView.setColumnWidth(3, 180)
@@ -914,7 +915,7 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 		self.timeEntriesTableView.setColumnWidth(5, 100)
 		self.timeEntriesTableView.setColumnWidth(6, 592)
 
-	def contractColumns(self):	
+	def contractColumns(self) -> None:	
 		self.timeEntriesTableView.setColumnWidth(1, 155)
 		self.timeEntriesTableView.setColumnWidth(2, 140)
 		self.timeEntriesTableView.setColumnWidth(3, 180)
@@ -923,7 +924,7 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 		self.timeEntriesTableView.setColumnWidth(6, 550)
 		self.timeEntriesTableView.setColumnWidth(7, 100)
 
-	def eventFilter(self, obj, event):
+	def eventFilter(self, obj, event) -> bool:
 		"""Method to allow row deletions"""
 		if obj == self.timeEntriesTableView and event.type() == QEvent.KeyPress:
 			if event.key() in (Qt.Key_Delete, Qt.Key_Backspace):
@@ -945,7 +946,7 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 				return True
 		return super().eventFilter(obj, event)
 
-	def closeEvent(self, event):
+	def closeEvent(self, event) -> None:
 		deleteEmptyInvoices()
 		if self.main_window.view_invoices_window:
 			self.main_window.view_invoices_window.model.select()
@@ -1013,10 +1014,26 @@ class ViewInvoices(QWidget, Ui_ViewInvoicesWindow):
 		status_column = self.model.fieldIndex("status")
 		self.invoicesTableView.setItemDelegateForColumn(status_column, 
 			status_delegate)
+
+		self.viewInvoicePushButton.clicked.connect(self.viewInvoice)
+		self.invoice_windows = []
 		
 		self.show()
 
-	def eventFilter(self, obj, event):
+	def viewInvoice(self) -> None:
+		self.invoice_ids = []
+		selected_indexes = self.invoicesTableView.selectionModel().selectedIndexes()
+		if selected_indexes:
+			selected_rows = set(index.row() for index in selected_indexes)
+			if selected_rows:
+				for row in selected_rows:
+					invoice_id = self.model.data(self.model.index(row, 0))
+					self.invoice_ids.append(invoice_id)
+		if self.invoice_ids:
+			for invoice_id in self.invoice_ids:
+				self.invoice_windows.append(ViewInvoice(invoice_id))
+
+	def eventFilter(self, obj, event) -> bool:
 		"""Method to allow row deletions"""
 		if obj == self.invoicesTableView and event.type() == QEvent.KeyPress:
 			if event.key() in (Qt.Key_Delete, Qt.Key_Backspace):
@@ -1039,9 +1056,90 @@ class ViewInvoices(QWidget, Ui_ViewInvoicesWindow):
 				return True
 		return super().eventFilter(obj, event)
 
+class ViewInvoice(Ui_ViewInvoiceWindow, QWidget):
+	def __init__(self, invoice_number: int) -> None:
+		super(ViewInvoice, self).__init__()
+		self.setupUi(self)
+		self.setFixedSize(self.size())
+		self.invoice_number = invoice_number
+		invoice_number_str = str(invoice_number)
+		
+		self.model = TimeEntriesRelationalTableModel()
+		self.invoiceTableView.setModel(self.model)
+		self.model.setTable("time_entries")
+		filter_string = f"invoice_id = {self.invoice_number}"
+		self.model.setFilter(filter_string)
+		self.invoiceTableView.setEditTriggers(QAbstractItemView.NoEditTriggers)
+
+		project_relation = QSqlRelation("projects", "project_id", "project_name")
+		self.model.setRelation(self.model.fieldIndex("project_id"), project_relation)
+
+		phase_relation = QSqlRelation("phases", "phase_id", "project_phase")
+		self.model.setRelation(self.model.fieldIndex("phase_id"), phase_relation)
+
+		with get_db_connection() as conn:
+			cur = conn.cursor()
+			sql = "SELECT invoice_number FROM invoices WHERE invoice_id = ?"
+			cur.execute(sql, (invoice_number,))
+			invoice_name = cur.fetchone()[0]
+
+		self.invoiceTableView.setSortingEnabled(True)
+		
+		self.addInvoiceNumberLabel.setText(invoice_name)
+
+		column_titles = {
+			"project_phase" : "Project Phase",
+			"start_time" : "Start Time",
+			"duration_minutes" : "Duration",
+			"notes" : "Notes",
+		}
+		for name, title in column_titles.items():
+			index = self.model.fieldIndex(name)
+			self.model.setHeaderData(index, Qt.Horizontal, title)
+
+		self.invoiceTableView.setColumnWidth(1, 155)
+		self.invoiceTableView.setColumnWidth(2, 140)
+		self.invoiceTableView.setColumnWidth(3, 180)
+		self.invoiceTableView.setColumnWidth(4, 152)
+		self.invoiceTableView.setColumnWidth(5, 80)
+		self.invoiceTableView.setColumnWidth(6, 550)
+		self.invoiceTableView.setColumnWidth(7, 100)
+
+		# Hide unused columns
+		self.invoiceTableView.setColumnHidden(
+			self.model.fieldIndex("time_entry_id"), True)
+		self.invoiceTableView.setColumnHidden(
+			self.model.fieldIndex("invoice_id"), True)
+		self.invoiceTableView.setColumnHidden(
+			self.model.fieldIndex("architect_id"), True)
+		self.invoiceTableView.setColumnHidden(
+			self.model.fieldIndex("project_name"), True)
+
+		self.model.select()
+
+		# Sum total time in invoice
+		with get_db_connection() as conn:
+			cur = conn.cursor()
+			sql = "SELECT SUM(duration_minutes) FROM time_entries \
+				WHERE invoice_id = ?"
+			cur.execute(sql, (invoice_number,))
+			self.total_time = cur.fetchone()
+
+		hours = self.total_time[0] // 60
+		minutes = self.total_time[0] % 60
+		total_time_hours_mins = f"{hours}:{minutes:02d}"
+
+		self.addTotalHoursLabel.setText(total_time_hours_mins)
+
+		self.project_name = self.model.data(self.model.index(0, 1))
+		self.projectNameLabel.setText(self.project_name)
+
+		self.show()
+
+
 
 class TimerDisplay(QLCDNumber):
-	def __init__(self, parent = None):
+	def __init__(self, parent = None) -> None:
 		super().__init__(parent)
 
 		QTimer.singleShot(0, lambda: self.display("   00:00"))
@@ -1050,7 +1148,7 @@ class TimerDisplay(QLCDNumber):
 		self.timer.timeout.connect(self.update_lcd)
 		self.timer.start()
 
-	def update_lcd(self):
+	def update_lcd(self) -> None:
 		elapsed_time = self.parent().time_log.elapsedTime()
 		qt_time = QTime(0, 0, 0).addSecs(int(elapsed_time))
 		self.display(qt_time.toString("   hh:mm"))
@@ -1117,7 +1215,7 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 
 		self.PhaseComboBox.blockSignals(False)
 
-	def phaseChanged(self):
+	def phaseChanged(self) -> None:
 		# Get current index and phase_id from phases combo box
 		phase_index = self.PhaseComboBox.currentIndex()
 		phase_id = self.phase_model.data(self.phase_model.index(phase_index, 0))
@@ -1134,7 +1232,7 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 		else:
 			self.PhaseComboBox.setEnabled(True)
 
-	def startPauseTime(self):
+	def startPauseTime(self) -> None:
 		if self.time_log.timer_state == "inactive":
 			self.time_log.timer_state = "running"
 			self.time_log.start_time = datetime.now()
@@ -1153,7 +1251,7 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 			self.time_log.pause_start_time = 0
 			self.timer.setStyleSheet("QLCDNumber {color : #35B5AC;}")
 
-	def stopTime(self):
+	def stopTime(self) -> None:
 		if self.time_log.start_time == 0:
 			self.main_window.showNormal()
 			self.close()
@@ -1213,14 +1311,14 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 		self.close()
 
 class TimeLog():
-	def __init__(self):
+	def __init__(self) -> None:
 		self.timer_state = "inactive"
 		self.total_time = 0
 		self.start_time = 0
 		self.pause_start_time = 0
 		self.total_pause_duration = 0
 
-	def elapsedTime(self):
+	def elapsedTime(self) -> int:
 		if self.timer_state == "running":
 			self.total_time = ((datetime.now() - self.start_time).total_seconds()
 				- self.total_pause_duration)
@@ -1230,7 +1328,7 @@ class TimeLog():
 		return self.total_time
 
 class TimeEntriesNotesWindow(QDialog, Ui_AddInvoiceDialog):
-	def __init__(self):
+	def __init__(self) -> None:
 		super(TimeEntriesNotesWindow, self).__init__()
 		self.setupUi(self)
 		self.setFixedSize(self.size())
@@ -1299,7 +1397,7 @@ class ManualTimeLogger(QDialog, Ui_AddTimeDialog):
 
 		self.PhaseComboBox.blockSignals(False)
 
-	def phaseChanged(self):
+	def phaseChanged(self) -> None:
 		# Get current index and phase_id from phases combo box
 		phase_index = self.PhaseComboBox.currentIndex()
 		phase_id = self.phase_model.data(self.phase_model.index(phase_index, 0))
@@ -1329,19 +1427,19 @@ class ManualTimeLogger(QDialog, Ui_AddTimeDialog):
 		super().accept()
 
 class AddInvoiceNumber(QDialog, Ui_AddInvoiceDialog):
-	def __init__(self):
+	def __init__(self) -> None:
 		super(AddInvoiceNumber, self).__init__()
 		self.setupUi(self)
 		self.setFixedSize(self.size())
 
 class DeleteInvoiceWarning(QDialog, Ui_DeleteInvoiceDialog):
-	def __init__(self):
+	def __init__(self) -> None:
 		super(DeleteInvoiceWarning, self).__init__()
 		self.setupUi(self)
 		self.setFixedSize(self.size())
 
 class DeleteTimeEntryWarning(QDialog, Ui_DeleteTimeEntryDialog):
-	def __init__(self):
+	def __init__(self) -> None:
 		super(DeleteTimeEntryWarning, self).__init__()
 		self.setupUi(self)
 		self.setFixedSize(self.size())
@@ -1353,7 +1451,7 @@ class NoDeleteTableModel(QSqlTableModel):
 	def removeRows(self, row, count, parent=None) -> bool:
 		return False
 
-	def setData(self, index, value, role = Qt.EditRole):
+	def setData(self, index, value, role = Qt.EditRole) -> bool:
 		# Get column database names to safetey desired column entries by user
 		field_name = self.record().fieldName(index.column())
 
@@ -1386,11 +1484,11 @@ class NoDeleteTableModel(QSqlTableModel):
 class NonDeletableRelationalTableModel(QSqlRelationalTableModel):
 	"""Class to disallow deletions of entire rows in relational table views 
 	and to check and reformat date on user edit"""
-	def removeRows(self, row, count, parent=None):
+	def removeRows(self, row, count, parent=None) -> bool:
 		return False
 
-	def setData(self, index, value, role = Qt.EditRole):
-		# Get column database names to safetey desired column entries by user
+	def setData(self, index, value, role = Qt.EditRole) -> bool:
+		# Get column database names to safety desired column entries by user
 		field_name = self.record().fieldName(index.column())
 
 		# Check start date is a valid date and reformat to chosen syntax
@@ -1430,7 +1528,7 @@ class TimeEntriesRelationalTableModel(QSqlRelationalTableModel):
 	reformat user start_time input from mm/dd/yyyy hh:mm am/pm to total ints"""
 
 
-	def data(self, index, role = Qt.DisplayRole):
+	def data(self, index, role = Qt.DisplayRole) -> any:
 		# Get column database names to change display of time duration
 		if role != Qt.DisplayRole:
 			return super().data(index, role)
@@ -1447,7 +1545,7 @@ class TimeEntriesRelationalTableModel(QSqlRelationalTableModel):
 		# Display start time in month/day/year hour:minute AM/PM
 		if field_name == "start_time" and value is not None:
 			date_time = datetime.fromtimestamp(value)
-			value = date_time.strftime("%m/%d/%Y %I:%M %p")
+			value = date_time.strftime("%m/%d/%Y   %I:%M %p")
 
 		# Display a blank string if invoice_number == 0
 		if field_name == "invoice_number" and value == "Not Invoiced":
@@ -1455,7 +1553,7 @@ class TimeEntriesRelationalTableModel(QSqlRelationalTableModel):
 
 		return value
 
-	def setData(self, index, value, role = Qt.EditRole):
+	def setData(self, index, value, role = Qt.EditRole) -> bool:
 		field_name = self.record().fieldName(index.column())
 
 		# Reset a user's entered duration from xx:xx to just minutes
@@ -1555,7 +1653,7 @@ class TimeEntriesRelationalTableModel(QSqlRelationalTableModel):
 
 class InvoiceRelationalTableModel(QSqlRelationalTableModel):
 	"""Class to reformat created date for invoices"""
-	def data(self, index, role = Qt.DisplayRole):
+	def data(self, index, role = Qt.DisplayRole) -> any:
 		field_name = self.record().fieldName(index.column())
 		value = super().data(index, role)
 
@@ -1570,7 +1668,7 @@ class InvoiceRelationalTableModel(QSqlRelationalTableModel):
 
 		return super().data(index, role)
 
-	def setData(self, index, value, role = Qt.EditRole):
+	def setData(self, index, value, role = Qt.EditRole) -> bool:
 		field_name = self.record().fieldName(index.column())
 		
 		if field_name == "created_date":
@@ -1622,7 +1720,7 @@ class StatusDelegate(QStyledItemDelegate):
 class DurationDelegate(QStyledItemDelegate):
 	"""Class to validate manual time duration input by user to allow
 	total minutes or hour:minutes input"""
-	def createEditor(self, parent, options, index):
+	def createEditor(self, parent, options, index) -> QLineEdit:
 		editor = QLineEdit(parent)
 		regex = QRegularExpression(r"^(\d+)?(:\d{2})?$")
 		validator = QRegularExpressionValidator(regex, editor)
@@ -1632,7 +1730,7 @@ class DurationDelegate(QStyledItemDelegate):
 
 class TimeStartDelegate(QStyledItemDelegate):
 	"""Class to validate manual date/time input by user"""
-	def createEditor(self, parent, options, index):
+	def createEditor(self, parent, options, index) -> QLineEdit:
 		editor = QLineEdit(parent)
 		regex = QRegularExpression(
 			r"^(([0]?[1-9])|([1][1-2]))(-|\/)(([0]?[1-9])|([1-2][0-9])|([3][0-1]))"
@@ -1646,7 +1744,7 @@ class TimeStartDelegate(QStyledItemDelegate):
 
 class CreatedDateDelegate(QStyledItemDelegate):
 	"""Class to validate manual date input by user"""
-	def createEditor(self, parent, options, index):
+	def createEditor(self, parent, options, index) -> QLineEdit:
 		editor = QLineEdit(parent)
 		regex = QRegularExpression(
 			r"^(([0]?[1-9])|([1][1-2]))(-|\/)(([0]?[1-9])|([1-2][0-9])|([3][0-1]))"
@@ -1660,14 +1758,14 @@ class CreatedDateDelegate(QStyledItemDelegate):
 class InvoiceCheckboxDelegate(QStyledItemDelegate):
 	"""Delegate to show check-boxes in selection mode or drop-down in normal mode"""
 	
-	def __init__(self, model, parent=None):
+	def __init__(self, model, parent=None) -> None:
 		super().__init__(parent)
 		self.selection_mode = False
 		self.checked_rows = set()
 		self.model = model
 		self.relational_delegate = QSqlRelationalDelegate(parent)
 	
-	def paint(self, painter, option, index):
+	def paint(self, painter, option, index) -> None:
 		# If in selection mode and row is uninvoiced, draw checkbox
 		if self.selection_mode:
 			invoice_id = index.data(Qt.EditRole)
@@ -1690,7 +1788,7 @@ class InvoiceCheckboxDelegate(QStyledItemDelegate):
 		# Otherwise, use relational delegate for dropdown display
 		self.relational_delegate.paint(painter, option, index)
 	
-	def createEditor(self, parent, option, index):
+	def createEditor(self, parent, option, index) -> QWidget | None:
 		# If in selection mode, no editor needed for checkboxes
 		if self.selection_mode:
 			return None
@@ -1698,17 +1796,17 @@ class InvoiceCheckboxDelegate(QStyledItemDelegate):
 		# Otherwise, use relational delegate to create dropdown
 		return self.relational_delegate.createEditor(parent, option, index)
 	
-	def setEditorData(self, editor, index):
+	def setEditorData(self, editor, index) -> None:
 		# Not in selection mode, use relational delegate
 		if not self.selection_mode:
 			self.relational_delegate.setEditorData(editor, index)
 	
-	def setModelData(self, editor, model, index):
+	def setModelData(self, editor, model, index) -> None:
 		# Not in selection mode, use relational delegate
 		if not self.selection_mode:
 			self.relational_delegate.setModelData(editor, model, index)
 	
-	def editorEvent(self, event, model, option, index):
+	def editorEvent(self, event, model, option, index) ->None:
 		# Handle checkbox clicks in selection mode
 		if self.selection_mode:
 			invoice_id = index.data(Qt.EditRole)
@@ -1725,7 +1823,7 @@ class InvoiceCheckboxDelegate(QStyledItemDelegate):
 		# Otherwise use relational delegate
 		return self.relational_delegate.editorEvent(event, model, option, index)
 	
-	def getCheckboxRect(self, rect):
+	def getCheckboxRect(self, rect) -> QRect:
 		# Center the checkbox in the cell
 		checkbox_size = 20
 		x = rect.x() + (rect.width() - checkbox_size) // 2

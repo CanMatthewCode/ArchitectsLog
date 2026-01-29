@@ -40,6 +40,22 @@
     </widget>
    </item>
    <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Policy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>10</width>
+       <height>15</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
     <widget class="QTableView" name="invoicesTableView">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
@@ -52,6 +68,43 @@
        <width>610</width>
        <height>0</height>
       </size>
+     </property>
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item alignment="Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignVCenter">
+    <widget class="QPushButton" name="viewInvoicePushButton">
+     <property name="font">
+      <font>
+       <pointsize>18</pointsize>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton{
+	border-radius: 12px;
+	border: 1px solid black;
+	border-style: solid;
+	min-width: 60px;
+	min-height: 30px;
+	padding: 5px 10px;
+	margin-left: 5px;
+	margin-right: 10px;
+	background-color: #008080;
+	color: black;
+}
+
+QPushButton:hover {
+	background-color: #006666;
+}
+
+QPushButton:pressed {
+	background-color: #004D4D;
+}</string>
+     </property>
+     <property name="text">
+      <string>View Invoice</string>
      </property>
     </widget>
    </item>

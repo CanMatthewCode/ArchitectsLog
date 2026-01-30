@@ -15,15 +15,15 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QHeaderView, QLabel, QPushButton,
-    QSizePolicy, QSpacerItem, QTableView, QVBoxLayout,
-    QWidget)
+from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QHBoxLayout,
+    QHeaderView, QLabel, QPushButton, QSizePolicy,
+    QSpacerItem, QTableView, QVBoxLayout, QWidget)
 
 class Ui_ViewInvoicesWindow(object):
     def setupUi(self, ViewInvoicesWindow):
         if not ViewInvoicesWindow.objectName():
             ViewInvoicesWindow.setObjectName(u"ViewInvoicesWindow")
-        ViewInvoicesWindow.resize(634, 450)
+        ViewInvoicesWindow.resize(683, 450)
         ViewInvoicesWindow.setStyleSheet(u"QWidget{\n"
 "	background-color: #1E2E34;\n"
 "}")
@@ -54,13 +54,48 @@ class Ui_ViewInvoicesWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.invoicesTableView.sizePolicy().hasHeightForWidth())
         self.invoicesTableView.setSizePolicy(sizePolicy)
-        self.invoicesTableView.setMinimumSize(QSize(610, 0))
+        self.invoicesTableView.setMinimumSize(QSize(620, 0))
         self.invoicesTableView.setAlternatingRowColors(True)
 
-        self.verticalLayout.addWidget(self.invoicesTableView)
+        self.verticalLayout.addWidget(self.invoicesTableView, 0, Qt.AlignmentFlag.AlignHCenter)
+
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.showByProjectCheckBox = QCheckBox(ViewInvoicesWindow)
+        self.showByProjectCheckBox.setObjectName(u"showByProjectCheckBox")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.showByProjectCheckBox.sizePolicy().hasHeightForWidth())
+        self.showByProjectCheckBox.setSizePolicy(sizePolicy1)
+        self.showByProjectCheckBox.setStyleSheet(u"QCheckBox{\n"
+"	color: #35B5AC;\n"
+"}")
+
+        self.horizontalLayout.addWidget(self.showByProjectCheckBox, 0, Qt.AlignmentFlag.AlignLeft)
+
+        self.ProjectComboBox = QComboBox(ViewInvoicesWindow)
+        self.ProjectComboBox.setObjectName(u"ProjectComboBox")
+        sizePolicy1.setHeightForWidth(self.ProjectComboBox.sizePolicy().hasHeightForWidth())
+        self.ProjectComboBox.setSizePolicy(sizePolicy1)
+        self.ProjectComboBox.setMinimumSize(QSize(200, 0))
+
+        self.horizontalLayout.addWidget(self.ProjectComboBox)
+
+        self.showCompletedProjectsCheckBox = QCheckBox(ViewInvoicesWindow)
+        self.showCompletedProjectsCheckBox.setObjectName(u"showCompletedProjectsCheckBox")
+        sizePolicy1.setHeightForWidth(self.showCompletedProjectsCheckBox.sizePolicy().hasHeightForWidth())
+        self.showCompletedProjectsCheckBox.setSizePolicy(sizePolicy1)
+        self.showCompletedProjectsCheckBox.setStyleSheet(u"QCheckBox{\n"
+"	color: #35B5AC;\n"
+"}")
+
+        self.horizontalLayout.addWidget(self.showCompletedProjectsCheckBox)
 
         self.viewInvoicePushButton = QPushButton(ViewInvoicesWindow)
         self.viewInvoicePushButton.setObjectName(u"viewInvoicePushButton")
+        sizePolicy1.setHeightForWidth(self.viewInvoicePushButton.sizePolicy().hasHeightForWidth())
+        self.viewInvoicePushButton.setSizePolicy(sizePolicy1)
         font1 = QFont()
         font1.setPointSize(18)
         self.viewInvoicePushButton.setFont(font1)
@@ -85,7 +120,10 @@ class Ui_ViewInvoicesWindow(object):
 "	background-color: #004D4D;\n"
 "}")
 
-        self.verticalLayout.addWidget(self.viewInvoicePushButton, 0, Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
+        self.horizontalLayout.addWidget(self.viewInvoicePushButton, 0, Qt.AlignmentFlag.AlignRight)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout)
 
 
         self.retranslateUi(ViewInvoicesWindow)
@@ -96,6 +134,8 @@ class Ui_ViewInvoicesWindow(object):
     def retranslateUi(self, ViewInvoicesWindow):
         ViewInvoicesWindow.setWindowTitle(QCoreApplication.translate("ViewInvoicesWindow", u"Form", None))
         self.invoicesLabel.setText(QCoreApplication.translate("ViewInvoicesWindow", u"Invoices", None))
+        self.showByProjectCheckBox.setText(QCoreApplication.translate("ViewInvoicesWindow", u"Display By Project", None))
+        self.showCompletedProjectsCheckBox.setText(QCoreApplication.translate("ViewInvoicesWindow", u"Show Comleted Projects", None))
         self.viewInvoicePushButton.setText(QCoreApplication.translate("ViewInvoicesWindow", u"View Invoice", None))
     # retranslateUi
 

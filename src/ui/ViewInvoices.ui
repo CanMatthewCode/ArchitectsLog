@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>634</width>
+    <width>683</width>
     <height>450</height>
    </rect>
   </property>
@@ -55,7 +55,7 @@
      </property>
     </spacer>
    </item>
-   <item>
+   <item alignment="Qt::AlignmentFlag::AlignHCenter">
     <widget class="QTableView" name="invoicesTableView">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
@@ -65,7 +65,7 @@
      </property>
      <property name="minimumSize">
       <size>
-       <width>610</width>
+       <width>620</width>
        <height>0</height>
       </size>
      </property>
@@ -74,15 +74,75 @@
      </property>
     </widget>
    </item>
-   <item alignment="Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignVCenter">
-    <widget class="QPushButton" name="viewInvoicePushButton">
-     <property name="font">
-      <font>
-       <pointsize>18</pointsize>
-      </font>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QPushButton{
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item alignment="Qt::AlignmentFlag::AlignLeft">
+      <widget class="QCheckBox" name="showByProjectCheckBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QCheckBox{
+	color: #35B5AC;
+}</string>
+       </property>
+       <property name="text">
+        <string>Display By Project</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="ProjectComboBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>0</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="showCompletedProjectsCheckBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QCheckBox{
+	color: #35B5AC;
+}</string>
+       </property>
+       <property name="text">
+        <string>Show Comleted Projects</string>
+       </property>
+      </widget>
+     </item>
+     <item alignment="Qt::AlignmentFlag::AlignRight">
+      <widget class="QPushButton" name="viewInvoicePushButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>18</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
 	border-radius: 12px;
 	border: 1px solid black;
 	border-style: solid;
@@ -102,11 +162,13 @@ QPushButton:hover {
 QPushButton:pressed {
 	background-color: #004D4D;
 }</string>
-     </property>
-     <property name="text">
-      <string>View Invoice</string>
-     </property>
-    </widget>
+       </property>
+       <property name="text">
+        <string>View Invoice</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

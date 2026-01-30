@@ -51,6 +51,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.setupUi(self) 
 		self.setFixedSize(self.size())
 
+		self.setWindowTitle("The Architects Log")
 		# create architect, project, phase models and set them on their combo box
 		self.architect_model = QSqlTableModel()
 		self.architect_model.setTable("architects")
@@ -277,6 +278,7 @@ class ArchitectWindow(QDialog, Ui_AddArchitectDialog):
 		super(ArchitectWindow, self).__init__()
 		self.setupUi(self)
 		self.setFixedSize(self.size())
+		self.setWindowTitle("Add Architect")
 
 		# set validators on phone and email patterns to sanitize user input
 		phone_regex = QRegularExpression(r'\(*(\d{3})\)*(\s|.)?(\d{3})(\s|.)?(\d{4})')
@@ -337,6 +339,7 @@ class ProjectWindow(QDialog, Ui_AddProjectDialog):
 		super(ProjectWindow, self).__init__()
 		self.setupUi(self)
 		self.setFixedSize(self.size())
+		self.setWindowTitle("Add Project")
 
 		# set current date onto the calendar drop down
 		self.projectStartDate.setDate(QDate.currentDate())
@@ -379,6 +382,7 @@ class ViewArchitects(QWidget, Ui_ViewArchitectsWindow):
 		super(ViewArchitects, self).__init__()
 		self.setupUi(self)
 		self.setFixedSize(self.size())
+		self.setWindowTitle("Architects")
 
 		# create no-delete table model and set it on window's TableView
 		self.model = NoDeleteTableModel()
@@ -488,6 +492,7 @@ class ViewProjects(QWidget, Ui_ViewProjectsWindow):
 		self.main_window = main_window
 		self.setupUi(self)
 		self.setFixedSize(self.size())
+		self.setWindowTitle("Projects")
 
 		# create a relational table model and set its relation to the phases table
 		self.model = NonDeletableRelationalTableModel()
@@ -615,6 +620,7 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 		self.main_window = main_window
 		self.setupUi(self)
 		self.setFixedSize(self.size())
+		self.setWindowTitle("Time Logs")
 
 		# create a relational table model and set its relation to the phases table
 		self.model = TimeEntriesRelationalTableModel()
@@ -958,6 +964,7 @@ class ViewInvoices(QWidget, Ui_ViewInvoicesWindow):
 		super(ViewInvoices, self).__init__()
 		self.setupUi(self)
 		self.setFixedSize(self.size())
+		self.setWindowTitle("Invoices")
 
 		self.model = InvoiceRelationalTableModel()
 		self.invoicesTableView.setModel(self.model)
@@ -1003,7 +1010,7 @@ class ViewInvoices(QWidget, Ui_ViewInvoicesWindow):
 		index = self.model.fieldIndex("created_date")
 		self.invoicesTableView.sortByColumn(index, Qt.DescendingOrder)
 
-		self.invoicesTableView.setColumnWidth(1, 180)
+		self.invoicesTableView.setColumnWidth(1, 200)
 		self.invoicesTableView.setColumnWidth(2, 150)
 		self.invoicesTableView.setColumnWidth(3, 150)
 		self.invoicesTableView.setColumnWidth(4, 100)
@@ -1015,10 +1022,68 @@ class ViewInvoices(QWidget, Ui_ViewInvoicesWindow):
 		self.invoicesTableView.setItemDelegateForColumn(status_column, 
 			status_delegate)
 
+		self.project_model = QSqlTableModel()
+		self.project_model.setTable("projects")
+		self.project_model.setFilter("status = 'Active' AND project_id > 0")
+		self.project_model.select()
+		self.ProjectComboBox.setModel(self.project_model)
+		self.ProjectComboBox.setModelColumn(1)
+		
+		project_relation = QSqlRelation("projects", "project_id", "project_name")
+		self.model.setRelation(self.model.fieldIndex("project_id"), project_relation)
+		
+		self.ProjectComboBox.hide()
+		self.showCompletedProjectsCheckBox.hide()
+
+		self.showByProjectCheckBox.stateChanged.connect(self.showProjectCombo)
+		self.ProjectComboBox.currentIndexChanged.connect(self.updateFilter)
+		self.showCompletedProjectsCheckBox.stateChanged.connect(
+			self.showCompletedProjects)
+
 		self.viewInvoicePushButton.clicked.connect(self.viewInvoice)
 		self.invoice_windows = []
 		
 		self.show()
+
+	def showProjectCombo(self, signal) -> None:
+		"""Show or hide Project ComboBox"""
+		if signal == 2:
+			self.ProjectComboBox.show()
+			self.showCompletedProjectsCheckBox.show()
+			with get_db_connection() as conn:
+				cur = conn.cursor()
+				arch_proj_ids = get_most_recent_archid_and_projid(cur)
+			arch_id, proj_id = arch_proj_ids
+			proj_match = self.project_model.match(self.project_model.index(0,0),
+			Qt.EditRole, proj_id)
+			if proj_match:
+				row = proj_match[0].row()
+				self.ProjectComboBox.setCurrentIndex(row)
+			self.updateFilter()
+
+		else:
+			self.ProjectComboBox.hide()
+			self.showCompletedProjectsCheckBox.hide()
+			self.model.setFilter(f"")
+
+	def updateFilter(self) -> None:
+		proj_index = self.ProjectComboBox.currentIndex()
+		proj_id = self.project_model.data(self.project_model.index(proj_index, 0))
+		with get_db_connection() as conn:
+			cur = conn.cursor()
+			sql = "SELECT * FROM projects WHERE project_id = ?"
+			cur.execute(sql, (proj_id,))
+			proj_row = cur.fetchone()
+		proj_name = proj_row[1]
+		self.model.setFilter(f"project_name = '{proj_name}'")
+
+	def showCompletedProjects(self, signal) -> None:
+		set_row = self.ProjectComboBox.currentIndex()
+		if signal == 2:
+			self.project_model.setFilter("project_id > 0")
+		else:
+			self.project_model.setFilter("status = 'Active' AND project_id > 0")
+		self.ProjectComboBox.setCurrentIndex(set_row)
 
 	def viewInvoice(self) -> None:
 		self.invoice_ids = []
@@ -1061,6 +1126,7 @@ class ViewInvoice(Ui_ViewInvoiceWindow, QWidget):
 		super(ViewInvoice, self).__init__()
 		self.setupUi(self)
 		self.setFixedSize(self.size())
+		self.setWindowTitle("Invoice")
 		self.invoice_number = invoice_number
 		invoice_number_str = str(invoice_number)
 		
@@ -1141,6 +1207,7 @@ class ViewInvoice(Ui_ViewInvoiceWindow, QWidget):
 class TimerDisplay(QLCDNumber):
 	def __init__(self, parent = None) -> None:
 		super().__init__(parent)
+		self.setWindowTitle("Timer")
 
 		QTimer.singleShot(0, lambda: self.display("   00:00"))
 		self.timer = QTimer()
@@ -1163,6 +1230,7 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 		self.main_window = main_window
 		self.setupUi(self)
 		self.setFixedSize(self.size())
+		self.setWindowTitle("Timer")
 
 		self.architect_model = QSqlTableModel()
 		self.architect_model.setTable("architects")
@@ -1332,6 +1400,7 @@ class TimeEntriesNotesWindow(QDialog, Ui_AddInvoiceDialog):
 		super(TimeEntriesNotesWindow, self).__init__()
 		self.setupUi(self)
 		self.setFixedSize(self.size())
+		self.setWindowTitle("Notes")
 
 
 class ManualTimeLogger(QDialog, Ui_AddTimeDialog):
@@ -1341,6 +1410,7 @@ class ManualTimeLogger(QDialog, Ui_AddTimeDialog):
 		self.setupUi(self)
 		self.setFixedSize(self.size())
 		self.main_window = main_window
+		self.setWindowTitle("Add Time")
 		
 		# Set models
 		self.architect_model = QSqlTableModel()
@@ -1431,18 +1501,21 @@ class AddInvoiceNumber(QDialog, Ui_AddInvoiceDialog):
 		super(AddInvoiceNumber, self).__init__()
 		self.setupUi(self)
 		self.setFixedSize(self.size())
+		self.setWindowTitle("Invoice Number")
 
 class DeleteInvoiceWarning(QDialog, Ui_DeleteInvoiceDialog):
 	def __init__(self) -> None:
 		super(DeleteInvoiceWarning, self).__init__()
 		self.setupUi(self)
 		self.setFixedSize(self.size())
+		self.setWindowTitle("DELETE Invoice")
 
 class DeleteTimeEntryWarning(QDialog, Ui_DeleteTimeEntryDialog):
 	def __init__(self) -> None:
 		super(DeleteTimeEntryWarning, self).__init__()
 		self.setupUi(self)
 		self.setFixedSize(self.size())
+		self.setWindowTitle("DELETE Time Log")
 
 
 class NoDeleteTableModel(QSqlTableModel):

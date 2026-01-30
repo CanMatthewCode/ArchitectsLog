@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>900</width>
-    <height>480</height>
+    <width>907</width>
+    <height>590</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -39,443 +39,123 @@
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <layout class="QVBoxLayout" name="main_layout">
-      <item>
-       <widget class="QLabel" name="theArchitectsLogLabel">
-        <property name="minimumSize">
-         <size>
-          <width>501</width>
-          <height>61</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>48</pointsize>
-          <bold>true</bold>
-          <underline>true</underline>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLabel{
+     <widget class="QLabel" name="theArchitectsLogLabel">
+      <property name="minimumSize">
+       <size>
+        <width>501</width>
+        <height>61</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>48</pointsize>
+        <bold>true</bold>
+        <underline>true</underline>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel{
 	color: #008080;
 }</string>
-        </property>
-        <property name="text">
-         <string>The Architects Log</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
+      </property>
+      <property name="text">
+       <string>The Architects Log</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="project_button_layout">
       <item>
-       <layout class="QHBoxLayout" name="project_button_layout">
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Policy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>70</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" name="architects_layout">
-          <item>
-           <widget class="QLabel" name="Architects">
-            <property name="font">
-             <font>
-              <pointsize>24</pointsize>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QLabel{
-	color: #89D5D2;
-}</string>
-            </property>
-            <property name="text">
-             <string>Architect</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignmentFlag::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item alignment="Qt::AlignmentFlag::AlignVCenter">
-           <widget class="QComboBox" name="ArchitectsComboBox">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>20</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QLabel{
-	background-color: #89D5D2;
-}</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="verticalSpacer">
-            <property name="orientation">
-             <enum>Qt::Orientation::Vertical</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Policy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>5</width>
-              <height>5</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
-           <widget class="QPushButton" name="AddArchitectBtn">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>20</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>180</width>
-              <height>40</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <pointsize>18</pointsize>
-             </font>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QPushButton{
-	border-radius: 12px;
-	border: 1px solid black;
-	background-color: #89D5D2;
-	color: black;
-}
-
-QPushButton:hover{
-	background-color: #6FB5B2;
-}
-
-QPushButton:pressed {
-	background-color: #5A9695
-}</string>
-            </property>
-            <property name="text">
-             <string>Add New Architect</string>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>10</width>
-              <height>16</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Policy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>30</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" name="projects_layout">
-          <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
-           <widget class="QLabel" name="Projects">
-            <property name="font">
-             <font>
-              <pointsize>24</pointsize>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QLabel{
-	color: #89D5D2;
-}</string>
-            </property>
-            <property name="text">
-             <string>Project</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignmentFlag::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item alignment="Qt::AlignmentFlag::AlignVCenter">
-           <widget class="QComboBox" name="ProjectsComboBox">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>20</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="verticalSpacer_2">
-            <property name="orientation">
-             <enum>Qt::Orientation::Vertical</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Policy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>5</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
-           <widget class="QPushButton" name="AddProjectBtn">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>20</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>180</width>
-              <height>40</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <pointsize>18</pointsize>
-             </font>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QPushButton{
-	border-radius: 12px;
-	border: 1px solid black;
-	background-color: #89D5D2;
-	color: black;
-}
-
-QPushButton:hover{
-	background-color: #6FB5B2;
-}
-
-QPushButton:pressed {
-	background-color: #5A9695
-}</string>
-            </property>
-            <property name="text">
-             <string>Add New Project</string>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>10</width>
-              <height>16</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_4">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Policy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>30</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" name="phases_layout">
-          <property name="sizeConstraint">
-           <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
-          </property>
-          <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignTop">
-           <widget class="QLabel" name="ProjectPhases">
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <pointsize>24</pointsize>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QLabel{
-	color: #89D5D2;
-}</string>
-            </property>
-            <property name="text">
-             <string>Project Phase</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignmentFlag::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QComboBox" name="PhasesComboBox">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>20</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QLabel{
-	background-color: #89D5D2;
-}</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="phases_vertical_spacer">
-            <property name="orientation">
-             <enum>Qt::Orientation::Vertical</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Policy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>200</width>
-              <height>48</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Policy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>70</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <spacer name="main_layout_spacer">
+       <spacer name="horizontalSpacer">
         <property name="orientation">
-         <enum>Qt::Orientation::Vertical</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="sizeType">
          <enum>QSizePolicy::Policy::Fixed</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>10</width>
-          <height>25</height>
+          <width>70</width>
+          <height>20</height>
          </size>
         </property>
        </spacer>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="time_button_layout">
+       <layout class="QVBoxLayout" name="architects_layout">
         <item>
-         <spacer name="left_time_spacer">
+         <widget class="QLabel" name="Architects">
+          <property name="font">
+           <font>
+            <pointsize>24</pointsize>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QLabel{
+	color: #89D5D2;
+}</string>
+          </property>
+          <property name="text">
+           <string>Architect</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignmentFlag::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item alignment="Qt::AlignmentFlag::AlignVCenter">
+         <widget class="QComboBox" name="ArchitectsComboBox">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QLabel{
+	background-color: #89D5D2;
+}</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer">
           <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
+           <enum>Qt::Orientation::Vertical</enum>
           </property>
           <property name="sizeType">
            <enum>QSizePolicy::Policy::Fixed</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>150</width>
-            <height>20</height>
+            <width>5</width>
+            <height>5</height>
            </size>
           </property>
          </spacer>
         </item>
-        <item>
-         <widget class="QPushButton" name="LogTimeBtn">
+        <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
+         <widget class="QPushButton" name="AddArchitectBtn">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>20</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
           <property name="minimumSize">
            <size>
-            <width>200</width>
-            <height>50</height>
+            <width>180</width>
+            <height>40</height>
            </size>
           </property>
           <property name="maximumSize">
@@ -486,27 +166,27 @@ QPushButton:pressed {
           </property>
           <property name="font">
            <font>
-            <pointsize>24</pointsize>
+            <pointsize>18</pointsize>
            </font>
           </property>
           <property name="styleSheet">
            <string notr="true">QPushButton{
 	border-radius: 12px;
 	border: 1px solid black;
-	background-color: #35B5AC;
+	background-color: #89D5D2;
 	color: black;
 }
 
-QPushButton:hover {
-	background-color: #2A9089;
+QPushButton:hover{
+	background-color: #6FB5B2;
 }
 
 QPushButton:pressed {
-	background-color: #1F6B66;
+	background-color: #5A9695
 }</string>
           </property>
           <property name="text">
-           <string>LOG TIME</string>
+           <string>Add New Architect</string>
           </property>
           <property name="iconSize">
            <size>
@@ -516,70 +196,214 @@ QPushButton:pressed {
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QPushButton" name="AddTimeBtn">
+       </layout>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Policy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>30</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="projects_layout">
+        <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
+         <widget class="QLabel" name="Projects">
+          <property name="font">
+           <font>
+            <pointsize>24</pointsize>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QLabel{
+	color: #89D5D2;
+}</string>
+          </property>
+          <property name="text">
+           <string>Project</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignmentFlag::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item alignment="Qt::AlignmentFlag::AlignVCenter">
+         <widget class="QComboBox" name="ProjectsComboBox">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>20</horstretch>
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
           <property name="minimumSize">
            <size>
-            <width>200</width>
-            <height>50</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>24</pointsize>
-           </font>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QPushButton{
-	border-radius: 12px;
-	border: 1px solid black;
-	background-color: #35B5AC;
-	color: black;
-}
-
-QPushButton:hover {
-	background-color: #2A9089;
-}
-
-QPushButton:pressed {
-	background-color: #1F6B66;
-}</string>
-          </property>
-          <property name="text">
-           <string>ADD TIME</string>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>10</width>
-            <height>16</height>
+            <width>0</width>
+            <height>20</height>
            </size>
           </property>
          </widget>
         </item>
         <item>
-         <spacer name="right_time_spacer">
+         <spacer name="projects_vertical_spacer">
           <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
+           <enum>Qt::Orientation::Vertical</enum>
           </property>
           <property name="sizeType">
            <enum>QSizePolicy::Policy::Fixed</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>150</width>
+            <width>20</width>
+            <height>5</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
+         <widget class="QPushButton" name="AddProjectBtn">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>20</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>180</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>18</pointsize>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QPushButton{
+	border-radius: 12px;
+	border: 1px solid black;
+	background-color: #89D5D2;
+	color: black;
+}
+
+QPushButton:hover{
+	background-color: #6FB5B2;
+}
+
+QPushButton:pressed {
+	background-color: #5A9695
+}</string>
+          </property>
+          <property name="text">
+           <string>Add New Project</string>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>10</width>
+            <height>16</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_4">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Policy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>30</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="phases_layout">
+        <property name="sizeConstraint">
+         <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
+        </property>
+        <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignTop">
+         <widget class="QLabel" name="ProjectPhases">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>24</pointsize>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QLabel{
+	color: #89D5D2;
+}</string>
+          </property>
+          <property name="text">
+           <string>Project Phase</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignmentFlag::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="PhasesComboBox">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
             <height>20</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QLabel{
+	background-color: #89D5D2;
+}</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="phases_vertical_spacer">
+          <property name="orientation">
+           <enum>Qt::Orientation::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Policy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>200</width>
+            <height>48</height>
            </size>
           </property>
          </spacer>
@@ -587,242 +411,477 @@ QPushButton:pressed {
        </layout>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="logs_layout">
-        <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
-         <widget class="QPushButton" name="ViewArchitectsBtn">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>150</width>
-            <height>50</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>18</pointsize>
-           </font>
-          </property>
-          <property name="layoutDirection">
-           <enum>Qt::LayoutDirection::LeftToRight</enum>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QPushButton{
-	border-radius: 12px;
-	border: 1px solid black;
-	background-color: #008080;
-	color: black;
-}
-
-QPushButton:hover {
-	background-color: #006666;
-}
-
-QPushButton:pressed {
-	background-color: #004D4D;
-}</string>
-          </property>
-          <property name="text">
-           <string>View Architects</string>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>10</width>
-            <height>16</height>
-           </size>
-          </property>
-          <property name="autoDefault">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
-         <widget class="QPushButton" name="ViewProjectsBtn">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>150</width>
-            <height>50</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>18</pointsize>
-           </font>
-          </property>
-          <property name="layoutDirection">
-           <enum>Qt::LayoutDirection::LeftToRight</enum>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QPushButton{
-	border-radius: 12px;
-	border: 1px solid black;
-	background-color: #008080;
-	color: black;
-}
-
-QPushButton:hover {
-	background-color: #006666;
-}
-
-QPushButton:pressed {
-	background-color: #004D4D;
-}</string>
-          </property>
-          <property name="text">
-           <string>View Projects</string>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>10</width>
-            <height>16</height>
-           </size>
-          </property>
-          <property name="autoDefault">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
-         <widget class="QPushButton" name="ViewTimeLogsBtn">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>150</width>
-            <height>50</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>18</pointsize>
-           </font>
-          </property>
-          <property name="layoutDirection">
-           <enum>Qt::LayoutDirection::LeftToRight</enum>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QPushButton{
-	border-radius: 12px;
-	border: 1px solid black;
-	background-color: #008080;
-	color: black;
-}
-
-QPushButton:hover {
-	background-color: #006666;
-}
-
-QPushButton:pressed {
-	background-color: #004D4D;
-}</string>
-          </property>
-          <property name="text">
-           <string>View Time Logs</string>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>10</width>
-            <height>16</height>
-           </size>
-          </property>
-          <property name="autoDefault">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
-         <widget class="QPushButton" name="ViewInvoicesBtn">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>150</width>
-            <height>50</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>18</pointsize>
-           </font>
-          </property>
-          <property name="layoutDirection">
-           <enum>Qt::LayoutDirection::LeftToRight</enum>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QPushButton{
-	border-radius: 12px;
-	border: 1px solid black;
-	background-color: #008080;
-	color: black;
-}
-
-QPushButton:hover {
-	background-color: #006666;
-}
-
-QPushButton:pressed {
-	background-color: #004D4D;
-}</string>
-          </property>
-          <property name="text">
-           <string>View Invoices</string>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>10</width>
-            <height>16</height>
-           </size>
-          </property>
-          <property name="autoDefault">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Policy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>70</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
+    </item>
+    <item>
+     <spacer name="main_layout_spacer">
+      <property name="orientation">
+       <enum>Qt::Orientation::Vertical</enum>
+      </property>
+      <property name="sizeType">
+       <enum>QSizePolicy::Policy::Fixed</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>13</width>
+        <height>25</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="time_button_layout">
+      <item>
+       <spacer name="left_time_spacer">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Policy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>150</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="LogTimeBtn">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>20</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>200</width>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>24</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton{
+	border-radius: 12px;
+	border: 1px solid black;
+	background-color: #35B5AC;
+	color: black;
+}
+
+QPushButton:hover {
+	background-color: #2A9089;
+}
+
+QPushButton:pressed {
+	background-color: #1F6B66;
+}</string>
+        </property>
+        <property name="text">
+         <string>LOG TIME</string>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>10</width>
+          <height>16</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="AddTimeBtn">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>20</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>200</width>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>24</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton{
+	border-radius: 12px;
+	border: 1px solid black;
+	background-color: #35B5AC;
+	color: black;
+}
+
+QPushButton:hover {
+	background-color: #2A9089;
+}
+
+QPushButton:pressed {
+	background-color: #1F6B66;
+}</string>
+        </property>
+        <property name="text">
+         <string>ADD TIME</string>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>10</width>
+          <height>16</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="right_time_spacer">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Policy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>150</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="logs_layout">
+      <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
+       <widget class="QPushButton" name="ViewArchitectsBtn">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>150</width>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>18</pointsize>
+         </font>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::LayoutDirection::LeftToRight</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton{
+	border-radius: 12px;
+	border: 1px solid black;
+	background-color: #008080;
+	color: black;
+}
+
+QPushButton:hover {
+	background-color: #006666;
+}
+
+QPushButton:pressed {
+	background-color: #004D4D;
+}</string>
+        </property>
+        <property name="text">
+         <string>View Architects</string>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>10</width>
+          <height>16</height>
+         </size>
+        </property>
+        <property name="autoDefault">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
+       <widget class="QPushButton" name="ViewProjectsBtn">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>150</width>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>18</pointsize>
+         </font>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::LayoutDirection::LeftToRight</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton{
+	border-radius: 12px;
+	border: 1px solid black;
+	background-color: #008080;
+	color: black;
+}
+
+QPushButton:hover {
+	background-color: #006666;
+}
+
+QPushButton:pressed {
+	background-color: #004D4D;
+}</string>
+        </property>
+        <property name="text">
+         <string>View Projects</string>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>10</width>
+          <height>16</height>
+         </size>
+        </property>
+        <property name="autoDefault">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
+       <widget class="QPushButton" name="ViewTimeLogsBtn">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>150</width>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>18</pointsize>
+         </font>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::LayoutDirection::LeftToRight</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton{
+	border-radius: 12px;
+	border: 1px solid black;
+	background-color: #008080;
+	color: black;
+}
+
+QPushButton:hover {
+	background-color: #006666;
+}
+
+QPushButton:pressed {
+	background-color: #004D4D;
+}</string>
+        </property>
+        <property name="text">
+         <string>View Time Logs</string>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>10</width>
+          <height>16</height>
+         </size>
+        </property>
+        <property name="autoDefault">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
+       <widget class="QPushButton" name="ViewInvoicesBtn">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>150</width>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>18</pointsize>
+         </font>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::LayoutDirection::LeftToRight</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton{
+	border-radius: 12px;
+	border: 1px solid black;
+	background-color: #008080;
+	color: black;
+}
+
+QPushButton:hover {
+	background-color: #006666;
+}
+
+QPushButton:pressed {
+	background-color: #004D4D;
+}</string>
+        </property>
+        <property name="text">
+         <string>View Invoices</string>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>10</width>
+          <height>16</height>
+         </size>
+        </property>
+        <property name="autoDefault">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QPushButton" name="AnalyticsBtn">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>20</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>200</width>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>24</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton{
+	border-radius: 12px;
+	border: 1px solid black;
+	background-color: #35B5AC;
+	color: black;
+}
+
+QPushButton:hover {
+	background-color: #2A9089;
+}
+
+QPushButton:pressed {
+	background-color: #1F6B66;
+}</string>
+        </property>
+        <property name="text">
+         <string>Analytics</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <spacer name="verticalSpacer_2">
+      <property name="orientation">
+       <enum>Qt::Orientation::Vertical</enum>
+      </property>
+      <property name="sizeType">
+       <enum>QSizePolicy::Policy::Fixed</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
     </item>
    </layout>
   </widget>
@@ -831,7 +890,7 @@ QPushButton:pressed {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>900</width>
+     <width>907</width>
      <height>24</height>
     </rect>
    </property>

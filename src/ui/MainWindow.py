@@ -24,7 +24,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(900, 480)
+        MainWindow.resize(907, 590)
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -39,8 +39,6 @@ class Ui_MainWindow(object):
 "}")
         self.verticalLayout = QVBoxLayout(self.centralwidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.main_layout = QVBoxLayout()
-        self.main_layout.setObjectName(u"main_layout")
         self.theArchitectsLogLabel = QLabel(self.centralwidget)
         self.theArchitectsLogLabel.setObjectName(u"theArchitectsLogLabel")
         self.theArchitectsLogLabel.setMinimumSize(QSize(501, 61))
@@ -54,7 +52,7 @@ class Ui_MainWindow(object):
 "}")
         self.theArchitectsLogLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.main_layout.addWidget(self.theArchitectsLogLabel)
+        self.verticalLayout.addWidget(self.theArchitectsLogLabel)
 
         self.project_button_layout = QHBoxLayout()
         self.project_button_layout.setObjectName(u"project_button_layout")
@@ -149,9 +147,9 @@ class Ui_MainWindow(object):
 
         self.projects_layout.addWidget(self.ProjectsComboBox, 0, Qt.AlignmentFlag.AlignVCenter)
 
-        self.verticalSpacer_2 = QSpacerItem(20, 5, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        self.projects_vertical_spacer = QSpacerItem(20, 5, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
 
-        self.projects_layout.addItem(self.verticalSpacer_2)
+        self.projects_layout.addItem(self.projects_vertical_spacer)
 
         self.AddProjectBtn = QPushButton(self.centralwidget)
         self.AddProjectBtn.setObjectName(u"AddProjectBtn")
@@ -222,11 +220,11 @@ class Ui_MainWindow(object):
         self.project_button_layout.addItem(self.horizontalSpacer_2)
 
 
-        self.main_layout.addLayout(self.project_button_layout)
+        self.verticalLayout.addLayout(self.project_button_layout)
 
-        self.main_layout_spacer = QSpacerItem(10, 25, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        self.main_layout_spacer = QSpacerItem(13, 25, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
 
-        self.main_layout.addItem(self.main_layout_spacer)
+        self.verticalLayout.addItem(self.main_layout_spacer)
 
         self.time_button_layout = QHBoxLayout()
         self.time_button_layout.setObjectName(u"time_button_layout")
@@ -266,6 +264,7 @@ class Ui_MainWindow(object):
 
         self.AddTimeBtn = QPushButton(self.centralwidget)
         self.AddTimeBtn.setObjectName(u"AddTimeBtn")
+        self.AddTimeBtn.setEnabled(True)
         sizePolicy2.setHeightForWidth(self.AddTimeBtn.sizePolicy().hasHeightForWidth())
         self.AddTimeBtn.setSizePolicy(sizePolicy2)
         self.AddTimeBtn.setMinimumSize(QSize(200, 50))
@@ -294,7 +293,7 @@ class Ui_MainWindow(object):
         self.time_button_layout.addItem(self.right_time_spacer)
 
 
-        self.main_layout.addLayout(self.time_button_layout)
+        self.verticalLayout.addLayout(self.time_button_layout)
 
         self.logs_layout = QHBoxLayout()
         self.logs_layout.setObjectName(u"logs_layout")
@@ -407,15 +406,44 @@ class Ui_MainWindow(object):
         self.logs_layout.addWidget(self.ViewInvoicesBtn, 0, Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignVCenter)
 
 
-        self.main_layout.addLayout(self.logs_layout)
+        self.verticalLayout.addLayout(self.logs_layout)
+
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.AnalyticsBtn = QPushButton(self.centralwidget)
+        self.AnalyticsBtn.setObjectName(u"AnalyticsBtn")
+        sizePolicy2.setHeightForWidth(self.AnalyticsBtn.sizePolicy().hasHeightForWidth())
+        self.AnalyticsBtn.setSizePolicy(sizePolicy2)
+        self.AnalyticsBtn.setMinimumSize(QSize(200, 50))
+        self.AnalyticsBtn.setFont(font3)
+        self.AnalyticsBtn.setStyleSheet(u"QPushButton{\n"
+"	border-radius: 12px;\n"
+"	border: 1px solid black;\n"
+"	background-color: #35B5AC;\n"
+"	color: black;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: #2A9089;\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: #1F6B66;\n"
+"}")
+
+        self.horizontalLayout.addWidget(self.AnalyticsBtn)
 
 
-        self.verticalLayout.addLayout(self.main_layout)
+        self.verticalLayout.addLayout(self.horizontalLayout)
+
+        self.verticalSpacer_2 = QSpacerItem(20, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+
+        self.verticalLayout.addItem(self.verticalSpacer_2)
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 900, 24))
+        self.menubar.setGeometry(QRect(0, 0, 907, 24))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
@@ -440,5 +468,6 @@ class Ui_MainWindow(object):
         self.ViewProjectsBtn.setText(QCoreApplication.translate("MainWindow", u"View Projects", None))
         self.ViewTimeLogsBtn.setText(QCoreApplication.translate("MainWindow", u"View Time Logs", None))
         self.ViewInvoicesBtn.setText(QCoreApplication.translate("MainWindow", u"View Invoices", None))
+        self.AnalyticsBtn.setText(QCoreApplication.translate("MainWindow", u"Analytics", None))
     # retranslateUi
 

@@ -37,6 +37,8 @@ from architectsLog_db import (DB_FILE, get_db_connection, add_architect, add_pro
 	get_most_recent_archid_and_projid, get_most_recent_project_phase,
 	load_invoice_ids_no_time_entries, delete_invoice, delete_time_entry)
 
+ADMIN = len(PHASES)
+BUSDEV = len(PHASES) - 1
 
 def initialize_database(DB_FILE: str) -> None:
 	"""Open the persistant global Qt connection to the database"""
@@ -136,9 +138,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		proj_id = self.project_model.data(self.project_model.index(proj_index, 0))
 		
 		# Disable PhasesComboBox if phase is Business Development or Administration
-		if phase_id in (8, 9):
+		if phase_id in (BUSDEV, ADMIN):
 			self.PhasesComboBox.setEnabled(False)
-			if phase_id == 8:
+			if phase_id == BUSDEV:
 				self.ProjectsComboBox.setCurrentIndex(1)
 			else:
 				self.ProjectsComboBox.setCurrentIndex(0)
@@ -239,9 +241,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			phase_model = manual_log_time.PhaseComboBox.model()
 			phase_id = phase_model.data(phase_model.index(phase_index, 0))
 
-			if phase_id == 8:
+			if phase_id == BUSDEV:
 				proj_id = -1
-			elif phase_id == 9:
+			elif phase_id == ADMIN:
 				proj_id = -2
 			else:
 				proj_index = manual_log_time.ProjectComboBox.currentIndex()
@@ -1126,7 +1128,6 @@ class ViewInvoice(Ui_ViewInvoiceWindow, QWidget):
 		super(ViewInvoice, self).__init__()
 		self.setupUi(self)
 		self.setFixedSize(self.size())
-		self.setWindowTitle("Invoice")
 		self.invoice_number = invoice_number
 		invoice_number_str = str(invoice_number)
 		
@@ -1152,6 +1153,7 @@ class ViewInvoice(Ui_ViewInvoiceWindow, QWidget):
 		self.invoiceTableView.setSortingEnabled(True)
 		
 		self.addInvoiceNumberLabel.setText(invoice_name)
+		self.setWindowTitle(f"Invoice #{invoice_name}")
 
 		column_titles = {
 			"project_phase" : "Project Phase",
@@ -1290,9 +1292,9 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 
 		# Set project ComboBox and disable phase ComboBox if phase is 
 		# 	Business Development or Administration
-		if phase_id in (8, 9):
+		if phase_id in (BUSDEV, ADMIN):
 			self.PhaseComboBox.setEnabled(False)
-			if phase_id == 8:
+			if phase_id == BUSDEV:
 				self.ProjectComboBox.setCurrentIndex(1)
 			else:
 				self.ProjectComboBox.setCurrentIndex(0)
@@ -1355,9 +1357,9 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 		phase_index = self.PhaseComboBox.currentIndex()
 		phase_id = self.phase_model.data(self.phase_model.index(phase_index, 0))
 
-		if phase_id == 8:
+		if phase_id == BUSDEV:
 			proj_id = -1
-		elif phase_id == 9:
+		elif phase_id == ADMIN:
 			proj_id = -2
 		else:
 			proj_index = self.ProjectComboBox.currentIndex()
@@ -1474,9 +1476,9 @@ class ManualTimeLogger(QDialog, Ui_AddTimeDialog):
 
 		# Set project ComboBox and disable phase ComboBox if phase is 
 		# 	Business Development or Administration
-		if phase_id in (8, 9):
+		if phase_id in (BUSDEV, ADMIN):
 			self.PhaseComboBox.setEnabled(False)
-			if phase_id == 8:
+			if phase_id == BUSDEV:
 				self.ProjectComboBox.setCurrentIndex(1)
 			else:
 				self.ProjectComboBox.setCurrentIndex(0)
@@ -1663,7 +1665,7 @@ class TimeEntriesRelationalTableModel(QSqlRelationalTableModel):
 			
 			phase_id = None
 			if new_proj_id < 0:
-				phase_id = 9 if new_proj_id == -2 else 8
+				phase_id = ADMIN if new_proj_id == -2 else BUSDEV
 
 			# if the phase id is currently 8 or 9, then change it to whatever 
 			#	the last phase was for the project in the database
@@ -1690,7 +1692,7 @@ class TimeEntriesRelationalTableModel(QSqlRelationalTableModel):
 			new_phase = value
 			if old_phase == "Administration" or old_phase == "Business Development":
 				return False
-			elif new_phase > 7:
+			elif new_phase > len(PHASES) - 2:
 				return False
 
 		if field_name == "invoice_number":

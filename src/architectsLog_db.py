@@ -2,6 +2,7 @@
 
 import sqlite3
 import os
+from datetime import datetime
 from contextlib import contextmanager
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry
 from architectsLog_constants import PHASES, UPDATABLE_ARCHITECTS_COLUMNS, \
@@ -63,7 +64,7 @@ def create_project_table(cur: sqlite3.Cursor) -> None:
 			project_name TEXT NOT NULL,
 			client_name TEXT NOT NULL,
 			client_address TEXT NOT NULL UNIQUE,
-			start_date TEXT NOT NULL,
+			start_date INTEGER NOT NULL,
 			current_phase_id INTEGER NOT NULL,
 			status TEXT DEFAULT 'Active',
 			FOREIGN KEY (current_phase_id) REFERENCES phases (phase_id)
@@ -154,15 +155,16 @@ def initialize_projects(cur: sqlite3.Cursor) -> None:
 	if cur.fetchone()[0] > 0:
 		return
 	# add Business Development as id -1
+	start_date_str = "01-01-1900"
+	project_date = datetime.strptime(start_date_str, "%m-%d-%Y")
+	int_date = int(project_date.timestamp())
 	cur.execute("""INSERT INTO projects (project_id, project_name, client_name,
 		client_address, start_date, current_phase_id)
-		VALUES(-1, "Business Development", "Internal", "N/A", "01/01/1900", 8)
-		""")
+		VALUES(-1, ?, ?, ?, ?, 8)""", ("Business Development", "Internal", "N/A", int_date,))
 	# add Administration as id -2
 	cur.execute("""INSERT INTO projects (project_id, project_name, client_name,
 		client_address, start_date, current_phase_id)
-		VALUES(-2, "Administration", "Internal", "N/A2", "01/01/1900", 9)
-		""")
+		VALUES(-2, ?, ?, ?, ?, 9)""", ("Administration", "Internal", "N/A2", int_date,))
 
 def initialize_invoices(cur: sqlite3.Cursor) -> None:
 	"""Initialize the invoices table with a 0 id, None named invoice for default
@@ -172,7 +174,7 @@ def initialize_invoices(cur: sqlite3.Cursor) -> None:
 		return
 	cur.execute("""INSERT INTO invoices (invoice_id, project_id, 
 		created_date, invoice_number)
-		VALUES (0,0,0,'Not Invoiced')""")
+		VALUES (?, ?, ?, ?)""", (0, -1, 0,'Not Invoiced',))
 
 def get_most_recent_archid_and_projid(cur: sqlite3.Cursor) -> list[tuple[int, int]]:
 	"""Function to retrieve the most recent architect and project from the
@@ -332,7 +334,7 @@ def load_invoice(invoice_id: int, cur: sqlite3.Cursor) -> Invoice:
 	cur.execute(sql, (invoice_id,))
 	inv_info = cur.fetchone()
 	project = load_project(inv_info[1], cur)
-	loaded_invoice = Invoice(inv_info[3], inv_info[2], project, inv_info[4], inv_info[0])
+	loaded_invoice = Invoice(inv_info[3], inv_info[2], project.project_id, inv_info[4], inv_info[0])
 
 	return loaded_invoice
 

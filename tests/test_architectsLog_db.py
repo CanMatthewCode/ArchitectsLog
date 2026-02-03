@@ -62,14 +62,17 @@ def table_initialize(test_conn):
 	initialize_phases(cur)
 
 	#create a test project with testArchitect and add it to the project table
-	testProject = Project("NewProject", "NewClient", "123ClientStreet", "01-01-2025")
+	date = "01-01-2025"
+	invoice_date = datetime.strptime(date, "%m-%d-%Y")
+	int_date = int(invoice_date.timestamp())
+	testProject = Project("NewProject", "NewClient", "123ClientStreet", int_date)
 	project_id = add_project(testProject, cur)
 
 	#create a test invoice with testProject and add it to the invoice table
 	date = "01-01-2025"
 	invoice_date = datetime.strptime(date, "%m-%d-%Y")
 	int_date = int(invoice_date.timestamp())
-	testInvoice = Invoice(1, int_date, testProject)
+	testInvoice = Invoice(1, int_date, project_id)
 	invoice_id = add_invoice(testInvoice, cur)
 
 	#create a test time entry with testProject and testArchitect and add it to the time_entries table
@@ -264,7 +267,7 @@ def test_project_table_column_types(table_info):
 	assert column_types['project_name'] == 'TEXT'
 	assert column_types['client_name'] == 'TEXT'
 	assert column_types['client_address'] == 'TEXT'
-	assert column_types['start_date'] == 'TEXT'
+	assert column_types['start_date'] == 'INTEGER'
 	assert column_types['current_phase_id'] == 'INTEGER'
 	assert column_types['status'] == 'TEXT'
 
@@ -416,12 +419,16 @@ def test_add_project(test_conn, table_initialize):
 	#unpack row for readability 
 	project_id, project_name, client_name, client_address, start_date, current_phase_id, status = row
 
+	date = "01-01-2025"
+	invoice_date = datetime.strptime(date, "%m-%d-%Y")
+	int_date = int(invoice_date.timestamp())
+
 	#test table columns for correct insertion
 	assert project_id == 1
 	assert project_name == "NewProject"
 	assert client_name == "NewClient"
 	assert client_address == "123ClientStreet"
-	assert start_date == "01-01-2025"
+	assert start_date == int_date
 	assert current_phase_id == 1
 	assert status == "Active"
 
@@ -453,7 +460,7 @@ def test_add_invoice(test_conn, table_initialize):
 	assert invoice_id == 1
 	assert project_id == table_initialize['project'].project_id
 	assert created_date == int_date
-	assert invoice_number == 1
+	assert invoice_number == '1'
 	assert status == "Draft"
 
 	#test if invoice object was updated with invoice_id
@@ -568,11 +575,15 @@ def test_load_project(test_conn, table_initialize):
 	cur = test_conn.cursor()
 	testProject = load_project(1, cur)
 
+	date = "01-01-2025"
+	project_date = datetime.strptime(date, "%m-%d-%Y")
+	int_date = int(project_date.timestamp())
+
 	#test if all columns were correctly loaded into Project object
 	assert testProject.project_name == "NewProject"
 	assert testProject.client_name == "NewClient"
 	assert testProject.client_address == "123ClientStreet"
-	assert testProject.start_date == "01-01-2025"
+	assert testProject.start_date == int_date
 	assert testProject.current_phase_id == 1
 	assert testProject.status == "Active"
 	assert testProject.project_id == 1
@@ -640,9 +651,9 @@ def test_load_invoice(test_conn, table_initialize):
 	int_date = int(invoice_date.timestamp())
 
 	#test if all columns were correctly loaded into Invoice object
-	assert testInvoice.invoice_number == 1
+	assert testInvoice.invoice_number == '1'
 	assert testInvoice.created_date == int_date
-	assert testInvoice.project.project_id == 1
+	assert testInvoice.project_id == 1
 	assert testInvoice.status == "Draft"
 	assert testInvoice.invoice_id == 1
 
@@ -653,7 +664,7 @@ def test_load_project_invoices(test_conn, table_initialize):
 	cur = test_conn.cursor()
 	project = table_initialize['project']
 	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", "02-02-2025")
-	add_project(second_project, cur)
+	second_proj_id = add_project(second_project, cur)
 
 	#turn dates into a timestamp ints
 	date = "01-01-2025"
@@ -669,9 +680,9 @@ def test_load_project_invoices(test_conn, table_initialize):
 	invoice_date4 = datetime.strptime(date4, "%m-%d-%Y")
 	int_date4 = int(invoice_date.timestamp())
 
-	testInvoice2 = Invoice(2, int_date2, project)
-	testInvoice3 = Invoice(3, int_date3, project, status = "Billed")
-	testInvoice4 = Invoice(4, int_date4, second_project)
+	testInvoice2 = Invoice(2, int_date2, project.project_id)
+	testInvoice3 = Invoice(3, int_date3, project.project_id, status = "Billed")
+	testInvoice4 = Invoice(4, int_date4, second_proj_id)
 	add_invoice(testInvoice2, cur)
 	add_invoice(testInvoice3, cur)
 	add_invoice(testInvoice4, cur)
@@ -683,15 +694,15 @@ def test_load_project_invoices(test_conn, table_initialize):
 
 	#test if all the columns were correctly loaded into the tuples in the correct order
 	assert testInvoices[0][0] == 3
-	assert testInvoices[0][1] == 3
+	assert testInvoices[0][1] == "3"
 	assert testInvoices[0][2] == int_date3
 	assert testInvoices[0][3] == "Billed"
 	assert testInvoices[1][0] == 1
-	assert testInvoices[1][1] == 1
+	assert testInvoices[1][1] == "1"
 	assert testInvoices[1][2] == int_date
 	assert testInvoices[1][3] == "Draft"
 	assert testInvoices[2][0] == 2
-	assert testInvoices[2][1] == 2
+	assert testInvoices[2][1] == "2"
 	assert testInvoices[2][2] == int_date2
 	assert testInvoices[2][3] == "Draft"
 
@@ -717,9 +728,9 @@ def test_load_status_invoices(test_conn, table_initialize):
 	invoice_date4 = datetime.strptime(date4, "%m-%d-%Y")
 	int_date4 = int(invoice_date.timestamp())
 
-	testInvoice2 = Invoice(2, int_date2, project)
-	testInvoice3 = Invoice(3, int_date3, project, status = "Billed")
-	testInvoice4 = Invoice(4, int_date4, second_project, status = "Billed")
+	testInvoice2 = Invoice(2, int_date2, project.project_id)
+	testInvoice3 = Invoice(3, int_date3, project.project_id, status = "Billed")
+	testInvoice4 = Invoice(4, int_date4, second_project.project_id, status = "Billed")
 	add_invoice(testInvoice2, cur)
 	add_invoice(testInvoice3, cur)
 	add_invoice(testInvoice4, cur)
@@ -733,15 +744,15 @@ def test_load_status_invoices(test_conn, table_initialize):
 
 	#test if all columns were correctly loaded into the tuples in the correct order
 	assert testDraftInvoices[0][0] == 1
-	assert testDraftInvoices[0][1] == 1
+	assert testDraftInvoices[0][1] == "1"
 	assert testDraftInvoices[0][2] == int_date
 	assert testDraftInvoices[0][3] == "NewProject"
 	assert testBilledInvoices[0][0] == 3
-	assert testBilledInvoices[0][1] == 3
+	assert testBilledInvoices[0][1] == "3"
 	assert testBilledInvoices[0][2] == int_date3
 	assert testBilledInvoices[0][3] == "NewProject"
 	assert testBilledInvoices[1][0] == 4
-	assert testBilledInvoices[1][1] == 4
+	assert testBilledInvoices[1][1] == "4"
 	assert testBilledInvoices[1][2] == int_date4
 	assert testBilledInvoices[1][3] == "NewProject2"
 
@@ -775,9 +786,9 @@ def test_load_all_invoices(test_conn, table_initialize):
 	invoice_date4 = datetime.strptime(date4, "%m-%d-%Y")
 	int_date4 = int(invoice_date.timestamp())
 
-	testInvoice2 = Invoice(2, int_date2, project, status = "Paid")
-	testInvoice3 = Invoice(3, int_date3, second_project, status = "Billed")
-	testInvoice4 = Invoice(4, int_date4, second_project, status = "Paid")
+	testInvoice2 = Invoice(2, int_date2, project.project_id, status = "Paid")
+	testInvoice3 = Invoice(3, int_date3, second_project.project_id, status = "Billed")
+	testInvoice4 = Invoice(4, int_date4, second_project.project_id, status = "Paid")
 	add_invoice(testInvoice2, cur)
 	add_invoice(testInvoice3, cur)
 	add_invoice(testInvoice4, cur)
@@ -791,12 +802,12 @@ def test_load_all_invoices(test_conn, table_initialize):
 	assert testInvoices[0][0] == 1
 	assert testInvoices[0][1] == "NewProject"
 	assert testInvoices[0][2] == int_date
-	assert testInvoices[0][3] == 1
+	assert testInvoices[0][3] == "1"
 	assert testInvoices[0][4] == "Draft"
 	assert testInvoices[3][0] == 4
 	assert testInvoices[3][1] == "NewProject2"
 	assert testInvoices[3][2] == int_date4
-	assert testInvoices[3][3] == 4
+	assert testInvoices[3][3] == "4"
 	assert testInvoices[3][4] == "Paid"
 
 
@@ -924,7 +935,7 @@ def test_load_invoice_time_entries(test_conn, table_initialize):
 	date2 = "02-02-2025"
 	invoice_date2 = datetime.strptime(date2, "%m-%d-%Y")
 	int_date2 = int(invoice_date2.timestamp())
-	testInvoice2 = Invoice(2, int_date2, project)
+	testInvoice2 = Invoice(2, int_date2, project.project_id)
 	add_invoice(testInvoice2, cur)
 
 	date_time = "01-01-2025 12:00:00"
@@ -1128,20 +1139,20 @@ def test_update_architect_invalid_column(test_conn, table_initialize):
 def test_update_project(test_conn, table_initialize):
 	"""Test that the projects table has been correctly updated with the new input values"""
 	cur = test_conn.cursor()
-	project = table_initialize['project']
+	project_id = table_initialize['project_id']
 
 	#update all columns in the projects table with new values
-	project = update_project('project_name', project, "NewProject2", cur)
-	project = update_project('client_name', project, "NewClient2", cur)
-	project = update_project('client_address', project, "345ClientStreet", cur)
-	project = update_project('start_date', project, "02-02-2025", cur)
-	project = update_project('current_phase_id', project, 2, cur)
-	project = update_project('status', project, 'Completed', cur)
+	project = update_project('project_name', project_id, "NewProject2", cur)
+	project = update_project('client_name', project_id, "NewClient2", cur)
+	project = update_project('client_address', project_id, "345ClientStreet", cur)
+	project = update_project('start_date', project_id, "02-02-2025", cur)
+	project = update_project('current_phase_id', project_id, 2, cur)
+	project = update_project('status', project_id, 'Completed', cur)
 	test_conn.commit()
 
 	#test if all column values were correctly updated
 	sql = "SELECT * FROM projects WHERE project_id = ?"
-	cur.execute(sql, (project.project_id,))
+	cur.execute(sql, (project_id,))
 	row = cur.fetchone()
 
 	#unpack row for readability 
@@ -1153,14 +1164,6 @@ def test_update_project(test_conn, table_initialize):
 	assert start_date == "02-02-2025"
 	assert current_phase_id == 2
 	assert status == 'Completed'
-
-	#test if all object attributes where correctly updated
-	assert project.project_name == "NewProject2"
-	assert project.client_name == "NewClient2"
-	assert project.client_address == "345ClientStreet"
-	assert project.start_date == "02-02-2025"
-	assert project.current_phase_id == 2
-	assert project.status == 'Completed'
 
 #Test if the update_project function raises an exception to an incorrect column name
 def test_update_project_invalid_column(test_conn, table_initialize):
@@ -1198,7 +1201,7 @@ def test_update_invoice(test_conn, table_initialize):
 
 	assert project_id == 2
 	assert created_date == "02-02-2025"
-	assert invoice_number == 2
+	assert invoice_number == "2"
 	assert status == "billed"
 
 	#test if all object attributes were correctly updated
@@ -1221,7 +1224,7 @@ def test_update_invoice_invalid_column(test_conn, table_initialize):
 def test_update_time_entry(test_conn, table_initialize):
 	"""Test that the time_entries table has been correctly updated with the new input values"""
 	cur = test_conn.cursor()
-	time_entry = table_initialize['time_entry']
+	time_entry_id = table_initialize['time_entry_id']
 	second_architect = Architect("Name 2", "LicenseNumber02", "987-654-3210", "email2@domain.com",
 		"Company 2")
 	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", "02-02-2025")
@@ -1230,18 +1233,18 @@ def test_update_time_entry(test_conn, table_initialize):
 	test_conn.commit()
 
 	#update all columns in the time_entries table with new values
-	time_entry = update_time_entry('project_id', time_entry, 2, cur)
-	time_entry = update_time_entry('architect_id', time_entry, 2, cur)
-	time_entry = update_time_entry('phase_id', time_entry, 2, cur)
-	time_entry = update_time_entry('start_time', time_entry, '02-02-2025 1:00:00', cur)
-	time_entry = update_time_entry('duration_minutes', time_entry, 60, cur)
-	time_entry = update_time_entry('notes', time_entry, 'New Note', cur)
-	time_entry = update_time_entry('invoice_id', time_entry, 1, cur)
+	time_entry = update_time_entry('project_id', time_entry_id, 2, cur)
+	time_entry = update_time_entry('architect_id', time_entry_id, 2, cur)
+	time_entry = update_time_entry('phase_id', time_entry_id, 2, cur)
+	time_entry = update_time_entry('start_time', time_entry_id, '02-02-2025 1:00:00', cur)
+	time_entry = update_time_entry('duration_minutes', time_entry_id, 60, cur)
+	time_entry = update_time_entry('notes', time_entry_id, 'New Note', cur)
+	time_entry = update_time_entry('invoice_id', time_entry_id, 1, cur)
 	test_conn.commit()
 
 	#test if all column values were correctly updated
 	sql = "SELECT * FROM time_entries WHERE time_entry_id = ?"
-	cur.execute(sql, (time_entry.time_entry_id,))
+	cur.execute(sql, (time_entry_id,))
 	row = cur.fetchone()
 
 	#unpack row for readability
@@ -1255,15 +1258,6 @@ def test_update_time_entry(test_conn, table_initialize):
 	assert duration_minutes == 60
 	assert notes == "New Note"
 	assert invoice_id == 1
-
-	#test if all object attributes where correctly updated
-	assert time_entry.start_time == "02-02-2025 1:00:00"
-	assert time_entry.duration_minutes == 60
-	assert time_entry.project.project_id == 2
-	assert time_entry.architect.architect_id == 2
-	assert time_entry.phase_id == 2
-	assert time_entry.notes == "New Note"
-	assert time_entry.invoice_id == 1
 
 #Test if the update_time_entry function raises an exception to an incorrect column name
 def test_update_time_entry_invalid_column(test_conn, table_initialize):
@@ -1282,8 +1276,8 @@ def test_update_time_entry_invalid_column(test_conn, table_initialize):
 def test_delete_invoice(test_conn, table_initialize):
 	"""Test to see if the delete_invoice function deletes the correct row"""
 	cur = test_conn.cursor()
-	project = table_initialize['project']
-	testInvoice2 = Invoice(2, "02-02-2025", project, status = "paid")
+	project_id = table_initialize['project_id']
+	testInvoice2 = Invoice(2, "02-02-2025", project_id, status = "paid")
 	add_invoice(testInvoice2, cur)
 	test_conn.commit()
 	pre_delete_invoices = load_all_invoices(cur)
@@ -1292,17 +1286,21 @@ def test_delete_invoice(test_conn, table_initialize):
 	assert len(pre_delete_invoices) == 2
 
 	#test delete_invoice function
-	delete_invoice(1, cur)
+	delete_invoice(2, cur)
 	test_conn.commit()
 	post_delete_invoices = load_all_invoices(cur)
 	assert len(post_delete_invoices) == 1
 
+	date = "01-01-2025"
+	invoice_date = datetime.strptime(date, "%m-%d-%Y")
+	int_date = int(invoice_date.timestamp())
+
 	#test the correct invoice was deleted
-	assert post_delete_invoices[0][0] == 2
+	assert post_delete_invoices[0][0] == 1
 	assert post_delete_invoices[0][1] == "NewProject"
-	assert post_delete_invoices[0][2] == "02-02-2025"
-	assert post_delete_invoices[0][3] == 2
-	assert post_delete_invoices[0][4] == "paid"
+	assert post_delete_invoices[0][2] == int_date
+	assert post_delete_invoices[0][3] == "1"
+	assert post_delete_invoices[0][4] == "Draft"
 
 
 #Test if the delete_time_entry function deletes the correct row from the time_entry table

@@ -54,6 +54,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.setFixedSize(self.size())
 
 		self.setWindowTitle("The Architects Log")
+
+		self.view_arch_window = None
+		self.view_proj_window = None
+		self.view_time_entries_window = None
+		self.view_invoices_window = None
+
 		# create architect, project, phase models and set them on their combo box
 		self.architect_model = QSqlTableModel()
 		self.architect_model.setTable("architects")
@@ -83,28 +89,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		with get_db_connection() as conn:
 			cur = conn.cursor()
 			arch_proj_ids = get_most_recent_archid_and_projid(cur)
-		arch_id, proj_id = arch_proj_ids
-		arch_match = self.architect_model.match(self.architect_model.index(0,0), 
-			Qt.EditRole, arch_id)
-		if arch_match:
-			row = arch_match[0].row()
-			self.ArchitectsComboBox.setCurrentIndex(row)
-		proj_match = self.project_model.match(self.project_model.index(0,0),
-			Qt.EditRole, proj_id)
-		if proj_match:
-			row = proj_match[0].row()
-			self.ProjectsComboBox.setCurrentIndex(row)
+		if arch_proj_ids:
+			arch_id, proj_id = arch_proj_ids
+			arch_match = self.architect_model.match(self.architect_model.index(0,0), 
+				Qt.EditRole, arch_id)
+			if arch_match:
+				row = arch_match[0].row()
+				self.ArchitectsComboBox.setCurrentIndex(row)
+			proj_match = self.project_model.match(self.project_model.index(0,0),
+				Qt.EditRole, proj_id)
+			if proj_match:
+				row = proj_match[0].row()
+				self.ProjectsComboBox.setCurrentIndex(row)
+		else:
+			self.ProjectsComboBox.setCurrentIndex(0)
 
 		# enable button clicks
 		self.AddArchitectBtn.clicked.connect(self.addArchitect)
 		self.AddProjectBtn.clicked.connect(self.addProject)
 		self.LogTimeBtn.clicked.connect(self.logTime)
 		self.AddTimeBtn.clicked.connect(self.addTime)
-		
-		self.view_arch_window = None
-		self.view_proj_window = None
-		self.view_time_entries_window = None
-		self.view_invoices_window = None
 
 		self.ViewArchitectsBtn.clicked.connect(self.viewArchitects)
 		self.ViewProjectsBtn.clicked.connect(self.viewProjects)
@@ -191,10 +195,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			# Turn the QDate object into a string
 			start_date = proj_window.projectStartDate.date()
 			start_date_str = start_date.toString("MM/dd/yyyy")
+			project_date = datetime.strptime(start_date_str, "%m/%d/%Y")
+			int_date = int(project_date.timestamp())
 			new_project = Project(project_name = proj_window.projectNameInput.text(),
 				client_name = proj_window.clientInput.text(),
 				client_address = proj_window.projectAddressInput.text(),
-				start_date = start_date_str,
+				start_date = int_date,
 				current_phase_id = phase_id)
 			with get_db_connection() as conn:
 				cur = conn.cursor()
@@ -387,12 +393,8 @@ class ViewArchitects(QWidget, Ui_ViewArchitectsWindow):
 		self.setWindowTitle("Architects")
 
 		# create no-delete table model and set it on window's TableView
-		self.model = NoDeleteTableModel()
+		self.model = ArchitectsTableModel()
 		self.model.setTable("architects")
-
-		# set my view state reset function onto the model
-		#self.model.modelReset.connect(self.applyViewState)
-		#self.model.layoutChanged.connect(self.applyViewState)
 
 		# set my model on my view
 		self.architectsTableView.setModel(self.model)
@@ -478,14 +480,6 @@ class ViewArchitects(QWidget, Ui_ViewArchitectsWindow):
 			self.architectsTableView.setColumnWidth(3, 135)
 			self.architectsTableView.setColumnWidth(4, 215)
 			self.architectsTableView.setColumnWidth(5, 170)
-			
-
-	def applyViewState(self) -> None:
-		# conditionally hide/show status column based on checkbox
-		status_column = self.model.fieldIndex("status")
-		if status_column != -1:
-			hide_status = not self.hideArchitectCheckBox.isChecked()
-			self.architectsTableView.setColumnHidden(status_column, hide_status)
 
 
 class ViewProjects(QWidget, Ui_ViewProjectsWindow):
@@ -497,7 +491,7 @@ class ViewProjects(QWidget, Ui_ViewProjectsWindow):
 		self.setWindowTitle("Projects")
 
 		# create a relational table model and set its relation to the phases table
-		self.model = NonDeletableRelationalTableModel()
+		self.model = ProjectsRelationalTableModel()
 
 		self.projectsTableView.setModel(self.model)
 
@@ -510,10 +504,11 @@ class ViewProjects(QWidget, Ui_ViewProjectsWindow):
 		self.projectsTableView.setItemDelegate(QSqlRelationalDelegate(
 			self.projectsTableView))
 
-
-		# set my view state reset function onto the model
-		#self.model.modelReset.connect(self.applyViewState)
-		#self.model.layoutChanged.connect(self.applyViewState)
+		# set start date delegate
+		start_date_column_index = self.model.fieldIndex("start_date")
+		self.projectsTableView.setItemDelegateForColumn(
+			start_date_column_index, CreatedDateDelegate(
+				self.projectsTableView))
 
 		# allow editing of project information
 		self.model.setEditStrategy(QSqlRelationalTableModel.OnFieldChange)
@@ -607,13 +602,6 @@ class ViewProjects(QWidget, Ui_ViewProjectsWindow):
 			self.projectsTableView.setColumnWidth(5, 202)
 
 		self.model.select()
-
-	def applyViewState(self) -> None:
-		# conditionally hide/show status column based on checkbox
-		status_column = self.model.fieldIndex("status")
-		if status_column != -1:
-			hide_status = self.showProjectCheckBox.isChecked()
-			self.projectsTableView.setColumnHidden(status_column, hide_status)
 
 
 class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
@@ -1380,6 +1368,9 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 		self.main_window.showNormal()
 		self.close()
 
+	def closeEvent(self, event) -> None:
+		self.main_window.showNormal()
+
 class TimeLog():
 	def __init__(self) -> None:
 		self.timer_state = "inactive"
@@ -1520,7 +1511,7 @@ class DeleteTimeEntryWarning(QDialog, Ui_DeleteTimeEntryDialog):
 		self.setWindowTitle("DELETE Time Log")
 
 
-class NoDeleteTableModel(QSqlTableModel):
+class ArchitectsTableModel(QSqlTableModel):
 	"""Class to disallow deletions of entire rows in table views and to 
 	check for valid email address and phone number on user edit"""
 	def removeRows(self, row, count, parent=None) -> bool:
@@ -1556,11 +1547,23 @@ class NoDeleteTableModel(QSqlTableModel):
 		return super().setData(index, value, role)
 
 
-class NonDeletableRelationalTableModel(QSqlRelationalTableModel):
+class ProjectsRelationalTableModel(QSqlRelationalTableModel):
 	"""Class to disallow deletions of entire rows in relational table views 
 	and to check and reformat date on user edit"""
 	def removeRows(self, row, count, parent=None) -> bool:
 		return False
+
+	def data(self, index, role = Qt.DisplayRole) -> any:
+		field_name = self.record().fieldName(index.column())
+		value = super().data(index, role)
+
+		if (field_name == "start_date" and value is not None 
+			and role == Qt.DisplayRole):
+			date_time = datetime.fromtimestamp(value)
+			value = date_time.strftime("%m/%d/%Y")
+			return value
+
+		return super().data(index, role)
 
 	def setData(self, index, value, role = Qt.EditRole) -> bool:
 		# Get column database names to safety desired column entries by user
@@ -1574,7 +1577,7 @@ class NonDeletableRelationalTableModel(QSqlRelationalTableModel):
 						try:
 							date_obj = datetime.strptime(value, fmt)
 							formatted_date = date_obj.strftime('%m/%d/%Y')
-							value = formatted_date
+							value = int(formatted_date.timestamp())
 							break
 						except ValueError:
 							continue
@@ -1586,6 +1589,7 @@ class NonDeletableRelationalTableModel(QSqlRelationalTableModel):
 					QMessageBox.warning(None, "Invalid Date", 
 							"Invalid Date, Please Correct")
 					return False
+
 
 		if field_name == "project_phase":
 			if isinstance(value, str):

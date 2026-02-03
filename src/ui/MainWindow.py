@@ -199,16 +199,19 @@ class Ui_MainWindow(object):
 
         self.PhasesComboBox = QComboBox(self.centralwidget)
         self.PhasesComboBox.setObjectName(u"PhasesComboBox")
-        sizePolicy.setHeightForWidth(self.PhasesComboBox.sizePolicy().hasHeightForWidth())
-        self.PhasesComboBox.setSizePolicy(sizePolicy)
-        self.PhasesComboBox.setMinimumSize(QSize(0, 20))
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.PhasesComboBox.sizePolicy().hasHeightForWidth())
+        self.PhasesComboBox.setSizePolicy(sizePolicy2)
+        self.PhasesComboBox.setMinimumSize(QSize(0, 22))
         self.PhasesComboBox.setStyleSheet(u"QLabel{\n"
 "	background-color: #89D5D2;\n"
 "}")
 
         self.phases_layout.addWidget(self.PhasesComboBox)
 
-        self.phases_vertical_spacer = QSpacerItem(200, 48, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        self.phases_vertical_spacer = QSpacerItem(200, 60, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
 
         self.phases_layout.addItem(self.phases_vertical_spacer)
 
@@ -234,11 +237,11 @@ class Ui_MainWindow(object):
 
         self.LogTimeBtn = QPushButton(self.centralwidget)
         self.LogTimeBtn.setObjectName(u"LogTimeBtn")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
-        sizePolicy2.setHorizontalStretch(20)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.LogTimeBtn.sizePolicy().hasHeightForWidth())
-        self.LogTimeBtn.setSizePolicy(sizePolicy2)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        sizePolicy3.setHorizontalStretch(20)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.LogTimeBtn.sizePolicy().hasHeightForWidth())
+        self.LogTimeBtn.setSizePolicy(sizePolicy3)
         self.LogTimeBtn.setMinimumSize(QSize(200, 50))
         self.LogTimeBtn.setMaximumSize(QSize(16777215, 16777215))
         font3 = QFont()
@@ -265,8 +268,8 @@ class Ui_MainWindow(object):
         self.AddTimeBtn = QPushButton(self.centralwidget)
         self.AddTimeBtn.setObjectName(u"AddTimeBtn")
         self.AddTimeBtn.setEnabled(True)
-        sizePolicy2.setHeightForWidth(self.AddTimeBtn.sizePolicy().hasHeightForWidth())
-        self.AddTimeBtn.setSizePolicy(sizePolicy2)
+        sizePolicy3.setHeightForWidth(self.AddTimeBtn.sizePolicy().hasHeightForWidth())
+        self.AddTimeBtn.setSizePolicy(sizePolicy3)
         self.AddTimeBtn.setMinimumSize(QSize(200, 50))
         self.AddTimeBtn.setMaximumSize(QSize(16777215, 16777215))
         self.AddTimeBtn.setFont(font3)
@@ -412,8 +415,8 @@ class Ui_MainWindow(object):
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.AnalyticsBtn = QPushButton(self.centralwidget)
         self.AnalyticsBtn.setObjectName(u"AnalyticsBtn")
-        sizePolicy2.setHeightForWidth(self.AnalyticsBtn.sizePolicy().hasHeightForWidth())
-        self.AnalyticsBtn.setSizePolicy(sizePolicy2)
+        sizePolicy3.setHeightForWidth(self.AnalyticsBtn.sizePolicy().hasHeightForWidth())
+        self.AnalyticsBtn.setSizePolicy(sizePolicy3)
         self.AnalyticsBtn.setMinimumSize(QSize(200, 50))
         self.AnalyticsBtn.setFont(font3)
         self.AnalyticsBtn.setStyleSheet(u"QPushButton{\n"
@@ -443,7 +446,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 907, 24))
+        self.menubar.setGeometry(QRect(0, 0, 907, 30))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")

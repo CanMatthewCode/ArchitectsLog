@@ -1,0 +1,237 @@
+# -*- coding: utf-8 -*-
+
+################################################################################
+## Form generated from reading UI file 'Analytics.ui'
+##
+## Created by: Qt User Interface Compiler version 6.9.3
+##
+## WARNING! All changes made in this file will be lost when recompiling UI file!
+################################################################################
+
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QApplication, QFrame, QGridLayout, QLabel,
+    QPushButton, QSizePolicy, QVBoxLayout, QWidget)
+
+class Ui_AnalyticsWindow(object):
+    def setupUi(self, AnalyticsWindow):
+        if not AnalyticsWindow.objectName():
+            AnalyticsWindow.setObjectName(u"AnalyticsWindow")
+        AnalyticsWindow.resize(2000, 1200)
+        AnalyticsWindow.setStyleSheet(u"QWidget{\n"
+"	background-color: #1E2E34;\n"
+"}")
+        self.verticalLayout = QVBoxLayout(AnalyticsWindow)
+        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.analyticsLabel = QLabel(AnalyticsWindow)
+        self.analyticsLabel.setObjectName(u"analyticsLabel")
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.analyticsLabel.sizePolicy().hasHeightForWidth())
+        self.analyticsLabel.setSizePolicy(sizePolicy)
+        font = QFont()
+        font.setPointSize(84)
+        font.setBold(True)
+        font.setUnderline(True)
+        self.analyticsLabel.setFont(font)
+        self.analyticsLabel.setStyleSheet(u"QLabel{\n"
+"	color: #35B5AC;\n"
+"}")
+
+        self.verticalLayout.addWidget(self.analyticsLabel, 0, Qt.AlignmentFlag.AlignHCenter)
+
+        self.analyticsQuadWidgets = QWidget(AnalyticsWindow)
+        self.analyticsQuadWidgets.setObjectName(u"analyticsQuadWidgets")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.analyticsQuadWidgets.sizePolicy().hasHeightForWidth())
+        self.analyticsQuadWidgets.setSizePolicy(sizePolicy1)
+        self.gridLayout = QGridLayout(self.analyticsQuadWidgets)
+        self.gridLayout.setObjectName(u"gridLayout")
+        self.analyticsWidget1 = QWidget(self.analyticsQuadWidgets)
+        self.analyticsWidget1.setObjectName(u"analyticsWidget1")
+        self.verticalLayout_2 = QVBoxLayout(self.analyticsWidget1)
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.projectByPhaseFrame = QFrame(self.analyticsWidget1)
+        self.projectByPhaseFrame.setObjectName(u"projectByPhaseFrame")
+        self.projectByPhaseFrame.setFrameShape(QFrame.Shape.Panel)
+        self.projectByPhaseFrame.setFrameShadow(QFrame.Shadow.Raised)
+        self.projectByPhaseFrame.setLineWidth(2)
+        self.projectByPhaseFrame.setMidLineWidth(1)
+
+        self.verticalLayout_2.addWidget(self.projectByPhaseFrame)
+
+        self.projectByPhaseBtn = QPushButton(self.analyticsWidget1)
+        self.projectByPhaseBtn.setObjectName(u"projectByPhaseBtn")
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        sizePolicy2.setHorizontalStretch(20)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.projectByPhaseBtn.sizePolicy().hasHeightForWidth())
+        self.projectByPhaseBtn.setSizePolicy(sizePolicy2)
+        self.projectByPhaseBtn.setMinimumSize(QSize(200, 40))
+        font1 = QFont()
+        font1.setPointSize(18)
+        font1.setBold(False)
+        self.projectByPhaseBtn.setFont(font1)
+        self.projectByPhaseBtn.setStyleSheet(u"QPushButton{\n"
+"	border-radius: 12px;\n"
+"	border: 1px solid black;\n"
+"	background-color: #35B5AC;\n"
+"	color: black;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: #2A9089;\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: #1F6B66;\n"
+"}")
+
+        self.verticalLayout_2.addWidget(self.projectByPhaseBtn, 0, Qt.AlignmentFlag.AlignHCenter)
+
+
+        self.gridLayout.addWidget(self.analyticsWidget1, 0, 1, 1, 1)
+
+        self.analyticsWidget2 = QWidget(self.analyticsQuadWidgets)
+        self.analyticsWidget2.setObjectName(u"analyticsWidget2")
+        self.verticalLayout_3 = QVBoxLayout(self.analyticsWidget2)
+        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
+        self.projectOverTimeFrame = QFrame(self.analyticsWidget2)
+        self.projectOverTimeFrame.setObjectName(u"projectOverTimeFrame")
+        self.projectOverTimeFrame.setFrameShape(QFrame.Shape.Panel)
+        self.projectOverTimeFrame.setFrameShadow(QFrame.Shadow.Raised)
+        self.projectOverTimeFrame.setLineWidth(2)
+        self.projectOverTimeFrame.setMidLineWidth(1)
+
+        self.verticalLayout_3.addWidget(self.projectOverTimeFrame)
+
+        self.projectOverTimeBtn = QPushButton(self.analyticsWidget2)
+        self.projectOverTimeBtn.setObjectName(u"projectOverTimeBtn")
+        sizePolicy2.setHeightForWidth(self.projectOverTimeBtn.sizePolicy().hasHeightForWidth())
+        self.projectOverTimeBtn.setSizePolicy(sizePolicy2)
+        self.projectOverTimeBtn.setMinimumSize(QSize(200, 40))
+        font2 = QFont()
+        font2.setPointSize(18)
+        self.projectOverTimeBtn.setFont(font2)
+        self.projectOverTimeBtn.setStyleSheet(u"QPushButton{\n"
+"	border-radius: 12px;\n"
+"	border: 1px solid black;\n"
+"	background-color: #35B5AC;\n"
+"	color: black;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: #2A9089;\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: #1F6B66;\n"
+"}")
+
+        self.verticalLayout_3.addWidget(self.projectOverTimeBtn, 0, Qt.AlignmentFlag.AlignHCenter)
+
+
+        self.gridLayout.addWidget(self.analyticsWidget2, 0, 2, 1, 1)
+
+        self.analyticsWidget4 = QWidget(self.analyticsQuadWidgets)
+        self.analyticsWidget4.setObjectName(u"analyticsWidget4")
+        self.verticalLayout_5 = QVBoxLayout(self.analyticsWidget4)
+        self.verticalLayout_5.setObjectName(u"verticalLayout_5")
+        self.projectsOverTimeFrame = QFrame(self.analyticsWidget4)
+        self.projectsOverTimeFrame.setObjectName(u"projectsOverTimeFrame")
+        self.projectsOverTimeFrame.setFrameShape(QFrame.Shape.Panel)
+        self.projectsOverTimeFrame.setFrameShadow(QFrame.Shadow.Raised)
+        self.projectsOverTimeFrame.setLineWidth(2)
+        self.projectsOverTimeFrame.setMidLineWidth(1)
+
+        self.verticalLayout_5.addWidget(self.projectsOverTimeFrame)
+
+        self.projectsOverTimeBtn = QPushButton(self.analyticsWidget4)
+        self.projectsOverTimeBtn.setObjectName(u"projectsOverTimeBtn")
+        self.projectsOverTimeBtn.setMinimumSize(QSize(200, 40))
+        self.projectsOverTimeBtn.setFont(font2)
+        self.projectsOverTimeBtn.setStyleSheet(u"QPushButton{\n"
+"	border-radius: 12px;\n"
+"	border: 1px solid black;\n"
+"	background-color: #89D5D2;\n"
+"	color: black;\n"
+"}\n"
+"\n"
+"QPushButton:hover{\n"
+"	background-color: #6FB5B2;\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: #5A9695\n"
+"}")
+
+        self.verticalLayout_5.addWidget(self.projectsOverTimeBtn, 0, Qt.AlignmentFlag.AlignHCenter)
+
+
+        self.gridLayout.addWidget(self.analyticsWidget4, 1, 2, 1, 1)
+
+        self.analyticsWidget3 = QWidget(self.analyticsQuadWidgets)
+        self.analyticsWidget3.setObjectName(u"analyticsWidget3")
+        self.verticalLayout_4 = QVBoxLayout(self.analyticsWidget3)
+        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
+        self.phaseAveragesFrame = QFrame(self.analyticsWidget3)
+        self.phaseAveragesFrame.setObjectName(u"phaseAveragesFrame")
+        self.phaseAveragesFrame.setFrameShape(QFrame.Shape.Panel)
+        self.phaseAveragesFrame.setFrameShadow(QFrame.Shadow.Raised)
+        self.phaseAveragesFrame.setLineWidth(2)
+        self.phaseAveragesFrame.setMidLineWidth(1)
+
+        self.verticalLayout_4.addWidget(self.phaseAveragesFrame)
+
+        self.phaseAveragesBtn = QPushButton(self.analyticsWidget3)
+        self.phaseAveragesBtn.setObjectName(u"phaseAveragesBtn")
+        sizePolicy2.setHeightForWidth(self.phaseAveragesBtn.sizePolicy().hasHeightForWidth())
+        self.phaseAveragesBtn.setSizePolicy(sizePolicy2)
+        self.phaseAveragesBtn.setMinimumSize(QSize(200, 40))
+        self.phaseAveragesBtn.setFont(font2)
+        self.phaseAveragesBtn.setStyleSheet(u"QPushButton{\n"
+"	border-radius: 12px;\n"
+"	border: 1px solid black;\n"
+"	background-color: #89D5D2;\n"
+"	color: black;\n"
+"}\n"
+"\n"
+"QPushButton:hover{\n"
+"	background-color: #6FB5B2;\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: #5A9695\n"
+"}")
+
+        self.verticalLayout_4.addWidget(self.phaseAveragesBtn, 0, Qt.AlignmentFlag.AlignHCenter)
+
+
+        self.gridLayout.addWidget(self.analyticsWidget3, 1, 1, 1, 1)
+
+
+        self.verticalLayout.addWidget(self.analyticsQuadWidgets)
+
+
+        self.retranslateUi(AnalyticsWindow)
+
+        QMetaObject.connectSlotsByName(AnalyticsWindow)
+    # setupUi
+
+    def retranslateUi(self, AnalyticsWindow):
+        AnalyticsWindow.setWindowTitle(QCoreApplication.translate("AnalyticsWindow", u"Form", None))
+        self.analyticsLabel.setText(QCoreApplication.translate("AnalyticsWindow", u"Analytics", None))
+        self.projectByPhaseBtn.setText(QCoreApplication.translate("AnalyticsWindow", u"Project By Phase", None))
+        self.projectOverTimeBtn.setText(QCoreApplication.translate("AnalyticsWindow", u"Project Timeline", None))
+        self.projectsOverTimeBtn.setText(QCoreApplication.translate("AnalyticsWindow", u"Projects Over Time", None))
+        self.phaseAveragesBtn.setText(QCoreApplication.translate("AnalyticsWindow", u"Phase Averages ", None))
+    # retranslateUi
+

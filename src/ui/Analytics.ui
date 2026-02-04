@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>analyticsWidget</class>
- <widget class="QWidget" name="analyticsWidget">
+ <class>AnalyticsWindow</class>
+ <widget class="QWidget" name="AnalyticsWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -59,10 +59,16 @@
          <item>
           <widget class="QFrame" name="projectByPhaseFrame">
            <property name="frameShape">
-            <enum>QFrame::Shape::StyledPanel</enum>
+            <enum>QFrame::Shape::Panel</enum>
            </property>
            <property name="frameShadow">
             <enum>QFrame::Shadow::Raised</enum>
+           </property>
+           <property name="lineWidth">
+            <number>2</number>
+           </property>
+           <property name="midLineWidth">
+            <number>1</number>
            </property>
           </widget>
          </item>
@@ -90,16 +96,16 @@
             <string notr="true">QPushButton{
 	border-radius: 12px;
 	border: 1px solid black;
-	background-color: #89D5D2;
+	background-color: #35B5AC;
 	color: black;
 }
 
-QPushButton:hover{
-	background-color: #6FB5B2;
+QPushButton:hover {
+	background-color: #2A9089;
 }
 
 QPushButton:pressed {
-	background-color: #5A9695
+	background-color: #1F6B66;
 }</string>
            </property>
            <property name="text">
@@ -116,10 +122,16 @@ QPushButton:pressed {
          <item>
           <widget class="QFrame" name="projectOverTimeFrame">
            <property name="frameShape">
-            <enum>QFrame::Shape::StyledPanel</enum>
+            <enum>QFrame::Shape::Panel</enum>
            </property>
            <property name="frameShadow">
             <enum>QFrame::Shadow::Raised</enum>
+           </property>
+           <property name="lineWidth">
+            <number>2</number>
+           </property>
+           <property name="midLineWidth">
+            <number>1</number>
            </property>
           </widget>
          </item>
@@ -146,16 +158,16 @@ QPushButton:pressed {
             <string notr="true">QPushButton{
 	border-radius: 12px;
 	border: 1px solid black;
-	background-color: #89D5D2;
+	background-color: #35B5AC;
 	color: black;
 }
 
-QPushButton:hover{
-	background-color: #6FB5B2;
+QPushButton:hover {
+	background-color: #2A9089;
 }
 
 QPushButton:pressed {
-	background-color: #5A9695
+	background-color: #1F6B66;
 }</string>
            </property>
            <property name="text">
@@ -172,10 +184,16 @@ QPushButton:pressed {
          <item>
           <widget class="QFrame" name="projectsOverTimeFrame">
            <property name="frameShape">
-            <enum>QFrame::Shape::StyledPanel</enum>
+            <enum>QFrame::Shape::Panel</enum>
            </property>
            <property name="frameShadow">
             <enum>QFrame::Shadow::Raised</enum>
+           </property>
+           <property name="lineWidth">
+            <number>2</number>
+           </property>
+           <property name="midLineWidth">
+            <number>1</number>
            </property>
           </widget>
          </item>
@@ -222,10 +240,16 @@ QPushButton:pressed {
          <item>
           <widget class="QFrame" name="phaseAveragesFrame">
            <property name="frameShape">
-            <enum>QFrame::Shape::StyledPanel</enum>
+            <enum>QFrame::Shape::Panel</enum>
            </property>
            <property name="frameShadow">
             <enum>QFrame::Shadow::Raised</enum>
+           </property>
+           <property name="lineWidth">
+            <number>2</number>
+           </property>
+           <property name="midLineWidth">
+            <number>1</number>
            </property>
           </widget>
          </item>

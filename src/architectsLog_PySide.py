@@ -28,6 +28,7 @@ from ui.AddInvoiceNumber import Ui_AddInvoiceDialog
 from ui.DeleteInvoiceWarning import Ui_DeleteInvoiceDialog
 from ui.DeleteTimeEntryWarning import Ui_DeleteTimeEntryDialog
 from ui.ViewInvoice import Ui_ViewInvoiceWindow
+from ui.Analytics import Ui_AnalyticsWindow
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry 
 from architectsLog_constants import	(PHASES, ARCHITECT_STATUSES, PROJECT_STATUSES, 
@@ -59,6 +60,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.view_proj_window = None
 		self.view_time_entries_window = None
 		self.view_invoices_window = None
+		self.analytics_window = None
 
 		# create architect, project, phase models and set them on their combo box
 		self.architect_model = QSqlTableModel()
@@ -114,6 +116,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.ViewProjectsBtn.clicked.connect(self.viewProjects)
 		self.ViewTimeLogsBtn.clicked.connect(self.viewTimeEntries)
 		self.ViewInvoicesBtn.clicked.connect(self.viewInvoices)
+
+		self.AnalyticsBtn.clicked.connect(self.viewAnalytics)
 
 		self.show()
 
@@ -225,6 +229,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 	def viewInvoices(self) -> None:
 		"""Method to view all invoices from the database table"""
 		self.view_invoices_window = ViewInvoices()
+
+	def viewAnalytics(self) -> None:
+		"""Method to access the analytics window"""
+		self.analytics_window = ViewAnalytics()
 
 	def logTime(self) -> None:
 		"""Method to activate TimeLogger window and store resulting 
@@ -1192,6 +1200,14 @@ class ViewInvoice(Ui_ViewInvoiceWindow, QWidget):
 
 		self.show()
 
+class ViewAnalytics(QWidget, Ui_AnalyticsWindow):
+	def __init__(self) -> None:
+		super(ViewAnalytics, self).__init__()
+		self.setupUi(self)
+		self.setFixedSize(self.size())
+		self.setWindowTitle("Analytics")
+
+		self.show()
 
 
 class TimerDisplay(QLCDNumber):

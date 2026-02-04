@@ -39,6 +39,7 @@ class Ui_MainWindow(object):
 "}")
         self.verticalLayout = QVBoxLayout(self.centralwidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
+        self.verticalLayout.setContentsMargins(-1, 6, -1, -1)
         self.theArchitectsLogLabel = QLabel(self.centralwidget)
         self.theArchitectsLogLabel.setObjectName(u"theArchitectsLogLabel")
         self.theArchitectsLogLabel.setMinimumSize(QSize(501, 61))

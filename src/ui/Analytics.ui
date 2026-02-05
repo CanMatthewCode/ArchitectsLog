@@ -58,6 +58,11 @@
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
           <widget class="QFrame" name="projectByPhaseFrame">
+           <property name="styleSheet">
+            <string notr="true">QFrame{
+	background: #1E2E34;
+}</string>
+           </property>
            <property name="frameShape">
             <enum>QFrame::Shape::Panel</enum>
            </property>
@@ -70,6 +75,11 @@
            <property name="midLineWidth">
             <number>1</number>
            </property>
+           <layout class="QGridLayout" name="gridLayout_2">
+            <item row="1" column="0">
+             <widget class="AnalyticsChartDesigner" name="projectByPhaseWidget" native="true"/>
+            </item>
+           </layout>
           </widget>
          </item>
          <item alignment="Qt::AlignmentFlag::AlignHCenter">
@@ -121,6 +131,11 @@ QPushButton:pressed {
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
           <widget class="QFrame" name="projectOverTimeFrame">
+           <property name="styleSheet">
+            <string notr="true">QFrame{
+	background: #1E2E34;
+}</string>
+           </property>
            <property name="frameShape">
             <enum>QFrame::Shape::Panel</enum>
            </property>
@@ -133,6 +148,15 @@ QPushButton:pressed {
            <property name="midLineWidth">
             <number>1</number>
            </property>
+           <layout class="QGridLayout" name="gridLayout_3">
+            <item row="0" column="0">
+             <widget class="AnalyticsChartDesigner" name="projectOverTimeWidget" native="true">
+              <property name="styleSheet">
+               <string notr="true"/>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </widget>
          </item>
          <item alignment="Qt::AlignmentFlag::AlignHCenter">
@@ -183,6 +207,11 @@ QPushButton:pressed {
         <layout class="QVBoxLayout" name="verticalLayout_5">
          <item>
           <widget class="QFrame" name="projectsOverTimeFrame">
+           <property name="styleSheet">
+            <string notr="true">QFrame{
+	background: #1E2E34;
+}</string>
+           </property>
            <property name="frameShape">
             <enum>QFrame::Shape::Panel</enum>
            </property>
@@ -195,6 +224,11 @@ QPushButton:pressed {
            <property name="midLineWidth">
             <number>1</number>
            </property>
+           <layout class="QGridLayout" name="gridLayout_5">
+            <item row="0" column="0">
+             <widget class="AnalyticsChartDesigner" name="projectsOverTimeWidget" native="true"/>
+            </item>
+           </layout>
           </widget>
          </item>
          <item alignment="Qt::AlignmentFlag::AlignHCenter">
@@ -239,6 +273,11 @@ QPushButton:pressed {
         <layout class="QVBoxLayout" name="verticalLayout_4">
          <item>
           <widget class="QFrame" name="phaseAveragesFrame">
+           <property name="styleSheet">
+            <string notr="true">QFrame{
+	background: #1E2E34;
+}</string>
+           </property>
            <property name="frameShape">
             <enum>QFrame::Shape::Panel</enum>
            </property>
@@ -251,6 +290,11 @@ QPushButton:pressed {
            <property name="midLineWidth">
             <number>1</number>
            </property>
+           <layout class="QGridLayout" name="gridLayout_4">
+            <item row="0" column="0">
+             <widget class="AnalyticsChartDesigner" name="phaseAveragesWidget" native="true"/>
+            </item>
+           </layout>
           </widget>
          </item>
          <item alignment="Qt::AlignmentFlag::AlignHCenter">
@@ -301,6 +345,14 @@ QPushButton:pressed {
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>AnalyticsChartDesigner</class>
+   <extends>QWidget</extends>
+   <header>architectsLog_analytics</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

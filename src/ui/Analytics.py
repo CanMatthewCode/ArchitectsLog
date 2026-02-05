@@ -18,6 +18,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QApplication, QFrame, QGridLayout, QLabel,
     QPushButton, QSizePolicy, QVBoxLayout, QWidget)
 
+from architectsLog_analytics import AnalyticsChartDesigner
+
 class Ui_AnalyticsWindow(object):
     def setupUi(self, AnalyticsWindow):
         if not AnalyticsWindow.objectName():
@@ -61,10 +63,20 @@ class Ui_AnalyticsWindow(object):
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.projectByPhaseFrame = QFrame(self.analyticsWidget1)
         self.projectByPhaseFrame.setObjectName(u"projectByPhaseFrame")
+        self.projectByPhaseFrame.setStyleSheet(u"QFrame{\n"
+"	background: #1E2E34;\n"
+"}")
         self.projectByPhaseFrame.setFrameShape(QFrame.Shape.Panel)
         self.projectByPhaseFrame.setFrameShadow(QFrame.Shadow.Raised)
         self.projectByPhaseFrame.setLineWidth(2)
         self.projectByPhaseFrame.setMidLineWidth(1)
+        self.gridLayout_2 = QGridLayout(self.projectByPhaseFrame)
+        self.gridLayout_2.setObjectName(u"gridLayout_2")
+        self.projectByPhaseWidget = AnalyticsChartDesigner(self.projectByPhaseFrame)
+        self.projectByPhaseWidget.setObjectName(u"projectByPhaseWidget")
+
+        self.gridLayout_2.addWidget(self.projectByPhaseWidget, 1, 0, 1, 1)
+
 
         self.verticalLayout_2.addWidget(self.projectByPhaseFrame)
 
@@ -106,10 +118,21 @@ class Ui_AnalyticsWindow(object):
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.projectOverTimeFrame = QFrame(self.analyticsWidget2)
         self.projectOverTimeFrame.setObjectName(u"projectOverTimeFrame")
+        self.projectOverTimeFrame.setStyleSheet(u"QFrame{\n"
+"	background: #1E2E34;\n"
+"}")
         self.projectOverTimeFrame.setFrameShape(QFrame.Shape.Panel)
         self.projectOverTimeFrame.setFrameShadow(QFrame.Shadow.Raised)
         self.projectOverTimeFrame.setLineWidth(2)
         self.projectOverTimeFrame.setMidLineWidth(1)
+        self.gridLayout_3 = QGridLayout(self.projectOverTimeFrame)
+        self.gridLayout_3.setObjectName(u"gridLayout_3")
+        self.projectOverTimeWidget = AnalyticsChartDesigner(self.projectOverTimeFrame)
+        self.projectOverTimeWidget.setObjectName(u"projectOverTimeWidget")
+        self.projectOverTimeWidget.setStyleSheet(u"")
+
+        self.gridLayout_3.addWidget(self.projectOverTimeWidget, 0, 0, 1, 1)
+
 
         self.verticalLayout_3.addWidget(self.projectOverTimeFrame)
 
@@ -147,10 +170,20 @@ class Ui_AnalyticsWindow(object):
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
         self.projectsOverTimeFrame = QFrame(self.analyticsWidget4)
         self.projectsOverTimeFrame.setObjectName(u"projectsOverTimeFrame")
+        self.projectsOverTimeFrame.setStyleSheet(u"QFrame{\n"
+"	background: #1E2E34;\n"
+"}")
         self.projectsOverTimeFrame.setFrameShape(QFrame.Shape.Panel)
         self.projectsOverTimeFrame.setFrameShadow(QFrame.Shadow.Raised)
         self.projectsOverTimeFrame.setLineWidth(2)
         self.projectsOverTimeFrame.setMidLineWidth(1)
+        self.gridLayout_5 = QGridLayout(self.projectsOverTimeFrame)
+        self.gridLayout_5.setObjectName(u"gridLayout_5")
+        self.projectsOverTimeWidget = AnalyticsChartDesigner(self.projectsOverTimeFrame)
+        self.projectsOverTimeWidget.setObjectName(u"projectsOverTimeWidget")
+
+        self.gridLayout_5.addWidget(self.projectsOverTimeWidget, 0, 0, 1, 1)
+
 
         self.verticalLayout_5.addWidget(self.projectsOverTimeFrame)
 
@@ -184,10 +217,20 @@ class Ui_AnalyticsWindow(object):
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.phaseAveragesFrame = QFrame(self.analyticsWidget3)
         self.phaseAveragesFrame.setObjectName(u"phaseAveragesFrame")
+        self.phaseAveragesFrame.setStyleSheet(u"QFrame{\n"
+"	background: #1E2E34;\n"
+"}")
         self.phaseAveragesFrame.setFrameShape(QFrame.Shape.Panel)
         self.phaseAveragesFrame.setFrameShadow(QFrame.Shadow.Raised)
         self.phaseAveragesFrame.setLineWidth(2)
         self.phaseAveragesFrame.setMidLineWidth(1)
+        self.gridLayout_4 = QGridLayout(self.phaseAveragesFrame)
+        self.gridLayout_4.setObjectName(u"gridLayout_4")
+        self.phaseAveragesWidget = AnalyticsChartDesigner(self.phaseAveragesFrame)
+        self.phaseAveragesWidget.setObjectName(u"phaseAveragesWidget")
+
+        self.gridLayout_4.addWidget(self.phaseAveragesWidget, 0, 0, 1, 1)
+
 
         self.verticalLayout_4.addWidget(self.phaseAveragesFrame)
 

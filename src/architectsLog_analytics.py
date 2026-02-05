@@ -53,7 +53,6 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		containing (phase_id, duration)"""
 		self.ax = self.fig.add_subplot(111)
 		self.ax.clear()
-		self.ax.set_axisbelow(True)
 
 		phase_ids = [row[0] for row in data]
 		data_list = [row[1] for row in data]
@@ -77,7 +76,6 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		self.ax.set_xticks(x_positions)
 		self.ax.set_xticklabels(phase_name, ha='right')
 
-		#self.ax.set_title('Phase Hours Breakdown', color='#89D5D2', pad=20)
 		self.fig.suptitle('Phase Hours Breakdown', color='#89D5D2', fontsize=12, y=0.97)
 		self.ax.set_ylabel('Total Hours', color='#89D5D2')
 
@@ -126,8 +124,8 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 
 		self.draw()
 
-	def stem_plot_phase(self, data: list[tuple[int, int]]) -> None:
-		"""Method for creating a step plot of time_entry duration_minutes
+	def stem_plot_phase(self, data: list[tuple[int, int, int]]) -> None:
+		"""Method for creating a stem plot of time_entry duration_minutes
 		plotted against time and color coded by phase_id"""
 		self.ax = self.fig.add_subplot(111)
 		self.ax.clear()
@@ -152,8 +150,74 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		self.ax.tick_params(axis='x', rotation=15, labelsize=8, colors='#89D5D2')
 		self.ax.tick_params(axis='y', labelsize=8, colors='#89D5D2')
 		
-		self.fig.suptitle('Phase Hours Over Time', color='#89D5D2', fontsize=12, y=0.97)
+		self.fig.suptitle('Phase Hours Over Time', color='#89D5D2',
+			fontsize=12, x=.44, y=0.97)
 		self.ax.set_ylabel('Hours', color='#89D5D2')
+
+		unique_phases = sorted(set(phase_ids))
+		legend_elements = [Patch(facecolor=self.PHASE_COLORS[pid-1], 
+			label=self.PHASE_NAMES[pid-1]) 
+ 			for pid in unique_phases]
+		legend = self.ax.legend(
+			handles=legend_elements, 
+			title="Phases", 
+			loc="center left", 
+			bbox_to_anchor=(1, 0, 0.5, 1),
+			prop={'size': 9},
+			facecolor='#A0E0DD',
+			edgecolor='#1E2E34')
+		legend.get_title().set_fontsize(11)
+		legend.get_title().set_weight('bold')
+
+		self.draw()
+
+	def step_plot_phase(self, data: list[tuple[int, int, int]]) -> None:
+		"""Method to create a step plot of time_entry duration minutes
+		plotted against time and color code by phase_id"""
+		self.ax = self.fig.add_subplot(111)
+		self.ax.clear()
+		self.ax.set_axisbelow(True)
+		self.ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+		self.ax.set_position([0.1, 0.1, 0.65, 0.8])
+
+		current_phase = data[0][0]
+		temp_dates = [datetime.fromtimestamp(data[0][2])]
+		temp_cumulative_time = [0]
+		cumulative_time = 0
+		phase_ids = []
+		for item in data:
+			if current_phase != item[0]:
+				temp_date = temp_dates[-1]
+				temp_time = temp_cumulative_time[-1]
+				self.ax.step(temp_dates, temp_cumulative_time, 
+					self.PHASE_COLORS[current_phase-1])
+				current_phase = item[0]
+				temp_dates.clear()
+				temp_cumulative_time.clear()
+				temp_dates.append(temp_date)
+				temp_cumulative_time.append(temp_time)
+			cumulative_time += item[1]/60
+			x = datetime.fromtimestamp(item[2])
+			self.ax.vlines(x, 0, cumulative_time, color=self.PHASE_COLORS[item[0]-1],
+				linewidth=.9, alpha=.6)
+			temp_cumulative_time.append(cumulative_time)
+			temp_dates.append(datetime.fromtimestamp(item[2]))
+			phase_ids.append(item[0])
+		self.ax.step(temp_dates, temp_cumulative_time,
+			self.PHASE_COLORS[current_phase-1])
+
+		self.ax.set_facecolor('#2A3F45')  # Plot area
+		self.ax.spines['bottom'].set_color('#4A6F75')
+		self.ax.spines['left'].set_color('#4A6F75')
+		self.ax.spines['top'].set_visible(False)
+		self.ax.spines['right'].set_visible(False)
+		self.ax.grid(color='#3A5F65', alpha=0.3, axis='x')
+		self.ax.tick_params(axis='x', rotation=15, labelsize=8, colors='#89D5D2')
+		self.ax.tick_params(axis='y', labelsize=8, colors='#89D5D2')
+		
+		self.fig.suptitle('Cumulative Hours Over Time', color='#89D5D2', 
+			fontsize=12, x=.44, y=.97)
+		self.ax.set_ylabel('Total Hours', color='#89D5D2')
 
 		unique_phases = sorted(set(phase_ids))
 		legend_elements = [Patch(facecolor=self.PHASE_COLORS[pid-1], 

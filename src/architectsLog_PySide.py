@@ -4,6 +4,7 @@ import sys
 import os
 import re
 from datetime import datetime
+import random
 import sqlite3
 
 from PySide6.QtWidgets import (QMainWindow, QApplication, QDialog, QMessageBox,
@@ -37,6 +38,9 @@ from architectsLog_db import (DB_FILE, get_db_connection, add_architect, add_pro
 	add_time_entry, add_invoice, update_project, update_time_entry,
 	get_most_recent_archid_and_projid, get_most_recent_project_phase,
 	load_invoice_ids_no_time_entries, delete_invoice, delete_time_entry)
+
+from architectsLog_analytics import AnalyticsChartDesigner
+from architectsLog_analytics_db import phase_duration_by_project
 
 ADMIN = len(PHASES)
 BUSDEV = len(PHASES) - 1
@@ -232,7 +236,30 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 	def viewAnalytics(self) -> None:
 		"""Method to access the analytics window"""
+		with get_db_connection() as conn:
+			cur = conn.cursor()
+			cur.execute("SELECT project_id FROM projects \
+				WHERE current_phase_id > 3 AND current_phase_id < 8")
+			proj_ids = cur.fetchall()
+			cur.execute("SELECT project_id FROM projects")
+			low_proj_ids = cur.fetchall()
+		if proj_ids:
+			all_proj_ids = [pid[0] for pid in proj_ids]
+			rand_id = random.choice(all_proj_ids)
+		elif low_proj_ids:
+			all_proj_ids = [pid[0] for pid in low_proj_ids]
+			rand_id = random.choice(all_proj_ids)
+		else:
+			rand_id = -1
+		with get_db_connection() as conn:
+			cur = conn.cursor()
+			phase_data = phase_duration_by_project(rand_id, cur)
+
 		self.analytics_window = ViewAnalytics()
+		self.analytics_window.projectByPhaseWidget.bars_project_phase(
+			phase_data)
+		self.analytics_window.projectOverTimeWidget.pie_project_phase(
+			phase_data)
 
 	def logTime(self) -> None:
 		"""Method to activate TimeLogger window and store resulting 

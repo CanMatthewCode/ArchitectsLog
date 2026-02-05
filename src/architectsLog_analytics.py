@@ -2,6 +2,10 @@ from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 from matplotlib import font_manager as fm
+from matplotlib.patches import Patch
+import matplotlib.dates as mdates
+
+from datetime import datetime
 
 class AnalyticsChartDesigner(FigureCanvasQTAgg):
 	"""Class to create Matplotlib charts for Analytics windows"""
@@ -21,7 +25,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 			"Business Dev.",
 			"Administration"
 			]
-		self.PHASE_NAMES_LONG = [
+		self.PHASE_NAMES = [
 			"Schematic Design", 
 			"Design Development", 
 			"Construction Documents", 
@@ -46,7 +50,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 
 	def bars_project_phase(self, data: list[tuple[int, int]]) -> None:
 		"""Method for creating a bar chart for one project. data is list of tuples
-		containing (phase_id, durations)"""
+		containing (phase_id, duration)"""
 		self.ax = self.fig.add_subplot(111)
 		self.ax.clear()
 		self.ax.set_axisbelow(True)
@@ -81,7 +85,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 
 	def pie_project_phase(self, data: list[tuple[int, int]]) -> None:
 		"""Method for creating a pie chart for one project. data is list of tuples
-		containing (phase_id, durations)"""
+		containing (phase_id, duration)"""
 		self.ax = self.fig.add_subplot(111)
 		self.ax.clear()
 		
@@ -90,7 +94,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 
 		phase_ids = [row[0] for row in data]
 		data_list = [row[1] for row in data]
-		phase_name = [self.PHASE_NAMES_LONG[phase_id - 1] for phase_id in phase_ids]
+		phase_name = [self.PHASE_NAMES[phase_id - 1] for phase_id in phase_ids]
 		colors = [self.PHASE_COLORS[phase_id - 1] for phase_id in phase_ids]
 
 		explode = [0.05 if v < 5 else 0 for v in data_list]
@@ -119,5 +123,51 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		legend.get_title().set_weight('bold')
 
 		self.fig.tight_layout()
+
+		self.draw()
+
+	def stem_plot_phase(self, data: list[tuple[int, int]]) -> None:
+		"""Method for creating a step plot of time_entry duration_minutes
+		plotted against time and color coded by phase_id"""
+		self.ax = self.fig.add_subplot(111)
+		self.ax.clear()
+		self.ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+		self.ax.set_position([0.1, 0.1, 0.65, 0.8])
+
+		phase_ids = [row[0] for row in data]
+		duration_list = [row[1]/60 for row in data]
+		start_times = [row[2] for row in data]
+		dates = [datetime.fromtimestamp(time) for time in start_times]
+		colors = [self.PHASE_COLORS[phase_id - 1] for phase_id in phase_ids]
+
+		for date, duration, color in zip(dates, duration_list, colors):
+			self.ax.stem([date], [duration], linefmt=color, markerfmt='.', basefmt=' ')
+
+		self.ax.set_facecolor('#2A3F45')  # Plot area
+		self.ax.spines['bottom'].set_color('#4A6F75')
+		self.ax.spines['left'].set_color('#4A6F75')
+		self.ax.spines['top'].set_visible(False)
+		self.ax.spines['right'].set_visible(False)
+
+		self.ax.tick_params(axis='x', rotation=15, labelsize=8, colors='#89D5D2')
+		self.ax.tick_params(axis='y', labelsize=8, colors='#89D5D2')
+		
+		self.fig.suptitle('Phase Hours Over Time', color='#89D5D2', fontsize=12, y=0.97)
+		self.ax.set_ylabel('Hours', color='#89D5D2')
+
+		unique_phases = sorted(set(phase_ids))
+		legend_elements = [Patch(facecolor=self.PHASE_COLORS[pid-1], 
+			label=self.PHASE_NAMES[pid-1]) 
+ 			for pid in unique_phases]
+		legend = self.ax.legend(
+			handles=legend_elements, 
+			title="Phases", 
+			loc="center left", 
+			bbox_to_anchor=(1, 0, 0.5, 1),
+			prop={'size': 9},
+			facecolor='#A0E0DD',
+			edgecolor='#1E2E34')
+		legend.get_title().set_fontsize(11)
+		legend.get_title().set_weight('bold')
 
 		self.draw()

@@ -264,6 +264,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			phase_data)
 		self.analytics_window.phaseAveragesWidget.stem_plot_phase(
 			phase_time_data)
+		self.analytics_window.projectsOverTimeWidget.step_plot_phase(
+			phase_time_data)
 
 	def logTime(self) -> None:
 		"""Method to activate TimeLogger window and store resulting 

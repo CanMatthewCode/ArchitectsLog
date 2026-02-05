@@ -40,13 +40,14 @@ from architectsLog_db import (DB_FILE, get_db_connection, add_architect, add_pro
 	load_invoice_ids_no_time_entries, delete_invoice, delete_time_entry)
 
 from architectsLog_analytics import AnalyticsChartDesigner
-from architectsLog_analytics_db import phase_duration_by_project
+from architectsLog_analytics_db import (phase_duration_by_project, 
+	phase_time_entries_by_project)
 
 ADMIN = len(PHASES)
 BUSDEV = len(PHASES) - 1
 
 def initialize_database(DB_FILE: str) -> None:
-	"""Open the persistant global Qt connection to the database"""
+	"""Open the persistent global Qt connection to the database"""
 	db = QSqlDatabase.addDatabase("QSQLITE")
 	db.setDatabaseName(DB_FILE)
 	if not db.open():
@@ -254,12 +255,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		with get_db_connection() as conn:
 			cur = conn.cursor()
 			phase_data = phase_duration_by_project(rand_id, cur)
+			phase_time_data = phase_time_entries_by_project(rand_id, cur)
 
 		self.analytics_window = ViewAnalytics()
 		self.analytics_window.projectByPhaseWidget.bars_project_phase(
 			phase_data)
 		self.analytics_window.projectOverTimeWidget.pie_project_phase(
 			phase_data)
+		self.analytics_window.phaseAveragesWidget.stem_plot_phase(
+			phase_time_data)
 
 	def logTime(self) -> None:
 		"""Method to activate TimeLogger window and store resulting 
@@ -532,7 +536,7 @@ class ViewProjects(QWidget, Ui_ViewProjectsWindow):
 
 		self.model.setTable("projects")
 		
-		# create a relation between 'projects' table and 'phases' with dropdown menu
+		# create a relation between 'projects' table and 'phases' with drop-down menu
 		relation = QSqlRelation("phases", "phase_id", "project_phase")
 		self.model.setRelation(self.model.fieldIndex("current_phase_id"), relation)
 
@@ -1561,7 +1565,7 @@ class ArchitectsTableModel(QSqlTableModel):
 		return False
 
 	def setData(self, index, value, role = Qt.EditRole) -> bool:
-		# Get column database names to safetey desired column entries by user
+		# Get column database names to safety desired column entries by user
 		field_name = self.record().fieldName(index.column())
 
 		# Check Phone Number and Email to make sure they are valid, re-format phone
@@ -1888,7 +1892,7 @@ class InvoiceCheckboxDelegate(QStyledItemDelegate):
 		self.relational_delegate = QSqlRelationalDelegate(parent)
 	
 	def paint(self, painter, option, index) -> None:
-		# If in selection mode and row is uninvoiced, draw checkbox
+		# If in selection mode and row is not invoiced, draw checkbox
 		if self.selection_mode:
 			invoice_id = index.data(Qt.EditRole)
 			if invoice_id == "Not Invoiced":
@@ -1907,15 +1911,15 @@ class InvoiceCheckboxDelegate(QStyledItemDelegate):
 				QApplication.style().drawControl(QStyle.CE_CheckBox, checkbox, painter)
 				return
 		
-		# Otherwise, use relational delegate for dropdown display
+		# Otherwise, use relational delegate for drop-down display
 		self.relational_delegate.paint(painter, option, index)
 	
 	def createEditor(self, parent, option, index) -> QWidget | None:
-		# If in selection mode, no editor needed for checkboxes
+		# If in selection mode, no editor needed for check-boxes
 		if self.selection_mode:
 			return None
 		
-		# Otherwise, use relational delegate to create dropdown
+		# Otherwise, use relational delegate to create drop-down
 		return self.relational_delegate.createEditor(parent, option, index)
 	
 	def setEditorData(self, editor, index) -> None:

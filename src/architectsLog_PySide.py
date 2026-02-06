@@ -33,7 +33,7 @@ from ui.Analytics import Ui_AnalyticsWindow
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry 
 from architectsLog_constants import	(PHASES, ARCHITECT_STATUSES, PROJECT_STATUSES, 
-	INVOICE_STATUSES)
+	INVOICE_STATUSES, ADMIN, BUSDEV)
 from architectsLog_db import (DB_FILE, get_db_connection, add_architect, add_project,
 	add_time_entry, add_invoice, update_project, update_time_entry,
 	get_most_recent_archid_and_projid, get_most_recent_project_phase,
@@ -41,10 +41,8 @@ from architectsLog_db import (DB_FILE, get_db_connection, add_architect, add_pro
 
 from architectsLog_analytics import AnalyticsChartDesigner
 from architectsLog_analytics_db import (phase_duration_by_project, 
-	phase_time_entries_by_project)
-
-ADMIN = len(PHASES)
-BUSDEV = len(PHASES) - 1
+	phase_time_entries_by_project, phase_duration_all_projects, 
+	phase_duration_by_project_with_name, total_number_of_projects_by_phase)
 
 def initialize_database(DB_FILE: str) -> None:
 	"""Open the persistent global Qt connection to the database"""
@@ -247,25 +245,40 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		if proj_ids:
 			all_proj_ids = [pid[0] for pid in proj_ids]
 			rand_id = random.choice(all_proj_ids)
+			rand_id2 = random.choice(all_proj_ids)
+			rand_id3 = random.choice(all_proj_ids)
 		elif low_proj_ids:
 			all_proj_ids = [pid[0] for pid in low_proj_ids]
 			rand_id = random.choice(all_proj_ids)
+			rand_id2 = random.choice(all_proj_ids)
+			rand_id3 = random.choice(all_proj_ids)
 		else:
 			rand_id = -1
 		with get_db_connection() as conn:
 			cur = conn.cursor()
 			phase_data = phase_duration_by_project(rand_id, cur)
 			phase_time_data = phase_time_entries_by_project(rand_id, cur)
+			total_hours = phase_duration_all_projects(cur)
+			phase_data_with_name = phase_duration_by_project_with_name(rand_id, cur)
+			num_proj_by_phase_tuple = total_number_of_projects_by_phase(cur)
+			phase_data_with_name2 = phase_duration_by_project_with_name(rand_id2, cur)
+			phase_data_with_name3 = phase_duration_by_project_with_name(rand_id3, cur)
 
 		self.analytics_window = ViewAnalytics()
-		self.analytics_window.projectByPhaseWidget.bars_project_phase(
+		self.analytics_window.projectByPhaseWidget.bars_by_phase(
 			phase_data)
-		self.analytics_window.projectOverTimeWidget.pie_project_phase(
-			phase_data)
-		self.analytics_window.phaseAveragesWidget.stem_plot_phase(
+		self.analytics_window.projectOverTimeWidget.step_plot_phase(
 			phase_time_data)
-		self.analytics_window.projectsOverTimeWidget.step_plot_phase(
-			phase_time_data)
+		self.analytics_window.phaseAveragesWidget.pie_by_phase(
+			total_hours, "Total Time Breakdown")
+		num_projects_by_phase = [projects[1] for projects in num_proj_by_phase_tuple]
+		avg_data = [round(data[1]/projects, 1) 
+			for data, projects in zip(total_hours, num_projects_by_phase)]
+		avg_phases = [data[0] for data in total_hours]
+		avg_data_tuple = list(zip(avg_phases, avg_data))
+		self.analytics_window.projectsOverTimeWidget.bars_projects_vs_average(
+			avg_data_tuple, phase_data_with_name, phase_data_with_name2,
+			phase_data_with_name3)
 
 	def logTime(self) -> None:
 		"""Method to activate TimeLogger window and store resulting 

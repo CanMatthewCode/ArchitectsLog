@@ -13,6 +13,9 @@ PHASES = {
 	9: "Administration"
 	}
 
+ADMIN = len(PHASES)
+BUSDEV = len(PHASES) - 1
+
 #Possible statuses
 ARCHITECT_STATUSES = ('Active', 'Inactive')
 

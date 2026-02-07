@@ -3,15 +3,23 @@
 import sqlite3
 from typing import Optional
 
-def phase_duration_by_project(project_id: int, 
-	cur: sqlite3.Cursor) -> list[tuple[int, int]]:
+def phase_duration_by_project(project_id: int, cur: sqlite3.Cursor, 
+	start_date: Optional[int] = None, 
+	end_date: Optional[int] = None) -> list[tuple[int, int]]:
 	"""Retrieve the summation of all of a project's per phase duration,
 	returns a list of tuples containing (phase_id, sum duration_minutes) per phase"""
-	sql = "SELECT phase_id, ROUND(SUM(duration_minutes)/60.0, 2) FROM time_entries\
-		WHERE project_id = ? \
-		GROUP BY phase_id \
-		ORDER BY phase_id ASC"
-	cur.execute(sql, (project_id,))
+	if start_date and end_date:
+		sql = "SELECT phase_id, ROUND(SUM(duration_minutes)/60.0, 2) FROM time_entries \
+			WHERE project_id = ? AND start_time >= ? AND start_time <= ?\
+			GROUP BY phase_id \
+			ORDER BY phase_id ASC"
+		cur.execute(sql, (project_id,start_date, end_date))
+	else:
+		sql = "SELECT phase_id, ROUND(SUM(duration_minutes)/60.0, 2) FROM time_entries \
+			WHERE project_id = ? \
+			GROUP BY phase_id \
+			ORDER BY phase_id ASC"
+		cur.execute(sql, (project_id,))
 	return cur.fetchall()
 
 def phase_duration_by_project_with_name(project_id: int, 
@@ -67,4 +75,13 @@ def project_start_date(project_id: int, cur:sqlite3.Cursor) -> int:
 	sql = "SELECT start_time FROM projects WHERE project_id = ?"
 	cur.execute(sql, (project_id,))
 	return cur.fetchone()
-		
+
+def project_ids_over_time_period(start_date: int, end_date: int, 
+	cur:sqlite3.Cursor) -> list[int]:
+	"""Retrieve all project_ids within a time frame"""
+	sql = "SELECT DISTINCT project_id FROM time_entries \
+		WHERE start_time >= ? AND start_time <= ? \
+		ORDER BY project_id ASC"
+	cur.execute(sql, (start_date, end_date))
+	return cur.fetchall()
+	

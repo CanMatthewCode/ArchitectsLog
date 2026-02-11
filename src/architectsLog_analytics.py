@@ -134,7 +134,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 
 		self.draw()
 
-	def stem_plot_phase(self, data: list[tuple[int, int, int]]) -> None:
+	def stem_plot_phases(self, data: list[tuple[int, int, int]]) -> None:
 		"""Method for creating a stem plot of time_entry duration_minutes
 		plotted against time and color coded by phase_id"""
 		self.ax = self.fig.add_subplot(111)
@@ -181,7 +181,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 
 		self.draw()
 
-	def step_plot_phase(self, data: list[tuple[int, int, int]]) -> None:
+	def step_plot_phases(self, data: list[tuple[int, int, int]]) -> None:
 		"""Method to create a step plot of time_entry duration minutes
 		plotted against time and color code by phase_id"""
 		self.ax = self.fig.add_subplot(111)
@@ -292,15 +292,18 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		bars = self.ax.bar(all_phases, avg_y, width, color=self.PHASE_COLORS[7])
 		self.ax.bar_label(bars, label_type='edge', 
 			color = '#A0E0DD', fontsize=6)
-		bars2 = self.ax.bar([x-width for x in x1], y1, width, color=self.PHASE_COLORS[5])
+		bars2 = self.ax.bar([x-width for x in x1], y1, width, 
+			color=self.PHASE_COLORS[5])
 		self.ax.bar_label(bars2, label_type='edge', 
 			color = '#A0E0DD', fontsize=6)
 		if data2:
-			bars3 = self.ax.bar([x-2*width for x in x2], y2, width, color=self.PHASE_COLORS[3])
+			bars3 = self.ax.bar([x-2*width for x in x2], y2, width, 
+				color=self.PHASE_COLORS[3])
 			self.ax.bar_label(bars3, label_type='edge', 
 				color = '#A0E0DD', fontsize=6)
 		if data3:
-			bars4 = self.ax.bar([x-3*width for x in x3], y3, width, color=self.PHASE_COLORS[2])
+			bars4 = self.ax.bar([x-3*width for x in x3], y3, width, 
+				color=self.PHASE_COLORS[2])
 			self.ax.bar_label(bars4, label_type='edge', 
 				color = '#A0E0DD', fontsize=6)
 
@@ -316,7 +319,8 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		self.ax.set_xticks(x_positions)
 		self.ax.set_xticklabels(phase_name, ha='right')
 
-		self.fig.suptitle("Project Phases vs Average", color='#89D5D2', fontsize=12, y=0.97)
+		self.fig.suptitle("Project Phases vs Average", color='#89D5D2', 
+			fontsize=12, y=0.97)
 		self.ax.set_ylabel('Total Hours', color='#89D5D2')
 
 		proj_names = ["Phase Average", proj1_name]
@@ -324,6 +328,86 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 			proj_names.append(proj2_name)
 		if data3:
 			proj_names.append(proj3_name)
-		legend = self.ax.legend(proj_names, title="Projects", facecolor='#A0E0DD', edgecolor='#1E2E34')
+		legend = self.ax.legend(proj_names, title="Projects", facecolor='#A0E0DD',
+			edgecolor='#1E2E34')
 		legend.get_title().set_fontsize(12)
 		legend.get_title().set_weight('bold')
+
+	def bars_projects_by_phase(self, 
+		projects_phase_data: list[list[tuple[int, int]]], 
+		project_names: list[str]) -> None:
+		"""Method to show stacked bar graphs by phase for multiple projects"""
+		self.ax = self.fig.add_subplot(111)
+		self.ax.clear()
+		
+		projects_by_phase_list = []
+		for i in range(len(self.PHASE_NAMES)):
+			projects_by_phase_list.append([])
+
+#		phase_ids = []
+		phase_num = 1
+		j = 0
+		for i in range(len(projects_phase_data)):
+			while phase_num - 1  < len(self.PHASE_NAMES):
+				if j >= len(projects_phase_data[i]):
+					projects_by_phase_list[phase_num-1].append(0)
+				elif projects_phase_data[i][j][0] == phase_num:
+					projects_by_phase_list[phase_num-1].append(
+						projects_phase_data[i][j][1])
+#					phase_ids.append(phase_num)
+				elif projects_phase_data[i][j][0] > phase_num:
+					projects_by_phase_list[phase_num-1].append(0)
+					j -= 1
+				phase_num += 1
+				j += 1
+			phase_num = 1
+			j = 0
+
+		bottoms = []
+		for i in range(len(projects_phase_data)):
+			bottoms.append(0)
+
+		x_positions = range(len(projects_phase_data))
+
+		for i in range(len(self.PHASE_NAMES)):
+			bars = self.ax.bar(x_positions, projects_by_phase_list[i], bottom = bottoms, 
+				color=self.PHASE_COLORS[i])
+			bottoms = [bottom + phase_hours for bottom, phase_hours in 
+				zip(bottoms, projects_by_phase_list[i])]
+
+		for x, height in zip(x_positions, bottoms):
+			self.ax.text(x, height + 5, str(height), 
+				ha='center', color = '#A0E0DD', fontsize=6)
+
+		max_height = max(bottoms)
+		self.ax.set_ylim(0, max_height + 20)
+		self.ax.set_facecolor('#2A3F45')  # Plot area
+		self.ax.spines['bottom'].set_color('#4A6F75')
+		self.ax.spines['left'].set_color('#4A6F75')
+		self.ax.spines['top'].set_visible(False)
+		self.ax.spines['right'].set_visible(False)
+
+		self.ax.tick_params(axis='x', rotation=15, labelsize=6, colors='#89D5D2')
+		self.ax.tick_params(axis='y', labelsize=8, colors='#89D5D2')
+
+		self.ax.set_xticks(x_positions)
+		self.ax.set_xticklabels(project_names, ha='right')
+
+		self.fig.suptitle("Projects By Phase", color='#89D5D2', 
+			fontsize=12, y=0.97)
+		self.ax.set_ylabel('Total Hours', color='#89D5D2')
+
+		#unique_phases = sorted(set(phase_ids))
+		#legend_elements = [Patch(facecolor=self.PHASE_COLORS[pid-1], 
+		#	label=self.PHASE_NAMES[pid-1]) 
+ 		#	for pid in unique_phases]
+		#legend = self.ax.legend(
+		#	handles=legend_elements, 
+		#	title="Phases", 
+		#	loc="center left", 
+		#	bbox_to_anchor=(1, 0, 0.5, 1),
+		#	prop={'size': 9},
+		#	facecolor='#A0E0DD',
+		#	edgecolor='#1E2E34')
+		#legend.get_title().set_fontsize(11)
+		#legend.get_title().set_weight('bold')

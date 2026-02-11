@@ -77,11 +77,13 @@ def project_start_date(project_id: int, cur:sqlite3.Cursor) -> int:
 	return cur.fetchone()
 
 def project_ids_over_time_period(start_date: int, end_date: int, 
-	cur:sqlite3.Cursor) -> list[int]:
-	"""Retrieve all project_ids within a time frame"""
-	sql = "SELECT DISTINCT project_id FROM time_entries \
+	cur:sqlite3.Cursor) -> list[int, str]:
+	"""Retrieve all project_ids within a time frame,
+	returns project_ids, project_names as tuples"""
+	sql = "SELECT DISTINCT time_entries.project_id, projects.project_name \
+		FROM time_entries \
+		INNER JOIN projects ON time_entries.project_id = projects.project_id \
 		WHERE start_time >= ? AND start_time <= ? \
-		ORDER BY project_id ASC"
+		ORDER BY time_entries.project_id ASC"
 	cur.execute(sql, (start_date, end_date))
 	return cur.fetchall()
-	

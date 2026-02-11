@@ -3,7 +3,7 @@
 import sys
 import os
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 import random
 import sqlite3
 
@@ -42,7 +42,8 @@ from architectsLog_db import (DB_FILE, get_db_connection, add_architect, add_pro
 from architectsLog_analytics import AnalyticsChartDesigner
 from architectsLog_analytics_db import (phase_duration_by_project, 
 	phase_time_entries_by_project, phase_duration_all_projects, 
-	phase_duration_by_project_with_name, total_number_of_projects_by_phase)
+	phase_duration_by_project_with_name, total_number_of_projects_by_phase,
+	project_ids_over_time_period)
 
 def initialize_database(DB_FILE: str) -> None:
 	"""Open the persistent global Qt connection to the database"""
@@ -254,6 +255,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			rand_id3 = random.choice(all_proj_ids)
 		else:
 			rand_id = -1
+
+		end_date = datetime.now()
+		end_date_int = int(end_date.timestamp())
+		start_date = end_date - timedelta(weeks=104)
+		start_date_int = int(start_date.timestamp())
+
 		with get_db_connection() as conn:
 			cur = conn.cursor()
 			phase_data = phase_duration_by_project(rand_id, cur)
@@ -263,11 +270,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			num_proj_by_phase_tuple = total_number_of_projects_by_phase(cur)
 			phase_data_with_name2 = phase_duration_by_project_with_name(rand_id2, cur)
 			phase_data_with_name3 = phase_duration_by_project_with_name(rand_id3, cur)
+			projs_over_time = project_ids_over_time_period(start_date_int, end_date_int, cur)
+			projs_over_time_ids = [proj[0] for proj in projs_over_time]
+			projs_over_time_names = [proj[1] for proj in projs_over_time]
+			projs_over_time_list = []
+			for proj_id in projs_over_time_ids:
+				projs_over_time_list.append(phase_duration_by_project(proj_id, cur))
 
 		self.analytics_window = ViewAnalytics()
 		self.analytics_window.projectByPhaseWidget.bars_by_phase(
 			phase_data)
-		self.analytics_window.projectOverTimeWidget.step_plot_phase(
+		self.analytics_window.projectOverTimeWidget.step_plot_phases(
 			phase_time_data)
 		self.analytics_window.phaseAveragesWidget.pie_by_phase(
 			total_hours, "Total Time Breakdown")
@@ -276,9 +289,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			for data, projects in zip(total_hours, num_projects_by_phase)]
 		avg_phases = [data[0] for data in total_hours]
 		avg_data_tuple = list(zip(avg_phases, avg_data))
-		self.analytics_window.projectsOverTimeWidget.bars_projects_vs_average(
-			avg_data_tuple, phase_data_with_name, phase_data_with_name2,
-			phase_data_with_name3)
+		#self.analytics_window.projectsOverTimeWidget.bars_projects_vs_average(
+		#	avg_data_tuple, phase_data_with_name, phase_data_with_name2,
+		#	phase_data_with_name3)
+		shifted_projs_over_time = projs_over_time_list[2:] + projs_over_time_list[1:2] + projs_over_time_list[0:1]
+		shifted_names_over_time = projs_over_time_names[2:] + projs_over_time_names[1:2]  + projs_over_time_names[0:1]
+		self.analytics_window.projectsOverTimeWidget.bars_projects_by_phase(
+			shifted_projs_over_time, shifted_names_over_time)
 
 	def logTime(self) -> None:
 		"""Method to activate TimeLogger window and store resulting 
@@ -438,6 +455,8 @@ class ProjectWindow(QDialog, Ui_AddProjectDialog):
 
 		super().accept()
 
+
+#		~~~View Windows~~~
 
 class ViewArchitects(QWidget, Ui_ViewArchitectsWindow):
 	def __init__(self) -> None:
@@ -1256,6 +1275,8 @@ class ViewAnalytics(QWidget, Ui_AnalyticsWindow):
 		self.show()
 
 
+#		~~~TIME LOGGERS~~~
+
 class TimerDisplay(QLCDNumber):
 	def __init__(self, parent = None) -> None:
 		super().__init__(parent)
@@ -1573,6 +1594,8 @@ class DeleteTimeEntryWarning(QDialog, Ui_DeleteTimeEntryDialog):
 		self.setWindowTitle("DELETE Time Log")
 
 
+#		~~~TABLE MODELS~~~
+
 class ArchitectsTableModel(QSqlTableModel):
 	"""Class to disallow deletions of entire rows in table views and to 
 	check for valid email address and phone number on user edit"""
@@ -1833,6 +1856,9 @@ class InvoiceRelationalTableModel(QSqlRelationalTableModel):
 
 		return super().setData(index, value, role)
 
+
+#		~~~DELEGATES~~~
+
 class StatusDelegate(QStyledItemDelegate):
 	"""Class to allow drop down ComboBoxes for table cells where only a specific
 	selection of values is allowed"""
@@ -1971,6 +1997,8 @@ class InvoiceCheckboxDelegate(QStyledItemDelegate):
 		y = rect.y() + (rect.height() - checkbox_size) // 2
 		return QRect(x, y, checkbox_size, checkbox_size)
 
+
+#		~~~FUNCTIONS~~~		
 
 def setCrossComboBox(source_combo: QComboBox, target_combo: QComboBox, 
 	column: int = 1) -> None:

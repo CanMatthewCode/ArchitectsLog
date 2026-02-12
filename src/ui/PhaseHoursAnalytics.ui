@@ -46,24 +46,69 @@
      </layout>
     </widget>
    </item>
-   <item alignment="Qt::AlignmentFlag::AlignHCenter">
-    <widget class="QComboBox" name="phaseHoursComboBox">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>200</horstretch>
-       <verstretch>200</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>300</width>
-       <height>30</height>
-      </size>
-     </property>
-    </widget>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Policy::Expanding</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>600</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item alignment="Qt::AlignmentFlag::AlignHCenter">
+      <widget class="QComboBox" name="ProjectComboBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>200</horstretch>
+         <verstretch>200</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>300</width>
+         <height>30</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item alignment="Qt::AlignmentFlag::AlignHCenter">
+      <widget class="QCheckBox" name="showAllProjectsChkBx">
+       <property name="styleSheet">
+        <string notr="true">QCheckBox{
+	color : #89D5D2;
+}</string>
+       </property>
+       <property name="text">
+        <string>Show All Projects</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>450</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
-   <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignBottom">
-    <widget class="QPushButton" name="barsPieBtn">
+   <item alignment="Qt::AlignmentFlag::AlignHCenter">
+    <widget class="QPushButton" name="barsStemToPieStepBtn">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
        <horstretch>20</horstretch>
@@ -80,6 +125,22 @@
       <font>
        <pointsize>18</pointsize>
       </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton{
+	border-radius: 12px;
+	border: 1px solid black;
+	background-color: #35B5AC;
+	color: black;
+}
+
+QPushButton:hover {
+	background-color: #2A9089;
+}
+
+QPushButton:pressed {
+	background-color: #1F6B66;
+}</string>
      </property>
      <property name="text">
       <string>Pie Chart</string>

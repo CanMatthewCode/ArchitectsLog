@@ -15,6 +15,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 	def __init__(self, parent=None) -> None:
 		self.fig = Figure()
 		super().__init__(self.fig)
+		self.ax = self.fig.add_subplot(111)
 		self.fig.patch.set_facecolor('#1E2E34')  # Figure background
 		
 		self.PHASE_NAMES_SHORT = [
@@ -55,8 +56,9 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		title: str = 'Phase Hours Breakdown') -> None:
 		"""Method for creating a bar chart based on phases; data is list of tuples
 		containing (phase_id, duration)"""
+		self.fig.clear()
 		self.ax = self.fig.add_subplot(111)
-		self.ax.clear()
+		self.fig.subplots_adjust(left=0.125, right=0.9, top=0.9, bottom=0.1)
 
 		phase_ids = [row[0] for row in data]
 		data_list = [row[1] for row in data]
@@ -89,11 +91,12 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		title: str = "Phase Hours Breakdown", show_admin: bool = True) -> None:
 		"""Method for creating a pie chart based on phases; data is list of tuples
 		containing (phase_id, duration). Pass in False to hide Business Dev/ Admin"""
+		self.fig.clear()
 		self.ax = self.fig.add_subplot(111)
-		self.ax.clear()
+		self.fig.subplots_adjust(left=0.125, right=0.9, top=0.9, bottom=0.1)
 		
 		self.ax.set_position([0.4, 0.1, 0.5, 0.8])
-		self.fig.suptitle(title, color='#89D5D2', fontsize=12, y=0.96)
+		self.fig.suptitle(title, color='#89D5D2', fontsize=12, y=0.97)
 
 		if show_admin:
 			phase_ids = [row[0] for row in data]
@@ -137,8 +140,8 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 	def stem_plot_phases(self, data: list[tuple[int, int, int]]) -> None:
 		"""Method for creating a stem plot of time_entry duration_minutes
 		plotted against time and color coded by phase_id"""
+		self.fig.clear()
 		self.ax = self.fig.add_subplot(111)
-		self.ax.clear()
 		self.ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
 		self.ax.set_position([0.1, 0.1, 0.65, 0.8])
 
@@ -160,8 +163,8 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		self.ax.tick_params(axis='x', rotation=15, labelsize=8, colors='#89D5D2')
 		self.ax.tick_params(axis='y', labelsize=8, colors='#89D5D2')
 		
-		self.fig.suptitle('Phase Hours Over Time', color='#89D5D2',
-			fontsize=12, x=.44, y=0.97)
+		self.fig.suptitle('Worked Hours Over Time', color='#89D5D2',
+			fontsize=12, y=0.97)
 		self.ax.set_ylabel('Hours', color='#89D5D2')
 
 		unique_phases = sorted(set(phase_ids))
@@ -176,7 +179,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 			prop={'size': 9},
 			facecolor='#A0E0DD',
 			edgecolor='#1E2E34')
-		legend.get_title().set_fontsize(11)
+		legend.get_title().set_fontsize(12)
 		legend.get_title().set_weight('bold')
 
 		self.draw()
@@ -184,8 +187,8 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 	def step_plot_phases(self, data: list[tuple[int, int, int]]) -> None:
 		"""Method to create a step plot of time_entry duration minutes
 		plotted against time and color code by phase_id"""
+		self.fig.clear()
 		self.ax = self.fig.add_subplot(111)
-		self.ax.clear()
 		self.ax.set_axisbelow(True)
 		self.ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
 		self.ax.set_position([0.1, 0.1, 0.65, 0.8])
@@ -226,7 +229,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		self.ax.tick_params(axis='y', labelsize=8, colors='#89D5D2')
 		
 		self.fig.suptitle('Cumulative Hours Over Time', color='#89D5D2', 
-			fontsize=12, x=.44, y=.97)
+			fontsize=12, y=.97)
 		self.ax.set_ylabel('Total Hours', color='#89D5D2')
 
 		unique_phases = sorted(set(phase_ids))
@@ -241,7 +244,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 			prop={'size': 9},
 			facecolor='#A0E0DD',
 			edgecolor='#1E2E34')
-		legend.get_title().set_fontsize(11)
+		legend.get_title().set_fontsize(12)
 		legend.get_title().set_weight('bold')
 
 		self.draw()
@@ -251,8 +254,8 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		data2: Optional[list[tuple[int, int, str]]] = None,
 		data3: Optional[list[tuple[int, int, str]]] = None) -> None:
 		"""Method to compare up to 3 projects' phases to the average phase duration"""
+		self.fig.clear()
 		self.ax = self.fig.add_subplot(111)
-		self.ax.clear()
 
 		x1 = [data[0] for data in data1]
 		y1 = [data[1] for data in data1]
@@ -337,8 +340,8 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		projects_phase_data: list[list[tuple[int, int]]], 
 		project_names: list[str]) -> None:
 		"""Method to show stacked bar graphs by phase for multiple projects"""
+		self.fig.clear()
 		self.ax = self.fig.add_subplot(111)
-		self.ax.clear()
 		
 		projects_by_phase_list = []
 		for i in range(len(self.PHASE_NAMES)):

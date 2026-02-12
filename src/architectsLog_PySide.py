@@ -30,6 +30,7 @@ from ui.DeleteInvoiceWarning import Ui_DeleteInvoiceDialog
 from ui.DeleteTimeEntryWarning import Ui_DeleteTimeEntryDialog
 from ui.ViewInvoice import Ui_ViewInvoiceWindow
 from ui.Analytics import Ui_AnalyticsWindow
+from ui.PhaseHoursAnalytics import Ui_PhaseHoursWindow
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry 
 from architectsLog_constants import	(PHASES, ARCHITECT_STATUSES, PROJECT_STATUSES, 
@@ -98,12 +99,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		if arch_proj_ids:
 			arch_id, proj_id = arch_proj_ids
 			arch_match = self.architect_model.match(self.architect_model.index(0,0), 
-				Qt.EditRole, arch_id)
+				Qt.EditRole, arch_id, 1, Qt.MatchFlags(Qt.MatchExactly))
 			if arch_match:
 				row = arch_match[0].row()
 				self.ArchitectsComboBox.setCurrentIndex(row)
 			proj_match = self.project_model.match(self.project_model.index(0,0),
-				Qt.EditRole, proj_id)
+				Qt.EditRole, proj_id, 1, Qt.MatchFlags(Qt.MatchExactly))
 			if proj_match:
 				row = proj_match[0].row()
 				self.ProjectsComboBox.setCurrentIndex(row)
@@ -236,66 +237,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 	def viewAnalytics(self) -> None:
 		"""Method to access the analytics window"""
-		with get_db_connection() as conn:
-			cur = conn.cursor()
-			cur.execute("SELECT project_id FROM projects \
-				WHERE current_phase_id > 3 AND current_phase_id < 8")
-			proj_ids = cur.fetchall()
-			cur.execute("SELECT project_id FROM projects")
-			low_proj_ids = cur.fetchall()
-		if proj_ids:
-			all_proj_ids = [pid[0] for pid in proj_ids]
-			rand_id = random.choice(all_proj_ids)
-			rand_id2 = random.choice(all_proj_ids)
-			rand_id3 = random.choice(all_proj_ids)
-		elif low_proj_ids:
-			all_proj_ids = [pid[0] for pid in low_proj_ids]
-			rand_id = random.choice(all_proj_ids)
-			rand_id2 = random.choice(all_proj_ids)
-			rand_id3 = random.choice(all_proj_ids)
-		else:
-			rand_id = -1
-
-		end_date = datetime.now()
-		end_date_int = int(end_date.timestamp())
-		start_date = end_date - timedelta(weeks=104)
-		start_date_int = int(start_date.timestamp())
-
-		with get_db_connection() as conn:
-			cur = conn.cursor()
-			phase_data = phase_duration_by_project(rand_id, cur)
-			phase_time_data = phase_time_entries_by_project(rand_id, cur)
-			total_hours = phase_duration_all_projects(cur)
-			phase_data_with_name = phase_duration_by_project_with_name(rand_id, cur)
-			num_proj_by_phase_tuple = total_number_of_projects_by_phase(cur)
-			phase_data_with_name2 = phase_duration_by_project_with_name(rand_id2, cur)
-			phase_data_with_name3 = phase_duration_by_project_with_name(rand_id3, cur)
-			projs_over_time = project_ids_over_time_period(start_date_int, end_date_int, cur)
-			projs_over_time_ids = [proj[0] for proj in projs_over_time]
-			projs_over_time_names = [proj[1] for proj in projs_over_time]
-			projs_over_time_list = []
-			for proj_id in projs_over_time_ids:
-				projs_over_time_list.append(phase_duration_by_project(proj_id, cur))
-
 		self.analytics_window = ViewAnalytics()
-		self.analytics_window.projectByPhaseWidget.bars_by_phase(
-			phase_data)
-		self.analytics_window.projectOverTimeWidget.step_plot_phases(
-			phase_time_data)
-		self.analytics_window.phaseAveragesWidget.pie_by_phase(
-			total_hours, "Total Time Breakdown")
-		num_projects_by_phase = [projects[1] for projects in num_proj_by_phase_tuple]
-		avg_data = [round(data[1]/projects, 1) 
-			for data, projects in zip(total_hours, num_projects_by_phase)]
-		avg_phases = [data[0] for data in total_hours]
-		avg_data_tuple = list(zip(avg_phases, avg_data))
-		#self.analytics_window.projectsOverTimeWidget.bars_projects_vs_average(
-		#	avg_data_tuple, phase_data_with_name, phase_data_with_name2,
-		#	phase_data_with_name3)
-		shifted_projs_over_time = projs_over_time_list[2:] + projs_over_time_list[1:2] + projs_over_time_list[0:1]
-		shifted_names_over_time = projs_over_time_names[2:] + projs_over_time_names[1:2]  + projs_over_time_names[0:1]
-		self.analytics_window.projectsOverTimeWidget.bars_projects_by_phase(
-			shifted_projs_over_time, shifted_names_over_time)
 
 	def logTime(self) -> None:
 		"""Method to activate TimeLogger window and store resulting 
@@ -820,7 +762,7 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 				arch_proj_ids = get_most_recent_archid_and_projid(cur)
 			arch_id, proj_id = arch_proj_ids
 			proj_match = self.project_model.match(self.project_model.index(0,0),
-			Qt.EditRole, proj_id)
+			Qt.EditRole, proj_id, 1, Qt.MatchFlags(Qt.MatchExactly))
 			if proj_match:
 				row = proj_match[0].row()
 				self.ProjectComboBox.setCurrentIndex(row)
@@ -1118,7 +1060,7 @@ class ViewInvoices(QWidget, Ui_ViewInvoicesWindow):
 				arch_proj_ids = get_most_recent_archid_and_projid(cur)
 			arch_id, proj_id = arch_proj_ids
 			proj_match = self.project_model.match(self.project_model.index(0,0),
-			Qt.EditRole, proj_id)
+			Qt.EditRole, proj_id, 1, Qt.MatchFlags(Qt.MatchExactly))
 			if proj_match:
 				row = proj_match[0].row()
 				self.ProjectComboBox.setCurrentIndex(row)
@@ -1265,6 +1207,7 @@ class ViewInvoice(Ui_ViewInvoiceWindow, QWidget):
 
 		self.show()
 
+
 class ViewAnalytics(QWidget, Ui_AnalyticsWindow):
 	def __init__(self) -> None:
 		super(ViewAnalytics, self).__init__()
@@ -1272,8 +1215,186 @@ class ViewAnalytics(QWidget, Ui_AnalyticsWindow):
 		self.setFixedSize(self.size())
 		self.setWindowTitle("Analytics")
 
+		with get_db_connection() as conn:
+			cur = conn.cursor()
+			cur.execute("SELECT project_id FROM projects \
+				WHERE current_phase_id > 3 AND current_phase_id < 8")
+			proj_ids = cur.fetchall()
+			cur.execute("SELECT project_id FROM projects")
+			low_proj_ids = cur.fetchall()
+		if proj_ids:
+			all_proj_ids = [pid[0] for pid in proj_ids]
+			rand_id = random.choice(all_proj_ids)
+		elif low_proj_ids:
+			all_proj_ids = [pid[0] for pid in low_proj_ids]
+			rand_id = random.choice(all_proj_ids)
+		else:
+			rand_id = -1
+
+		end_date = datetime.now()
+		end_date_int = int(end_date.timestamp())
+		start_date = end_date - timedelta(weeks=104)
+		start_date_int = int(start_date.timestamp())
+
+		with get_db_connection() as conn:
+			cur = conn.cursor()
+			phase_data = phase_duration_by_project(rand_id, cur)
+			phase_time_data = phase_time_entries_by_project(rand_id, cur)
+			total_hours = phase_duration_all_projects(cur)
+			phase_data_with_name = phase_duration_by_project_with_name(rand_id, cur)
+			num_proj_by_phase_tuple = total_number_of_projects_by_phase(cur)
+			projs_over_time = project_ids_over_time_period(start_date_int, end_date_int, cur)
+			projs_over_time_ids = [proj[0] for proj in projs_over_time]
+			projs_over_time_names = [proj[1] for proj in projs_over_time]
+			projs_over_time_list = []
+			for proj_id in projs_over_time_ids:
+				projs_over_time_list.append(phase_duration_by_project(proj_id, cur))
+
+		self.projectByPhaseWidget.bars_by_phase(
+			phase_data)
+		self.projectOverTimeWidget.step_plot_phases(
+			phase_time_data)
+		self.phaseAveragesWidget.pie_by_phase(
+			total_hours, "Total Time Breakdown")
+		num_projects_by_phase = [projects[1] for projects in num_proj_by_phase_tuple]
+		avg_data = [round(data[1]/projects, 1) 
+			for data, projects in zip(total_hours, num_projects_by_phase)]
+		avg_phases = [data[0] for data in total_hours]
+		avg_data_tuple = list(zip(avg_phases, avg_data))
+		shifted_projs_over_time = projs_over_time_list[2:] + projs_over_time_list[1:2] + projs_over_time_list[0:1]
+		shifted_names_over_time = projs_over_time_names[2:] + projs_over_time_names[1:2]  + projs_over_time_names[0:1]
+		self.projectsOverTimeWidget.bars_projects_by_phase(
+			shifted_projs_over_time, shifted_names_over_time)
+
+		self.ProjectByPhaseBtn.clicked.connect(self.projectByPhase)
+		self.ProjectOverTimeBtn.clicked.connect(self.projectOverTime)
+
 		self.show()
 
+	def projectByPhase(self) -> None:
+		self.phases_bar_or_pie = ViewProjectPhases("bar_pie")
+
+	def projectOverTime(self) -> None:
+		self.phases_stem_or_step = ViewProjectPhases("stem_step")
+
+
+
+class ViewProjectPhases(QWidget, Ui_PhaseHoursWindow):
+	"""Class to utilize either bar/pie charts or stem/step charts.
+	Must pass in either 'bar_pie' or 'stem_step' as the 2nd parameter"""
+	def __init__(self, chart_type: str) -> None:
+		super(ViewProjectPhases, self).__init__()
+		self.setupUi(self)
+		self.setFixedSize(self.size())
+		self.setWindowTitle("Projects By Phase")
+
+		self.chart_type = chart_type
+		self.barStem_or_pieStep = 0
+		self.phase_data = []
+		self.original_row = 0
+
+		end_date = datetime.now()
+		end_date_int = int(end_date.timestamp())
+		start_date = end_date - timedelta(weeks=102)
+		self.start_date_int = int(start_date.timestamp())
+
+		self.project_model = QSqlTableModel()
+		self.project_model.setTable("projects")
+		self.project_model.setFilter(
+			f"project_id > 0 AND start_date > {self.start_date_int}")
+		self.project_model.select()
+		self.ProjectComboBox.setModel(self.project_model)
+		self.ProjectComboBox.setModelColumn(1)
+
+		with get_db_connection() as conn:
+			cur = conn.cursor()
+			arch_proj_ids = get_most_recent_archid_and_projid(cur)
+		if arch_proj_ids:
+			arch_id, proj_id = arch_proj_ids
+			proj_match = self.project_model.match(self.project_model.index(0,0),
+				Qt.EditRole, proj_id, 1, Qt.MatchFlags(Qt.MatchExactly))
+			if proj_match:
+				self.original_row = proj_match[0].row()
+				self.ProjectComboBox.setCurrentIndex(self.original_row)
+		else:
+			self.ProjectComboBox.setCurrentIndex(0)
+
+		with get_db_connection() as conn:
+			cur = conn.cursor()
+			if self.chart_type == "bar_pie":
+				self.bar_phase_data = phase_duration_by_project(proj_id, cur)
+			else:
+				self.stem_phase_data = phase_time_entries_by_project(proj_id, cur)
+
+		if self.chart_type == 'bar_pie':
+			self.PhaseHoursWidget.bars_by_phase(self.bar_phase_data)
+		else:
+			self.barsStemToPieStepBtn.setText("Stem Chart")
+			self.PhaseHoursWidget.step_plot_phases(self.stem_phase_data)
+
+		self.ProjectComboBox.currentIndexChanged.connect(self.projectChanged)
+		self.barsStemToPieStepBtn.clicked.connect(self.barStem_to_pieStep)
+		self.showAllProjectsChkBx.stateChanged.connect(self.projectFilter)
+
+		self.show()
+
+	def projectChanged(self) -> None:
+		proj_index = self.ProjectComboBox.currentIndex()
+		proj_id = self.project_model.data(self.project_model.index(proj_index, 0))
+		with get_db_connection() as conn:
+			cur = conn.cursor()
+			if self.chart_type == "bar_pie":
+				self.bar_phase_data = phase_duration_by_project(proj_id, cur)
+			else:
+				self.stem_phase_data = phase_time_entries_by_project(proj_id, cur)
+		if self.chart_type == "bar_pie":
+			self.bars_or_pie()
+		else:
+			self.stem_or_step()
+
+	def bars_or_pie(self) -> None:
+		if self.barStem_or_pieStep == 0:
+			self.PhaseHoursWidget.bars_by_phase(self.bar_phase_data)
+			self.barsStemToPieStepBtn.setText("Pie Chart")
+		else:
+			self.PhaseHoursWidget.pie_by_phase(self.bar_phase_data)
+			self.barsStemToPieStepBtn.setText("Bar Chart")
+
+	def stem_or_step(self) -> None:
+		if self.barStem_or_pieStep == 0:
+			self.PhaseHoursWidget.step_plot_phases(self.stem_phase_data)
+			self.barsStemToPieStepBtn.setText("Stem Chart")
+		else:
+			self.PhaseHoursWidget.stem_plot_phases(self.stem_phase_data)
+			self.barsStemToPieStepBtn.setText("Step Chart")
+
+	def barStem_to_pieStep(self) -> None:
+		if self.barStem_or_pieStep == 0:
+			self.barStem_or_pieStep = 1
+		else:
+			self.barStem_or_pieStep = 0
+		if self.chart_type == "bar_pie":
+			self.bars_or_pie()
+		else:
+			self.stem_or_step()
+
+	def projectFilter(self, signal):
+		proj_index = self.ProjectComboBox.currentIndex()
+		proj_model = self.ProjectComboBox.model()
+		current_proj_id = proj_model.data(proj_model.index(proj_index, 0))
+		if signal == 2:
+			self.project_model.setFilter("project_id > 0")
+		else:
+			self.project_model.setFilter(
+				f"project_id > 0 AND start_date > {self.start_date_int}")
+		proj_match = self.project_model.match(self.project_model.index(0,0),
+			Qt.EditRole, current_proj_id, 1, Qt.MatchFlags(Qt.MatchExactly))
+		if proj_match:
+			row = proj_match[0].row()
+			self.ProjectComboBox.setCurrentIndex(row)
+		else:
+			self.ProjectComboBox.setCurrentIndex(self.original_row)
+		
 
 #		~~~TIME LOGGERS~~~
 
@@ -2010,7 +2131,7 @@ def setCrossComboBox(source_combo: QComboBox, target_combo: QComboBox,
 	item_id = model.data(model.index(row, column))
 
 	matches = target_combo.model().match(target_combo.model().index(0,0),
-		Qt.EditRole, item_id)
+		Qt.EditRole, item_id, 1, Qt.MatchFlags(Qt.MatchExactly))
 	if matches:
 		row = matches[0].row()
 		target_combo.setCurrentIndex(row)

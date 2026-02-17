@@ -56,6 +56,9 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		title: str = 'Phase Hours Breakdown') -> None:
 		"""Method for creating a bar chart based on phases; data is list of tuples
 		containing (phase_id, duration)"""
+		if not data or len(data) == 0:
+			self.no_data_message(title)
+			return
 		self.fig.clear()
 		self.ax = self.fig.add_subplot(111)
 		self.fig.subplots_adjust(left=0.125, right=0.9, top=0.9, bottom=0.1)
@@ -82,7 +85,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		self.ax.set_xticks(x_positions)
 		self.ax.set_xticklabels(phase_name, ha='right')
 
-		self.fig.suptitle(title, color='#89D5D2', fontsize=12, y=0.97)
+		self.fig.suptitle(title, color='#89D5D2', fontsize=14, y=0.97)
 		self.ax.set_ylabel('Total Hours', color='#89D5D2')
 
 		self.draw()
@@ -91,12 +94,15 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		title: str = "Phase Hours Breakdown", show_admin: bool = True) -> None:
 		"""Method for creating a pie chart based on phases; data is list of tuples
 		containing (phase_id, duration). Pass in False to hide Business Dev/ Admin"""
+		if not data or len(data) == 0:
+			self.no_data_message(title)
+			return
 		self.fig.clear()
 		self.ax = self.fig.add_subplot(111)
 		self.fig.subplots_adjust(left=0.125, right=0.9, top=0.9, bottom=0.1)
 		
 		self.ax.set_position([0.4, 0.1, 0.5, 0.8])
-		self.fig.suptitle(title, color='#89D5D2', fontsize=12, y=0.97)
+		self.fig.suptitle(title, color='#89D5D2', fontsize=14, y=0.97)
 
 		if show_admin:
 			phase_ids = [row[0] for row in data]
@@ -140,6 +146,9 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 	def stem_plot_phases(self, data: list[tuple[int, int, int]]) -> None:
 		"""Method for creating a stem plot of time_entry duration_minutes
 		plotted against time and color coded by phase_id"""
+		if not data or len(data) == 0:
+			self.no_data_message("Worked Hours Over Time")
+			return
 		self.fig.clear()
 		self.ax = self.fig.add_subplot(111)
 		self.ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
@@ -164,7 +173,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		self.ax.tick_params(axis='y', labelsize=8, colors='#89D5D2')
 		
 		self.fig.suptitle('Worked Hours Over Time', color='#89D5D2',
-			fontsize=12, y=0.97)
+			fontsize=14, y=0.97)
 		self.ax.set_ylabel('Hours', color='#89D5D2')
 
 		unique_phases = sorted(set(phase_ids))
@@ -187,6 +196,9 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 	def step_plot_phases(self, data: list[tuple[int, int, int]]) -> None:
 		"""Method to create a step plot of time_entry duration minutes
 		plotted against time and color code by phase_id"""
+		if not data or len(data) == 0:
+			self.no_data_message("Cumulative Hours Over Time")
+			return
 		self.fig.clear()
 		self.ax = self.fig.add_subplot(111)
 		self.ax.set_axisbelow(True)
@@ -229,7 +241,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		self.ax.tick_params(axis='y', labelsize=8, colors='#89D5D2')
 		
 		self.fig.suptitle('Cumulative Hours Over Time', color='#89D5D2', 
-			fontsize=12, y=.97)
+			fontsize=14, y=.97)
 		self.ax.set_ylabel('Total Hours', color='#89D5D2')
 
 		unique_phases = sorted(set(phase_ids))
@@ -254,6 +266,9 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		data2: Optional[list[tuple[int, int, str]]] = None,
 		data3: Optional[list[tuple[int, int, str]]] = None) -> None:
 		"""Method to compare up to 3 projects' phases to the average phase duration"""
+		if not average_data or len(average_data) == 0:
+			self.no_data_message("Project Phases vs Average")
+			return
 		self.fig.clear()
 		self.ax = self.fig.add_subplot(111)
 
@@ -323,7 +338,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		self.ax.set_xticklabels(phase_name, ha='right')
 
 		self.fig.suptitle("Project Phases vs Average", color='#89D5D2', 
-			fontsize=12, y=0.97)
+			fontsize=14, y=0.97)
 		self.ax.set_ylabel('Total Hours', color='#89D5D2')
 
 		proj_names = ["Phase Average", proj1_name]
@@ -336,10 +351,15 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		legend.get_title().set_fontsize(12)
 		legend.get_title().set_weight('bold')
 
+		self.draw()
+
 	def bars_projects_by_phase(self, 
 		projects_phase_data: list[list[tuple[int, int]]], 
 		project_names: list[str]) -> None:
 		"""Method to show stacked bar graphs by phase for multiple projects"""
+		if not projects_phase_data or len(projects_phase_data) == 0:
+			self.no_data_message("Projects By Phase")
+			return
 		self.fig.clear()
 		self.ax = self.fig.add_subplot(111)
 		
@@ -400,6 +420,8 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 			fontsize=12, y=0.97)
 		self.ax.set_ylabel('Total Hours', color='#89D5D2')
 
+		self.draw()
+
 		#unique_phases = sorted(set(phase_ids))
 		#legend_elements = [Patch(facecolor=self.PHASE_COLORS[pid-1], 
 		#	label=self.PHASE_NAMES[pid-1]) 
@@ -414,3 +436,13 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		#	edgecolor='#1E2E34')
 		#legend.get_title().set_fontsize(11)
 		#legend.get_title().set_weight('bold')
+
+	def no_data_message(self, title="No Data Available") -> None:
+		self.fig.clear()
+		self.ax = self.fig.add_subplot(111)
+		self.fig.suptitle(title, color='#89D5D2', fontsize=12, y=0.97)
+		self.ax.text(0.5, 0.5, 'No Data For Selected Range',
+			ha='center', va='center', fontsize=18, color='#89D5D2')
+		self.ax.set_facecolor('#2A3F45')
+		self.ax.axis('off')
+		self.draw()

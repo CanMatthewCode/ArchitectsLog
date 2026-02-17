@@ -53,7 +53,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 			]
 
 	def bars_by_phase(self, data: list[tuple[int, int]],
-		title: str = 'Phase Hours Breakdown') -> None:
+		title: str = 'Phase Hours Breakdown', phase_names_length: int = 0) -> None:
 		"""Method for creating a bar chart based on phases; data is list of tuples
 		containing (phase_id, duration)"""
 		if not data or len(data) == 0:
@@ -65,7 +65,10 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 
 		phase_ids = [row[0] for row in data]
 		data_list = [row[1] for row in data]
-		phase_name = [self.PHASE_NAMES_SHORT[phase_id - 1] for phase_id in phase_ids]
+		if phase_names_length == 0:
+			phase_name = [self.PHASE_NAMES_SHORT[phase_id - 1] for phase_id in phase_ids]
+		else:
+			phase_name = [self.PHASE_NAMES[phase_id - 1] for phase_id in phase_ids]
 		colors = [self.PHASE_COLORS[phase_id - 1] for phase_id in phase_ids]
 
 		x_positions = range(len(phase_ids))
@@ -306,7 +309,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		width = .75 / (num_projects + 1)
 		x_positions = range(1,len(all_phases)+1)
 
-		phase_name = [self.PHASE_NAMES_SHORT[phase_id - 1] for phase_id in all_phases]
+		phase_name = [self.PHASE_NAMES[phase_id - 1] for phase_id in all_phases]
 		bars = self.ax.bar(all_phases, avg_y, width, color=self.PHASE_COLORS[7])
 		self.ax.bar_label(bars, label_type='edge', 
 			color = '#A0E0DD', fontsize=6)

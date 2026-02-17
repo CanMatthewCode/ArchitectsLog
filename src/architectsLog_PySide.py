@@ -6,6 +6,7 @@ import re
 from datetime import datetime, timedelta
 import random
 import sqlite3
+from typing import Optional
 
 from PySide6.QtWidgets import (QMainWindow, QApplication, QDialog, QMessageBox,
 	QStyledItemDelegate, QLineEdit, QComboBox, QWidget, QLCDNumber, 
@@ -31,6 +32,7 @@ from ui.DeleteTimeEntryWarning import Ui_DeleteTimeEntryDialog
 from ui.ViewInvoice import Ui_ViewInvoiceWindow
 from ui.Analytics import Ui_AnalyticsWindow
 from ui.PhaseHoursAnalytics import Ui_PhaseHoursWindow
+from ui.PhaseAveragesAnalytics import Ui_PhaseAveragesWindow
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry 
 from architectsLog_constants import	(PHASES, ARCHITECT_STATUSES, PROJECT_STATUSES, 
@@ -44,7 +46,7 @@ from architectsLog_analytics import AnalyticsChartDesigner
 from architectsLog_analytics_db import (phase_duration_by_project, 
 	phase_time_entries_by_project, phase_duration_all_projects, 
 	phase_duration_by_project_with_name, total_number_of_projects_by_phase,
-	project_ids_over_time_period)
+	project_ids_over_time_period, project_start_date)
 
 def initialize_database(DB_FILE: str) -> None:
 	"""Open the persistent global Qt connection to the database"""
@@ -398,7 +400,7 @@ class ProjectWindow(QDialog, Ui_AddProjectDialog):
 		super().accept()
 
 
-#		~~~View Windows~~~
+#		~~~Table View Windows~~~
 
 class ViewArchitects(QWidget, Ui_ViewArchitectsWindow):
 	def __init__(self) -> None:
@@ -1208,6 +1210,8 @@ class ViewInvoice(Ui_ViewInvoiceWindow, QWidget):
 		self.show()
 
 
+#	~~ANALYTICS~~
+
 class ViewAnalytics(QWidget, Ui_AnalyticsWindow):
 	def __init__(self) -> None:
 		super(ViewAnalytics, self).__init__()
@@ -1256,18 +1260,48 @@ class ViewAnalytics(QWidget, Ui_AnalyticsWindow):
 			phase_time_data)
 		self.phaseAveragesWidget.pie_by_phase(
 			total_hours, "Total Time Breakdown")
+
 		num_projects_by_phase = [projects[1] for projects in num_proj_by_phase_tuple]
 		avg_data = [round(data[1]/projects, 1) 
 			for data, projects in zip(total_hours, num_projects_by_phase)]
 		avg_phases = [data[0] for data in total_hours]
-		avg_data_tuple = list(zip(avg_phases, avg_data))
-		shifted_projs_over_time = projs_over_time_list[2:] + projs_over_time_list[1:2] + projs_over_time_list[0:1]
-		shifted_names_over_time = projs_over_time_names[2:] + projs_over_time_names[1:2]  + projs_over_time_names[0:1]
+
+		if BUSDEV in avg_phases and ADMIN in avg_phases:
+			shifted_avg_phases = avg_phases[:-2]
+			shifted_avg_data = avg_data[:-2]
+		elif BUSDEV in avg_phases or ADMIN in avg_phases:
+			shifted_avg_phases = avg_phases[:-1]
+			shifted_avg_data = avg_data[:-1]
+		else:
+			shifted_avg_phases = avg_phases
+			shifted_avg_data = avg_data
+		avg_data_tuple = list(zip(shifted_avg_phases, shifted_avg_data))
+
+		#self.phaseAveragesWidget.bars_by_phase(
+		#	avg_data_tuple, "Average Hours Per Phase")
+
+		if ("Administration" in projs_over_time_names and 
+			"Business Development" in projs_over_time_names):
+			shifted_projs_over_time = (projs_over_time_list[2:] 
+				+ projs_over_time_list[1:2] + projs_over_time_list[0:1])
+			shifted_names_over_time = (projs_over_time_names[2:] 
+				+ projs_over_time_names[1:2]  + projs_over_time_names[0:1])
+		elif ("Administration" in projs_over_time_names or 
+			"Business Development" in projs_over_time_names):
+			shifted_projs_over_time = (projs_over_time_list[1:] 
+				+  projs_over_time_list[0:1])
+			shifted_names_over_time = (projs_over_time_names[1:] 
+				+ projs_over_time_names[0:1])
+		else:
+			shifted_projs_over_time = projs_over_time_list
+			shifted_names_over_time = projs_over_time_names
+
 		self.projectsOverTimeWidget.bars_projects_by_phase(
 			shifted_projs_over_time, shifted_names_over_time)
 
 		self.ProjectByPhaseBtn.clicked.connect(self.projectByPhase)
 		self.ProjectOverTimeBtn.clicked.connect(self.projectOverTime)
+		self.PhaseAveragesBtn.clicked.connect(self.averageProjectTime)
 
 		self.show()
 
@@ -1277,6 +1311,8 @@ class ViewAnalytics(QWidget, Ui_AnalyticsWindow):
 	def projectOverTime(self) -> None:
 		self.phases_stem_or_step = ViewProjectPhases("stem_step")
 
+	def averageProjectTime(self) -> None:
+		self.phases_averages = ViewProjectAverages()
 
 
 class ViewProjectPhases(QWidget, Ui_PhaseHoursWindow):
@@ -1329,12 +1365,12 @@ class ViewProjectPhases(QWidget, Ui_PhaseHoursWindow):
 		if self.chart_type == 'bar_pie':
 			self.PhaseHoursWidget.bars_by_phase(self.bar_phase_data)
 		else:
-			self.barsStemToPieStepBtn.setText("Stem Chart")
+			self.BarsStemToPieStepBtn.setText("Stem Chart")
 			self.PhaseHoursWidget.step_plot_phases(self.stem_phase_data)
 
 		self.ProjectComboBox.currentIndexChanged.connect(self.projectChanged)
-		self.barsStemToPieStepBtn.clicked.connect(self.barStem_to_pieStep)
-		self.showAllProjectsChkBx.stateChanged.connect(self.projectFilter)
+		self.BarsStemToPieStepBtn.clicked.connect(self.barStemToPieStep)
+		self.ShowAllProjectsChkBx.stateChanged.connect(self.projectFilter)
 
 		self.show()
 
@@ -1348,35 +1384,35 @@ class ViewProjectPhases(QWidget, Ui_PhaseHoursWindow):
 			else:
 				self.stem_phase_data = phase_time_entries_by_project(proj_id, cur)
 		if self.chart_type == "bar_pie":
-			self.bars_or_pie()
+			self.barsOrPie()
 		else:
-			self.stem_or_step()
+			self.stemOrStep()
 
-	def bars_or_pie(self) -> None:
+	def barsOrPie(self) -> None:
 		if self.barStem_or_pieStep == 0:
 			self.PhaseHoursWidget.bars_by_phase(self.bar_phase_data)
-			self.barsStemToPieStepBtn.setText("Pie Chart")
+			self.BarsStemToPieStepBtn.setText("Pie Chart")
 		else:
 			self.PhaseHoursWidget.pie_by_phase(self.bar_phase_data)
-			self.barsStemToPieStepBtn.setText("Bar Chart")
+			self.BarsStemToPieStepBtn.setText("Bar Chart")
 
-	def stem_or_step(self) -> None:
+	def stemOrStep(self) -> None:
 		if self.barStem_or_pieStep == 0:
 			self.PhaseHoursWidget.step_plot_phases(self.stem_phase_data)
-			self.barsStemToPieStepBtn.setText("Stem Chart")
+			self.BarsStemToPieStepBtn.setText("Stem Chart")
 		else:
 			self.PhaseHoursWidget.stem_plot_phases(self.stem_phase_data)
-			self.barsStemToPieStepBtn.setText("Step Chart")
+			self.BarsStemToPieStepBtn.setText("Step Chart")
 
-	def barStem_to_pieStep(self) -> None:
+	def barStemToPieStep(self) -> None:
 		if self.barStem_or_pieStep == 0:
 			self.barStem_or_pieStep = 1
 		else:
 			self.barStem_or_pieStep = 0
 		if self.chart_type == "bar_pie":
-			self.bars_or_pie()
+			self.barsOrPie()
 		else:
-			self.stem_or_step()
+			self.stemOrStep()
 
 	def projectFilter(self, signal):
 		proj_index = self.ProjectComboBox.currentIndex()
@@ -1395,6 +1431,313 @@ class ViewProjectPhases(QWidget, Ui_PhaseHoursWindow):
 		else:
 			self.ProjectComboBox.setCurrentIndex(self.original_row)
 		
+class ViewProjectAverages(QWidget, Ui_PhaseAveragesWindow):
+	def __init__(self) -> None:
+		super(ViewProjectAverages, self).__init__()
+		self.setupUi(self)
+		self.setFixedSize(self.size())
+		self.setWindowTitle("Phase Time Averages")
+		self.bar_or_pie = 0
+		self.project_vs_average = 0
+
+		self.total_hours = []
+		self.shifted_total_hours = []
+		self.avg_data_tuple = ()
+		self.original_project_row = 0
+
+		self.proj_data = 0
+		self.proj_data2 = 0
+		self.proj_data3 = 0
+
+		self.ShowAllProjectsChkBx.hide()
+		self.ProjectComboBox.hide()
+		self.Project2ComboBox.hide()
+		self.Project3ComboBox.hide()
+		self.Show2ndProjectChkBx.hide()
+		self.Show3rdProjectChkBx.hide()
+		self.NonBillableTimesChkBx.hide()
+		self.StartDateEdit.hide()
+		self.EndDateEdit.hide()
+
+		# ComboBoxes Model setup
+		end_date = datetime.now()
+		end_date_int = int(end_date.timestamp())
+		start_date = end_date - timedelta(weeks=102)
+		self.start_date_int = int(start_date.timestamp())
+		self.project_model = QSqlTableModel()
+		self.project_model.setTable("projects")
+		self.project_model.setFilter(
+			f"project_id > 0 AND start_date > {self.start_date_int}")
+		self.project_model.select()
+		self.ProjectComboBox.setModel(self.project_model)
+		self.ProjectComboBox.setModelColumn(1)
+		self.Project2ComboBox.setModel(self.project_model)
+		self.Project2ComboBox.setModelColumn(1)
+		self.Project3ComboBox.setModel(self.project_model)
+		self.Project3ComboBox.setModelColumn(1)
+
+		self.getData()
+
+		self.original_total_hours = self.total_hours
+		self.original_shifted_total_hours = self.shifted_total_hours
+		self.original_avg_tuple = self.avg_data_tuple
+
+		self.current_date = QDate.currentDate()
+		self.EndDateEdit.setDate(self.current_date)
+		start_date_datetime = datetime.fromtimestamp(self.first_proj_start_date[0])
+		self.start_date = QDate(start_date_datetime.year, start_date_datetime.month,
+			start_date_datetime.day)
+		self.StartDateEdit.setDate(self.start_date)
+
+		self.ProjectComboBox.setCurrentIndex(self.original_project_row)
+		self.Project2ComboBox.setCurrentIndex(self.original_project_row)
+		self.Project3ComboBox.setCurrentIndex(self.original_project_row)
+
+		self.PhaseAverageWidget.bars_by_phase(self.avg_data_tuple, 
+			"Average Hours Per Phase")
+
+		self.PieToBarBtn.clicked.connect(self.barsToPie)
+		self.AvgTotalTimeChkBx.stateChanged.connect(self.showHideTotalTimes)
+		self.NonBillableTimesChkBx.stateChanged.connect(self.showHideNonbillable)
+		self.ChoseDateChkBx.stateChanged.connect(self.showDateRange)
+		self.StartDateEdit.userDateChanged.connect(self.selectDateRange)
+		self.EndDateEdit.userDateChanged.connect(self.selectDateRange)
+
+		self.ProjectVsAveragesBtn.clicked.connect(self.projectVsAverages)
+		self.ShowAllProjectsChkBx.stateChanged.connect(self.projectFilter)
+		self.Show2ndProjectChkBx.stateChanged.connect(self.projectVsAverages2ndProject)
+		self.Show3rdProjectChkBx.stateChanged.connect(self.projectVsAverages3rdProject)
+
+		self.ProjectComboBox.currentIndexChanged.connect(self.getAveragesData)
+		self.Project2ComboBox.currentIndexChanged.connect(self.getAveragesData)
+		self.Project3ComboBox.currentIndexChanged.connect(self.getAveragesData)
+
+		self.show()
+
+	def getData(self, start_date: Optional[int] = None, 
+		end_date: Optional[int] = None) -> None:
+		"""Method to fetch all needed information from database"""
+		with get_db_connection() as conn:
+			cur = conn.cursor()
+			self.total_hours = phase_duration_all_projects(cur, start_date, end_date)
+			self.first_proj_start_date = project_start_date(1, cur)
+			num_proj_by_phase_tuple = total_number_of_projects_by_phase(cur, start_date,
+				end_date)
+			arch_proj_ids = get_most_recent_archid_and_projid(cur)
+
+		num_projects_by_phase = [projects[1] for projects in num_proj_by_phase_tuple]
+		avg_data = [round(data[1]/projects, 1) 
+			for data, projects in zip(self.total_hours, num_projects_by_phase)]
+		avg_phases = [data[0] for data in self.total_hours]
+
+		if BUSDEV in avg_phases and ADMIN in avg_phases:
+			shifted_avg_phases = avg_phases[:-2]
+			shifted_avg_data = avg_data[:-2]
+			self.shifted_total_hours = self.total_hours[:-2]
+		elif BUSDEV in avg_phases or ADMIN in avg_phases:
+			shifted_avg_phases = avg_phases[:-1]
+			shifted_avg_data = avg_data[:-1]
+			self.shifted_total_hours = self.total_hours[:-1]
+		else:
+			shifted_avg_phases = avg_phases
+			shifted_avg_data = avg_data
+			self.shifted_total_hours = self.total_hours
+		self.avg_data_tuple = list(zip(shifted_avg_phases, shifted_avg_data))
+
+		if arch_proj_ids:
+			arch_id, proj_id = arch_proj_ids
+			proj_match = self.project_model.match(self.project_model.index(0,0),
+				Qt.EditRole, proj_id, 1, Qt.MatchFlags(Qt.MatchExactly))
+			if proj_match:
+				self.original_project_row = proj_match[0].row()
+			else:
+				self.original_project_row = 1
+
+	def getAveragesData(self, start_date: Optional[int] = None, 
+		end_date: Optional[int] = None) -> None:
+		proj_index = self.ProjectComboBox.currentIndex()
+		proj_index2 = self.Project2ComboBox.currentIndex()
+		proj_index3 = self.Project3ComboBox.currentIndex()
+		proj_id = self.project_model.data(self.project_model.index(proj_index, 0))
+		proj_id2 = self.project_model.data(self.project_model.index(proj_index2, 0))
+		proj_id3 = self.project_model.data(self.project_model.index(proj_index3, 0))
+		with get_db_connection() as conn:
+			cur = conn.cursor()
+			self.proj_data = phase_duration_by_project_with_name(proj_id, cur, 
+				start_date, end_date)
+			self.proj_data2 = phase_duration_by_project_with_name(proj_id2, cur, 
+				start_date, end_date)
+			self.proj_data3 = phase_duration_by_project_with_name(proj_id3, cur, 
+				start_date, end_date)
+		if self.project_vs_average == 1:
+			self.projectPhasesVsAverages()
+
+	def barsToPie(self) -> None:
+		if self.project_vs_average == 1:
+			self.project_vs_average = 0
+			self.ShowAllProjectsChkBx.hide()
+			self.ProjectComboBox.hide()
+			self.ProjectVsAveragesBtn.show()
+			self.Show2ndProjectChkBx.setChecked(False)
+			self.Show2ndProjectChkBx.hide()
+			self.Project2ComboBox.hide()
+			self.Show3rdProjectChkBx.setChecked(False)
+			self.Show3rdProjectChkBx.hide()
+			self.Project3ComboBox.hide()
+			self.ChoseDateChkBx.setChecked(False)
+			self.ProjectComboBox.setCurrentIndex(self.original_project_row)
+			self.Project2ComboBox.setCurrentIndex(self.original_project_row)
+			self.Project3ComboBox.setCurrentIndex(self.original_project_row)
+		if self.bar_or_pie == 0:
+			self.bar_or_pie = 1
+			self.PieToBarBtn.setText("Bar Chart")
+		else:
+			self.bar_or_pie = 0
+			self.PieToBarBtn.setText("Pie Chart")
+		self.barsOrPie()
+
+	def barsOrPie(self) -> None:
+		if self.bar_or_pie == 1:
+			self.PhaseAverageWidget.pie_by_phase(self.total_hours, 
+				"Total Time Breakdown")
+			self.NonBillableTimesChkBx.show()
+			self.AvgTotalTimeChkBx.setChecked(False)
+			self.AvgTotalTimeChkBx.hide()
+		else:
+			self.PhaseAverageWidget.bars_by_phase(self.avg_data_tuple, 
+				"Average Hours Per Phase")
+			self.AvgTotalTimeChkBx.show()
+			self.NonBillableTimesChkBx.setChecked(False)
+			self.NonBillableTimesChkBx.hide()
+
+	def projectPhasesVsAverages(self) -> None:
+		if self.Show3rdProjectChkBx.checkState().value == 2:
+			self.PhaseAverageWidget.bars_projects_vs_average(self.avg_data_tuple, 
+				self.proj_data, self.proj_data2, self.proj_data3)
+		elif self.Show2ndProjectChkBx.checkState().value == 2:
+			self.PhaseAverageWidget.bars_projects_vs_average(self.avg_data_tuple, 
+				self.proj_data, self.proj_data2)
+		else:
+			self.PhaseAverageWidget.bars_projects_vs_average(self.avg_data_tuple, 
+				self.proj_data)
+
+	def showHideTotalTimes(self, signal) -> None:
+		if signal == 2 and self.bar_or_pie == 0:
+			self.PhaseAverageWidget.bars_by_phase(self.total_hours, 
+				"Total Time By Phase")
+		elif signal == 0 and self.bar_or_pie == 0:
+			self.PhaseAverageWidget.bars_by_phase(self.avg_data_tuple, 
+				"Average Hours Per Phase")
+
+	def showHideNonbillable(self, signal) -> None:
+		if signal == 2 and self.bar_or_pie == 1:
+			self.PhaseAverageWidget.pie_by_phase(self.shifted_total_hours,
+				"Total Billable Time Breakdown")
+		elif signal == 0 and self.bar_or_pie == 1:
+			self.PhaseAverageWidget.pie_by_phase(self.total_hours,
+				"Total Time Breakdown")
+
+	def showDateRange(self, signal) -> None:
+		if signal == 2:
+			self.StartDateEdit.show()
+			self.EndDateEdit.show()
+		else:
+			self.StartDateEdit.hide()
+			self.EndDateEdit.hide()
+			self.total_hours = self.original_total_hours
+			self.shifted_total_hours = self.original_shifted_total_hours
+			self.avg_data_tuple = self.original_avg_tuple
+			self.StartDateEdit.setDate(self.start_date)
+			self.EndDateEdit.setDate(self.current_date)
+
+	def selectDateRange(self) -> None:
+		start_date = self.StartDateEdit.date()
+		end_date = self.EndDateEdit.date()
+		pyDatetime_start = start_date.toPython()
+		pyDatetime_end = end_date .toPython()
+		int_start_time = int(datetime(pyDatetime_start.year, pyDatetime_start.month,
+			pyDatetime_start.day).timestamp())
+		int_end_time = int(datetime(pyDatetime_end.year, pyDatetime_end.month, 
+			pyDatetime_end.day).timestamp())
+		self.getData(int_start_time, int_end_time)
+		self.getAveragesData(int_start_time, int_end_time)
+		if self.project_vs_average == 0:
+			if self.bar_or_pie == 0:
+				self.showHideTotalTimes(self.AvgTotalTimeChkBx.checkState().value)
+			else:
+				self.showHideNonbillable(self.NonBillableTimesChkBx.checkState().value)
+		else:
+			self.projectPhasesVsAverages()
+
+	def projectVsAverages(self) -> None:
+		self.project_vs_average = 1
+		self.ShowAllProjectsChkBx.show()
+		self.ProjectComboBox.show()
+		self.Show2ndProjectChkBx.show()
+		self.ProjectVsAveragesBtn.hide()
+		self.AvgTotalTimeChkBx.hide()
+		self.NonBillableTimesChkBx.hide()
+		self.getAveragesData()
+		self.projectPhasesVsAverages()
+
+	def projectVsAverages2ndProject(self, signal) -> None:
+		if signal == 2:
+			self.Project2ComboBox.show()
+			self.Show3rdProjectChkBx.show()
+			self.projectPhasesVsAverages()
+		else:
+			self.Project2ComboBox.hide()
+			self.Show3rdProjectChkBx.setChecked(False)
+			self.Show3rdProjectChkBx.hide()
+			self.projectPhasesVsAverages()
+
+	def projectVsAverages3rdProject(self, signal) -> None:
+		if signal == 2:
+			self.Project3ComboBox.show()
+			self.projectPhasesVsAverages()
+		else:
+			self.Project3ComboBox.hide()
+			self.projectPhasesVsAverages()
+
+	def projectFilter(self, signal):
+		proj_index1 = self.ProjectComboBox.currentIndex()
+		proj_index2 = self.Project2ComboBox.currentIndex()
+		proj_index3 = self.Project3ComboBox.currentIndex()
+		proj_model = self.ProjectComboBox.model()
+		current_proj1_id = proj_model.data(proj_model.index(proj_index1, 0))
+		current_proj2_id = proj_model.data(proj_model.index(proj_index2, 0))
+		current_proj3_id = proj_model.data(proj_model.index(proj_index3, 0))
+		
+		if signal == 2:
+			self.project_model.setFilter("project_id > 0")
+		else:
+			self.project_model.setFilter(
+				f"project_id > 0 AND start_date > {self.start_date_int}")
+		
+		proj1_match = self.project_model.match(self.project_model.index(0,0),
+			Qt.EditRole, current_proj1_id, 1, Qt.MatchFlags(Qt.MatchExactly))
+		if proj1_match:
+			row1 = proj1_match[0].row()
+			self.ProjectComboBox.setCurrentIndex(row1)
+		else:
+			self.ProjectComboBox.setCurrentIndex(self.original_project_row)
+		
+		proj2_match = self.project_model.match(self.project_model.index(0,0),
+			Qt.EditRole, current_proj2_id, 1, Qt.MatchFlags(Qt.MatchExactly))
+		if proj2_match:
+			row2 = proj2_match[0].row()
+			self.Project2ComboBox.setCurrentIndex(row2)
+		else:
+			self.Project2ComboBox.setCurrentIndex(self.original_project_row)
+		
+		proj3_match = self.project_model.match(self.project_model.index(0,0),
+			Qt.EditRole, current_proj3_id, 1, Qt.MatchFlags(Qt.MatchExactly))
+		if proj3_match:
+			row3 = proj3_match[0].row()
+			self.Project3ComboBox.setCurrentIndex(row3)
+		else:
+			self.Project3ComboBox.setCurrentIndex(self.original_project_row)
+
 
 #		~~~TIME LOGGERS~~~
 
@@ -1416,7 +1759,6 @@ class TimerDisplay(QLCDNumber):
 
 # Import ui.TimeLogger after TimerDisplay to stop circular import
 from ui.TimeLogger import Ui_TimeLoggerWindow
-
 
 class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 	def __init__(self, main_window) -> None:

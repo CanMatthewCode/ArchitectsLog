@@ -81,7 +81,7 @@
       </widget>
      </item>
      <item alignment="Qt::AlignmentFlag::AlignHCenter">
-      <widget class="QCheckBox" name="showAllProjectsChkBx">
+      <widget class="QCheckBox" name="ShowAllProjectsChkBx">
        <property name="styleSheet">
         <string notr="true">QCheckBox{
 	color : #89D5D2;
@@ -108,7 +108,7 @@
     </layout>
    </item>
    <item alignment="Qt::AlignmentFlag::AlignHCenter">
-    <widget class="QPushButton" name="barsStemToPieStepBtn">
+    <widget class="QPushButton" name="BarsStemToPieStepBtn">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
        <horstretch>20</horstretch>

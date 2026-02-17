@@ -65,7 +65,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QCheckBox" name="showAllProjectsChkBx">
+      <widget class="QCheckBox" name="ShowAllProjectsChkBx">
        <property name="styleSheet">
         <string notr="true">QCheckBox{
 	color : #89D5D2;
@@ -146,16 +146,19 @@
        <property name="orientation">
         <enum>Qt::Orientation::Horizontal</enum>
        </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Policy::MinimumExpanding</enum>
+       </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>40</width>
+         <width>230</width>
          <height>20</height>
         </size>
        </property>
       </spacer>
      </item>
      <item>
-      <widget class="QCheckBox" name="show2ndProjectChkBx">
+      <widget class="QCheckBox" name="Show2ndProjectChkBx">
        <property name="styleSheet">
         <string notr="true">QCheckBox{
 	color : #89D5D2;
@@ -167,7 +170,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="show3rdProjectChkBx">
+      <widget class="QCheckBox" name="Show3rdProjectChkBx">
        <property name="styleSheet">
         <string notr="true">QCheckBox{
 	color : #89D5D2;
@@ -179,7 +182,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="ProjectVsAveragesChkBx">
+      <widget class="QPushButton" name="ProjectVsAveragesBtn">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>20</horstretch>
@@ -201,16 +204,16 @@
         <string notr="true">QPushButton{
 	border-radius: 12px;
 	border: 1px solid black;
-	background-color: #35B5AC;
+	background-color: #89D5D2;
 	color: black;
 }
 
-QPushButton:hover {
-	background-color: #2A9089;
+QPushButton:hover{
+	background-color: #6FB5B2;
 }
 
 QPushButton:pressed {
-	background-color: #1F6B66;
+	background-color: #5A9695
 }</string>
        </property>
        <property name="text">
@@ -235,7 +238,7 @@ QPushButton:pressed {
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="BarToPieBtn">
+      <widget class="QPushButton" name="PieToBarBtn">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>20</horstretch>
@@ -257,32 +260,20 @@ QPushButton:pressed {
         <string notr="true">QPushButton{
 	border-radius: 12px;
 	border: 1px solid black;
-	background-color: #35B5AC;
+	background-color: #89D5D2;
 	color: black;
 }
 
-QPushButton:hover {
-	background-color: #2A9089;
+QPushButton:hover{
+	background-color: #6FB5B2;
 }
 
 QPushButton:pressed {
-	background-color: #1F6B66;
+	background-color: #5A9695
 }</string>
        </property>
        <property name="text">
         <string>Pie Chart</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="NonBillableTimesBtn">
-       <property name="styleSheet">
-        <string notr="true">QCheckBox{
-	color : #89D5D2;
-}</string>
-       </property>
-       <property name="text">
-        <string>Show Non-Billable Times</string>
        </property>
       </widget>
      </item>
@@ -292,11 +283,119 @@ QPushButton:pressed {
         <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeType">
-        <enum>QSizePolicy::Policy::Fixed</enum>
+        <enum>QSizePolicy::Policy::MinimumExpanding</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>200</width>
+         <width>370</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <spacer name="horizontalSpacer_6">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Policy::MinimumExpanding</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>400</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="ChoseDateChkBx">
+       <property name="styleSheet">
+        <string notr="true">QCheckBox{
+	color : #89D5D2;
+}</string>
+       </property>
+       <property name="text">
+        <string>Choose Date Range</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDateEdit" name="StartDateEdit">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>30</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QDateEdit{
+	color : #89D5D2;
+}</string>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDateEdit" name="EndDateEdit">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>20</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QDateEdit{
+	color : #89D5D2;
+}</string>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="AvgTotalTimeChkBx">
+       <property name="styleSheet">
+        <string notr="true">QCheckBox{
+	color : #89D5D2;
+}</string>
+       </property>
+       <property name="text">
+        <string>Show Total Times</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="NonBillableTimesChkBx">
+       <property name="styleSheet">
+        <string notr="true">QCheckBox{
+	color : #89D5D2;
+}</string>
+       </property>
+       <property name="text">
+        <string>Hide Non-Billable Times</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_7">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Policy::MinimumExpanding</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>550</width>
          <height>20</height>
         </size>
        </property>

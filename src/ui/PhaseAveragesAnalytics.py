@@ -15,9 +15,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFrame,
-    QGridLayout, QHBoxLayout, QPushButton, QSizePolicy,
-    QSpacerItem, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateEdit,
+    QFrame, QGridLayout, QHBoxLayout, QPushButton,
+    QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
 
 from architectsLog_analytics import AnalyticsChartDesigner
 
@@ -58,13 +58,13 @@ class Ui_PhaseAveragesWindow(object):
 
         self.horizontalLayout.addItem(self.horizontalSpacer)
 
-        self.showAllProjectsChkBx = QCheckBox(PhaseAveragesWindow)
-        self.showAllProjectsChkBx.setObjectName(u"showAllProjectsChkBx")
-        self.showAllProjectsChkBx.setStyleSheet(u"QCheckBox{\n"
+        self.ShowAllProjectsChkBx = QCheckBox(PhaseAveragesWindow)
+        self.ShowAllProjectsChkBx.setObjectName(u"ShowAllProjectsChkBx")
+        self.ShowAllProjectsChkBx.setStyleSheet(u"QCheckBox{\n"
 "	color : #89D5D2;\n"
 "}")
 
-        self.horizontalLayout.addWidget(self.showAllProjectsChkBx)
+        self.horizontalLayout.addWidget(self.ShowAllProjectsChkBx)
 
         self.ProjectComboBox = QComboBox(PhaseAveragesWindow)
         self.ProjectComboBox.setObjectName(u"ProjectComboBox")
@@ -102,25 +102,25 @@ class Ui_PhaseAveragesWindow(object):
 
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        self.horizontalSpacer_3 = QSpacerItem(230, 20, QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_2.addItem(self.horizontalSpacer_3)
 
-        self.show2ndProjectChkBx = QCheckBox(PhaseAveragesWindow)
-        self.show2ndProjectChkBx.setObjectName(u"show2ndProjectChkBx")
-        self.show2ndProjectChkBx.setStyleSheet(u"QCheckBox{\n"
+        self.Show2ndProjectChkBx = QCheckBox(PhaseAveragesWindow)
+        self.Show2ndProjectChkBx.setObjectName(u"Show2ndProjectChkBx")
+        self.Show2ndProjectChkBx.setStyleSheet(u"QCheckBox{\n"
 "	color : #89D5D2;\n"
 "}")
 
-        self.horizontalLayout_2.addWidget(self.show2ndProjectChkBx)
+        self.horizontalLayout_2.addWidget(self.Show2ndProjectChkBx)
 
-        self.show3rdProjectChkBx = QCheckBox(PhaseAveragesWindow)
-        self.show3rdProjectChkBx.setObjectName(u"show3rdProjectChkBx")
-        self.show3rdProjectChkBx.setStyleSheet(u"QCheckBox{\n"
+        self.Show3rdProjectChkBx = QCheckBox(PhaseAveragesWindow)
+        self.Show3rdProjectChkBx.setObjectName(u"Show3rdProjectChkBx")
+        self.Show3rdProjectChkBx.setStyleSheet(u"QCheckBox{\n"
 "	color : #89D5D2;\n"
 "}")
 
-        self.horizontalLayout_2.addWidget(self.show3rdProjectChkBx)
+        self.horizontalLayout_2.addWidget(self.Show3rdProjectChkBx)
 
         self.ProjectVsAveragesBtn = QPushButton(PhaseAveragesWindow)
         self.ProjectVsAveragesBtn.setObjectName(u"ProjectVsAveragesBtn")
@@ -136,16 +136,16 @@ class Ui_PhaseAveragesWindow(object):
         self.ProjectVsAveragesBtn.setStyleSheet(u"QPushButton{\n"
 "	border-radius: 12px;\n"
 "	border: 1px solid black;\n"
-"	background-color: #35B5AC;\n"
+"	background-color: #89D5D2;\n"
 "	color: black;\n"
 "}\n"
 "\n"
-"QPushButton:hover {\n"
-"	background-color: #2A9089;\n"
+"QPushButton:hover{\n"
+"	background-color: #6FB5B2;\n"
 "}\n"
 "\n"
 "QPushButton:pressed {\n"
-"	background-color: #1F6B66;\n"
+"	background-color: #5A9695\n"
 "}")
 
         self.horizontalLayout_2.addWidget(self.ProjectVsAveragesBtn)
@@ -154,35 +154,100 @@ class Ui_PhaseAveragesWindow(object):
 
         self.horizontalLayout_2.addItem(self.horizontalSpacer_5)
 
-        self.BarToPieBtn = QPushButton(PhaseAveragesWindow)
-        self.BarToPieBtn.setObjectName(u"BarToPieBtn")
-        sizePolicy2.setHeightForWidth(self.BarToPieBtn.sizePolicy().hasHeightForWidth())
-        self.BarToPieBtn.setSizePolicy(sizePolicy2)
-        self.BarToPieBtn.setMinimumSize(QSize(200, 40))
-        self.BarToPieBtn.setFont(font)
-        self.BarToPieBtn.setStyleSheet(u"QPushButton{\n"
+        self.PieToBarBtn = QPushButton(PhaseAveragesWindow)
+        self.PieToBarBtn.setObjectName(u"PieToBarBtn")
+        sizePolicy2.setHeightForWidth(self.PieToBarBtn.sizePolicy().hasHeightForWidth())
+        self.PieToBarBtn.setSizePolicy(sizePolicy2)
+        self.PieToBarBtn.setMinimumSize(QSize(200, 40))
+        self.PieToBarBtn.setFont(font)
+        self.PieToBarBtn.setStyleSheet(u"QPushButton{\n"
 "	border-radius: 12px;\n"
 "	border: 1px solid black;\n"
-"	background-color: #35B5AC;\n"
+"	background-color: #89D5D2;\n"
 "	color: black;\n"
 "}\n"
 "\n"
-"QPushButton:hover {\n"
-"	background-color: #2A9089;\n"
+"QPushButton:hover{\n"
+"	background-color: #6FB5B2;\n"
 "}\n"
 "\n"
 "QPushButton:pressed {\n"
-"	background-color: #1F6B66;\n"
+"	background-color: #5A9695\n"
 "}")
 
-        self.horizontalLayout_2.addWidget(self.BarToPieBtn)
+        self.horizontalLayout_2.addWidget(self.PieToBarBtn)
 
-        self.horizontalSpacer_4 = QSpacerItem(400, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
+        self.horizontalSpacer_4 = QSpacerItem(370, 20, QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_2.addItem(self.horizontalSpacer_4)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout_2)
+
+        self.horizontalLayout_3 = QHBoxLayout()
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.horizontalSpacer_6 = QSpacerItem(400, 20, QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_3.addItem(self.horizontalSpacer_6)
+
+        self.ChoseDateChkBx = QCheckBox(PhaseAveragesWindow)
+        self.ChoseDateChkBx.setObjectName(u"ChoseDateChkBx")
+        self.ChoseDateChkBx.setStyleSheet(u"QCheckBox{\n"
+"	color : #89D5D2;\n"
+"}")
+
+        self.horizontalLayout_3.addWidget(self.ChoseDateChkBx)
+
+        self.StartDateEdit = QDateEdit(PhaseAveragesWindow)
+        self.StartDateEdit.setObjectName(u"StartDateEdit")
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        sizePolicy3.setHorizontalStretch(30)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.StartDateEdit.sizePolicy().hasHeightForWidth())
+        self.StartDateEdit.setSizePolicy(sizePolicy3)
+        self.StartDateEdit.setStyleSheet(u"QDateEdit{\n"
+"	color : #89D5D2;\n"
+"}")
+        self.StartDateEdit.setCalendarPopup(True)
+
+        self.horizontalLayout_3.addWidget(self.StartDateEdit)
+
+        self.EndDateEdit = QDateEdit(PhaseAveragesWindow)
+        self.EndDateEdit.setObjectName(u"EndDateEdit")
+        sizePolicy4 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        sizePolicy4.setHorizontalStretch(20)
+        sizePolicy4.setVerticalStretch(0)
+        sizePolicy4.setHeightForWidth(self.EndDateEdit.sizePolicy().hasHeightForWidth())
+        self.EndDateEdit.setSizePolicy(sizePolicy4)
+        self.EndDateEdit.setStyleSheet(u"QDateEdit{\n"
+"	color : #89D5D2;\n"
+"}")
+        self.EndDateEdit.setCalendarPopup(True)
+
+        self.horizontalLayout_3.addWidget(self.EndDateEdit)
+
+        self.AvgTotalTimeChkBx = QCheckBox(PhaseAveragesWindow)
+        self.AvgTotalTimeChkBx.setObjectName(u"AvgTotalTimeChkBx")
+        self.AvgTotalTimeChkBx.setStyleSheet(u"QCheckBox{\n"
+"	color : #89D5D2;\n"
+"}")
+
+        self.horizontalLayout_3.addWidget(self.AvgTotalTimeChkBx)
+
+        self.NonBillableTimesChkBx = QCheckBox(PhaseAveragesWindow)
+        self.NonBillableTimesChkBx.setObjectName(u"NonBillableTimesChkBx")
+        self.NonBillableTimesChkBx.setStyleSheet(u"QCheckBox{\n"
+"	color : #89D5D2;\n"
+"}")
+
+        self.horizontalLayout_3.addWidget(self.NonBillableTimesChkBx)
+
+        self.horizontalSpacer_7 = QSpacerItem(550, 20, QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_3.addItem(self.horizontalSpacer_7)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout_3)
 
 
         self.retranslateUi(PhaseAveragesWindow)
@@ -192,10 +257,13 @@ class Ui_PhaseAveragesWindow(object):
 
     def retranslateUi(self, PhaseAveragesWindow):
         PhaseAveragesWindow.setWindowTitle(QCoreApplication.translate("PhaseAveragesWindow", u"Form", None))
-        self.showAllProjectsChkBx.setText(QCoreApplication.translate("PhaseAveragesWindow", u"Show All Projects", None))
-        self.show2ndProjectChkBx.setText(QCoreApplication.translate("PhaseAveragesWindow", u"Add 2nd Project", None))
-        self.show3rdProjectChkBx.setText(QCoreApplication.translate("PhaseAveragesWindow", u"Add 3rd Project", None))
+        self.ShowAllProjectsChkBx.setText(QCoreApplication.translate("PhaseAveragesWindow", u"Show All Projects", None))
+        self.Show2ndProjectChkBx.setText(QCoreApplication.translate("PhaseAveragesWindow", u"Add 2nd Project", None))
+        self.Show3rdProjectChkBx.setText(QCoreApplication.translate("PhaseAveragesWindow", u"Add 3rd Project", None))
         self.ProjectVsAveragesBtn.setText(QCoreApplication.translate("PhaseAveragesWindow", u"Project Vs Averages", None))
-        self.BarToPieBtn.setText(QCoreApplication.translate("PhaseAveragesWindow", u"Pie Chart", None))
+        self.PieToBarBtn.setText(QCoreApplication.translate("PhaseAveragesWindow", u"Pie Chart", None))
+        self.ChoseDateChkBx.setText(QCoreApplication.translate("PhaseAveragesWindow", u"Choose Date Range", None))
+        self.AvgTotalTimeChkBx.setText(QCoreApplication.translate("PhaseAveragesWindow", u"Show Total Times", None))
+        self.NonBillableTimesChkBx.setText(QCoreApplication.translate("PhaseAveragesWindow", u"Hide Non-Billable Times", None))
     # retranslateUi
 

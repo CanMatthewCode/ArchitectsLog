@@ -69,13 +69,13 @@ class Ui_PhaseHoursWindow(object):
 
         self.horizontalLayout.addWidget(self.ProjectComboBox, 0, Qt.AlignmentFlag.AlignHCenter)
 
-        self.showAllProjectsChkBx = QCheckBox(PhaseHoursWindow)
-        self.showAllProjectsChkBx.setObjectName(u"showAllProjectsChkBx")
-        self.showAllProjectsChkBx.setStyleSheet(u"QCheckBox{\n"
+        self.ShowAllProjectsChkBx = QCheckBox(PhaseHoursWindow)
+        self.ShowAllProjectsChkBx.setObjectName(u"ShowAllProjectsChkBx")
+        self.ShowAllProjectsChkBx.setStyleSheet(u"QCheckBox{\n"
 "	color : #89D5D2;\n"
 "}")
 
-        self.horizontalLayout.addWidget(self.showAllProjectsChkBx, 0, Qt.AlignmentFlag.AlignHCenter)
+        self.horizontalLayout.addWidget(self.ShowAllProjectsChkBx, 0, Qt.AlignmentFlag.AlignHCenter)
 
         self.horizontalSpacer_2 = QSpacerItem(450, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
@@ -84,18 +84,18 @@ class Ui_PhaseHoursWindow(object):
 
         self.verticalLayout.addLayout(self.horizontalLayout)
 
-        self.barsStemToPieStepBtn = QPushButton(PhaseHoursWindow)
-        self.barsStemToPieStepBtn.setObjectName(u"barsStemToPieStepBtn")
+        self.BarsStemToPieStepBtn = QPushButton(PhaseHoursWindow)
+        self.BarsStemToPieStepBtn.setObjectName(u"BarsStemToPieStepBtn")
         sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
         sizePolicy2.setHorizontalStretch(20)
         sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.barsStemToPieStepBtn.sizePolicy().hasHeightForWidth())
-        self.barsStemToPieStepBtn.setSizePolicy(sizePolicy2)
-        self.barsStemToPieStepBtn.setMinimumSize(QSize(200, 40))
+        sizePolicy2.setHeightForWidth(self.BarsStemToPieStepBtn.sizePolicy().hasHeightForWidth())
+        self.BarsStemToPieStepBtn.setSizePolicy(sizePolicy2)
+        self.BarsStemToPieStepBtn.setMinimumSize(QSize(200, 40))
         font = QFont()
         font.setPointSize(18)
-        self.barsStemToPieStepBtn.setFont(font)
-        self.barsStemToPieStepBtn.setStyleSheet(u"QPushButton{\n"
+        self.BarsStemToPieStepBtn.setFont(font)
+        self.BarsStemToPieStepBtn.setStyleSheet(u"QPushButton{\n"
 "	border-radius: 12px;\n"
 "	border: 1px solid black;\n"
 "	background-color: #35B5AC;\n"
@@ -110,7 +110,7 @@ class Ui_PhaseHoursWindow(object):
 "	background-color: #1F6B66;\n"
 "}")
 
-        self.verticalLayout.addWidget(self.barsStemToPieStepBtn, 0, Qt.AlignmentFlag.AlignHCenter)
+        self.verticalLayout.addWidget(self.BarsStemToPieStepBtn, 0, Qt.AlignmentFlag.AlignHCenter)
 
 
         self.retranslateUi(PhaseHoursWindow)
@@ -120,7 +120,7 @@ class Ui_PhaseHoursWindow(object):
 
     def retranslateUi(self, PhaseHoursWindow):
         PhaseHoursWindow.setWindowTitle(QCoreApplication.translate("PhaseHoursWindow", u"Form", None))
-        self.showAllProjectsChkBx.setText(QCoreApplication.translate("PhaseHoursWindow", u"Show All Projects", None))
-        self.barsStemToPieStepBtn.setText(QCoreApplication.translate("PhaseHoursWindow", u"Pie Chart", None))
+        self.ShowAllProjectsChkBx.setText(QCoreApplication.translate("PhaseHoursWindow", u"Show All Projects", None))
+        self.BarsStemToPieStepBtn.setText(QCoreApplication.translate("PhaseHoursWindow", u"Pie Chart", None))
     # retranslateUi
 

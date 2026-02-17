@@ -1363,7 +1363,8 @@ class ViewProjectPhases(QWidget, Ui_PhaseHoursWindow):
 				self.stem_phase_data = phase_time_entries_by_project(proj_id, cur)
 
 		if self.chart_type == 'bar_pie':
-			self.PhaseHoursWidget.bars_by_phase(self.bar_phase_data)
+			self.PhaseHoursWidget.bars_by_phase(self.bar_phase_data, 
+				phase_names_length = 1)
 		else:
 			self.BarsStemToPieStepBtn.setText("Stem Chart")
 			self.PhaseHoursWidget.step_plot_phases(self.stem_phase_data)
@@ -1390,7 +1391,8 @@ class ViewProjectPhases(QWidget, Ui_PhaseHoursWindow):
 
 	def barsOrPie(self) -> None:
 		if self.barStem_or_pieStep == 0:
-			self.PhaseHoursWidget.bars_by_phase(self.bar_phase_data)
+			self.PhaseHoursWidget.bars_by_phase(self.bar_phase_data, 
+				phase_names_length = 1)
 			self.BarsStemToPieStepBtn.setText("Pie Chart")
 		else:
 			self.PhaseHoursWidget.pie_by_phase(self.bar_phase_data)
@@ -1494,7 +1496,7 @@ class ViewProjectAverages(QWidget, Ui_PhaseAveragesWindow):
 		self.Project3ComboBox.setCurrentIndex(self.original_project_row)
 
 		self.PhaseAverageWidget.bars_by_phase(self.avg_data_tuple, 
-			"Average Hours Per Phase")
+			"Average Hours Per Phase", phase_names_length = 1)
 
 		self.PieToBarBtn.clicked.connect(self.barsToPie)
 		self.AvgTotalTimeChkBx.stateChanged.connect(self.showHideTotalTimes)
@@ -1605,7 +1607,7 @@ class ViewProjectAverages(QWidget, Ui_PhaseAveragesWindow):
 			self.AvgTotalTimeChkBx.hide()
 		else:
 			self.PhaseAverageWidget.bars_by_phase(self.avg_data_tuple, 
-				"Average Hours Per Phase")
+				"Average Hours Per Phase", phase_names_length = 1)
 			self.AvgTotalTimeChkBx.show()
 			self.NonBillableTimesChkBx.setChecked(False)
 			self.NonBillableTimesChkBx.hide()
@@ -1624,10 +1626,10 @@ class ViewProjectAverages(QWidget, Ui_PhaseAveragesWindow):
 	def showHideTotalTimes(self, signal) -> None:
 		if signal == 2 and self.bar_or_pie == 0:
 			self.PhaseAverageWidget.bars_by_phase(self.total_hours, 
-				"Total Time By Phase")
+				"Total Time By Phase", phase_names_length = 1)
 		elif signal == 0 and self.bar_or_pie == 0:
 			self.PhaseAverageWidget.bars_by_phase(self.avg_data_tuple, 
-				"Average Hours Per Phase")
+				"Average Hours Per Phase", phase_names_length = 1)
 
 	def showHideNonbillable(self, signal) -> None:
 		if signal == 2 and self.bar_or_pie == 1:

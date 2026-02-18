@@ -357,7 +357,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 
 	def bars_projects_by_phase(self, 
 		projects_phase_data: list[list[tuple[int, int]]], 
-		project_names: list[str]) -> None:
+		project_names: list[str], add_legend: Optional[str] = None) -> None:
 		"""Method to show stacked bar graphs by phase for multiple projects"""
 		if not projects_phase_data or len(projects_phase_data) == 0:
 			self.no_data_message("Projects By Phase")
@@ -369,7 +369,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		for i in range(len(self.PHASE_NAMES)):
 			projects_by_phase_list.append([])
 
-#		phase_ids = []
+		phase_ids = []
 		phase_num = 1
 		j = 0
 		for i in range(len(projects_phase_data)):
@@ -379,7 +379,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 				elif projects_phase_data[i][j][0] == phase_num:
 					projects_by_phase_list[phase_num-1].append(
 						projects_phase_data[i][j][1])
-#					phase_ids.append(phase_num)
+					phase_ids.append(phase_num)
 				elif projects_phase_data[i][j][0] > phase_num:
 					projects_by_phase_list[phase_num-1].append(0)
 					j -= 1
@@ -400,9 +400,14 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 			bottoms = [bottom + phase_hours for bottom, phase_hours in 
 				zip(bottoms, projects_by_phase_list[i])]
 
+		fontsize = 6
+		if len(x_positions) <= 8:
+			fontsize = 8
+		if len(x_positions) <= 4:
+			fontsize = 10
 		for x, height in zip(x_positions, bottoms):
 			self.ax.text(x, height + 5, str(height), 
-				ha='center', color = '#A0E0DD', fontsize=6)
+				ha='center', color = '#A0E0DD', fontsize=fontsize)
 
 		max_height = max(bottoms)
 		self.ax.set_ylim(0, max_height + 20)
@@ -412,7 +417,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		self.ax.spines['top'].set_visible(False)
 		self.ax.spines['right'].set_visible(False)
 
-		self.ax.tick_params(axis='x', rotation=15, labelsize=6, colors='#89D5D2')
+		self.ax.tick_params(axis='x', rotation=15, labelsize=fontsize, colors='#89D5D2')
 		self.ax.tick_params(axis='y', labelsize=8, colors='#89D5D2')
 
 		self.ax.set_xticks(x_positions)
@@ -422,22 +427,24 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 			fontsize=12, y=0.97)
 		self.ax.set_ylabel('Total Hours', color='#89D5D2')
 
-		self.draw()
+		if add_legend:
+			self.ax.set_position([0.05, 0.1, 0.77, 0.8])
+			unique_phases = sorted(set(phase_ids))
+			legend_elements = [Patch(facecolor=self.PHASE_COLORS[pid-1], 
+				label=self.PHASE_NAMES[pid-1]) 
+	 			for pid in unique_phases]
+			legend = self.ax.legend(
+				handles=legend_elements, 
+				title="Phases", 
+				loc="center left", 
+				bbox_to_anchor=(1, 0, 0.5, 1),
+				prop={'size': 9},
+				facecolor='#A0E0DD',
+				edgecolor='#1E2E34')
+			legend.get_title().set_fontsize(11)
+			legend.get_title().set_weight('bold')
 
-		#unique_phases = sorted(set(phase_ids))
-		#legend_elements = [Patch(facecolor=self.PHASE_COLORS[pid-1], 
-		#	label=self.PHASE_NAMES[pid-1]) 
- 		#	for pid in unique_phases]
-		#legend = self.ax.legend(
-		#	handles=legend_elements, 
-		#	title="Phases", 
-		#	loc="center left", 
-		#	bbox_to_anchor=(1, 0, 0.5, 1),
-		#	prop={'size': 9},
-		#	facecolor='#A0E0DD',
-		#	edgecolor='#1E2E34')
-		#legend.get_title().set_fontsize(11)
-		#legend.get_title().set_weight('bold')
+		self.draw()
 
 	def no_data_message(self, title="No Data Available") -> None:
 		self.fig.clear()

@@ -46,7 +46,7 @@ from architectsLog_analytics import AnalyticsChartDesigner
 from architectsLog_analytics_db import (phase_duration_by_project, 
 	phase_time_entries_by_project, phase_duration_all_projects, 
 	phase_duration_by_project_with_name, total_number_of_projects_by_phase,
-	project_ids_over_time_period, project_start_date)
+	project_ids_over_time_period, earliest_start_date)
 
 def initialize_database(DB_FILE: str) -> None:
 	"""Open the persistent global Qt connection to the database"""
@@ -1451,6 +1451,9 @@ class ViewProjectAverages(QWidget, Ui_PhaseAveragesWindow):
 		self.proj_data2 = 0
 		self.proj_data3 = 0
 
+		self.current_start_date = None
+		self.current_end_date = None
+
 		self.ShowAllProjectsChkBx.hide()
 		self.ProjectComboBox.hide()
 		self.Project2ComboBox.hide()
@@ -1522,7 +1525,7 @@ class ViewProjectAverages(QWidget, Ui_PhaseAveragesWindow):
 		with get_db_connection() as conn:
 			cur = conn.cursor()
 			self.total_hours = phase_duration_all_projects(cur, start_date, end_date)
-			self.first_proj_start_date = project_start_date(1, cur)
+			self.first_proj_start_date = earliest_start_date(cur)
 			num_proj_by_phase_tuple = total_number_of_projects_by_phase(cur, start_date,
 				end_date)
 			arch_proj_ids = get_most_recent_archid_and_projid(cur)
@@ -1555,8 +1558,7 @@ class ViewProjectAverages(QWidget, Ui_PhaseAveragesWindow):
 			else:
 				self.original_project_row = 1
 
-	def getAveragesData(self, start_date: Optional[int] = None, 
-		end_date: Optional[int] = None) -> None:
+	def getAveragesData(self) -> None:
 		proj_index = self.ProjectComboBox.currentIndex()
 		proj_index2 = self.Project2ComboBox.currentIndex()
 		proj_index3 = self.Project3ComboBox.currentIndex()
@@ -1566,11 +1568,11 @@ class ViewProjectAverages(QWidget, Ui_PhaseAveragesWindow):
 		with get_db_connection() as conn:
 			cur = conn.cursor()
 			self.proj_data = phase_duration_by_project_with_name(proj_id, cur, 
-				start_date, end_date)
+				self.current_start_date, self.current_end_date)
 			self.proj_data2 = phase_duration_by_project_with_name(proj_id2, cur, 
-				start_date, end_date)
+				self.current_start_date, self.current_end_date)
 			self.proj_data3 = phase_duration_by_project_with_name(proj_id3, cur, 
-				start_date, end_date)
+				self.current_start_date, self.current_end_date)
 		if self.project_vs_average == 1:
 			self.projectPhasesVsAverages()
 
@@ -1614,9 +1616,19 @@ class ViewProjectAverages(QWidget, Ui_PhaseAveragesWindow):
 
 	def projectPhasesVsAverages(self) -> None:
 		if self.Show3rdProjectChkBx.checkState().value == 2:
+			if len(self.proj_data) == 0:
+				self.proj_data = self.proj_data2
+				self.proj_data2 = self.proj_data3
+				self.proj_data3 = []
+				if len(self.proj_data) == 0:
+					self.proj_data = self.proj_data2
+					self.proj_data2 = []
 			self.PhaseAverageWidget.bars_projects_vs_average(self.avg_data_tuple, 
 				self.proj_data, self.proj_data2, self.proj_data3)
 		elif self.Show2ndProjectChkBx.checkState().value == 2:
+			if len(self.proj_data) == 0:
+				self.proj_data = self.proj_data2
+				self.proj_data2 = []
 			self.PhaseAverageWidget.bars_projects_vs_average(self.avg_data_tuple, 
 				self.proj_data, self.proj_data2)
 		else:
@@ -1649,6 +1661,8 @@ class ViewProjectAverages(QWidget, Ui_PhaseAveragesWindow):
 			self.total_hours = self.original_total_hours
 			self.shifted_total_hours = self.original_shifted_total_hours
 			self.avg_data_tuple = self.original_avg_tuple
+			self.current_start_date = None
+			self.current_end_date = None
 			self.StartDateEdit.setDate(self.start_date)
 			self.EndDateEdit.setDate(self.current_date)
 
@@ -1661,8 +1675,10 @@ class ViewProjectAverages(QWidget, Ui_PhaseAveragesWindow):
 			pyDatetime_start.day).timestamp())
 		int_end_time = int(datetime(pyDatetime_end.year, pyDatetime_end.month, 
 			pyDatetime_end.day).timestamp())
+		self.current_start_date = int_start_time
+		self.current_end_date = int_end_time
 		self.getData(int_start_time, int_end_time)
-		self.getAveragesData(int_start_time, int_end_time)
+		self.getAveragesData()
 		if self.project_vs_average == 0:
 			if self.bar_or_pie == 0:
 				self.showHideTotalTimes(self.AvgTotalTimeChkBx.checkState().value)
@@ -1691,6 +1707,7 @@ class ViewProjectAverages(QWidget, Ui_PhaseAveragesWindow):
 			self.Project2ComboBox.hide()
 			self.Show3rdProjectChkBx.setChecked(False)
 			self.Show3rdProjectChkBx.hide()
+			self.getAveragesData()
 			self.projectPhasesVsAverages()
 
 	def projectVsAverages3rdProject(self, signal) -> None:
@@ -1699,6 +1716,7 @@ class ViewProjectAverages(QWidget, Ui_PhaseAveragesWindow):
 			self.projectPhasesVsAverages()
 		else:
 			self.Project3ComboBox.hide()
+			self.getAveragesData()
 			self.projectPhasesVsAverages()
 
 	def projectFilter(self, signal):

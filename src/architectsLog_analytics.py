@@ -269,7 +269,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		data2: Optional[list[tuple[int, int, str]]] = None,
 		data3: Optional[list[tuple[int, int, str]]] = None) -> None:
 		"""Method to compare up to 3 projects' phases to the average phase duration"""
-		if not average_data or len(average_data) == 0:
+		if not average_data or len(average_data) == 0 or not data1 or len(data1) == 0:
 			self.no_data_message("Project Phases vs Average")
 			return
 		self.fig.clear()
@@ -299,7 +299,6 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 
 		avg_y = [data[1] for data in average_data if data[0] in all_phases]
 
-		colors = self.PHASE_COLORS[:len(all_phases)]
 		num_projects = 1
 		if data2:
 			num_projects += 1
@@ -307,7 +306,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 			num_projects += 1
 
 		width = .75 / (num_projects + 1)
-		x_positions = range(1,len(all_phases)+1)
+		x_positions = all_phases
 
 		phase_name = [self.PHASE_NAMES[phase_id - 1] for phase_id in all_phases]
 		bars = self.ax.bar(all_phases, avg_y, width, color=self.PHASE_COLORS[7])

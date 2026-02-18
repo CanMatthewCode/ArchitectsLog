@@ -43,7 +43,7 @@ def get_db_connection(db_file: str | None = None) -> sqlite3.Connection:
 #	~~~TABLE CREATION FUNCTIONS~~~
 
 def create_architect_table(cur: sqlite3.Cursor) -> None:
-	"""Create Architect's Table"""
+	"""Create Architects Table"""
 	cur.execute('''
 		CREATE TABLE IF NOT EXISTS architects (
 			architect_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -57,7 +57,7 @@ def create_architect_table(cur: sqlite3.Cursor) -> None:
 	''')
 
 def create_project_table(cur: sqlite3.Cursor) -> None:
-	"""Create Project's Table"""
+	"""Create Projects Table"""
 	cur.execute('''
 		CREATE TABLE IF NOT EXISTS projects (
 			project_id INTEGER PRIMARY KEY AUTOINCREMENT,

@@ -96,6 +96,14 @@ def project_start_date(project_id: int, cur:sqlite3.Cursor) -> int:
 	cur.execute(sql, (project_id,))
 	return cur.fetchone()
 
+def earliest_start_date(cur: sqlite3.Cursor) -> None:
+	"""Retrieve the date of the projects table creation"""
+	sql = "SELECT start_date FROM projects \
+	WHERE project_id > 0 \
+	ORDER BY start_date ASC"
+	cur.execute(sql)
+	return cur.fetchone()
+
 def project_ids_over_time_period(start_date: int, end_date: int, 
 	cur:sqlite3.Cursor) -> list[int, str]:
 	"""Retrieve all project_ids within a time frame,

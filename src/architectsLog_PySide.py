@@ -33,6 +33,7 @@ from ui.ViewInvoice import Ui_ViewInvoiceWindow
 from ui.Analytics import Ui_AnalyticsWindow
 from ui.PhaseHoursAnalytics import Ui_PhaseHoursWindow
 from ui.PhaseAveragesAnalytics import Ui_PhaseAveragesWindow
+from ui.ProjectsOverTime import Ui_ProjectsOverTimeWindow
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry 
 from architectsLog_constants import	(PHASES, ARCHITECT_STATUSES, PROJECT_STATUSES, 
@@ -1302,6 +1303,7 @@ class ViewAnalytics(QWidget, Ui_AnalyticsWindow):
 		self.ProjectByPhaseBtn.clicked.connect(self.projectByPhase)
 		self.ProjectOverTimeBtn.clicked.connect(self.projectOverTime)
 		self.PhaseAveragesBtn.clicked.connect(self.averageProjectTime)
+		self.ProjectsOverTimeBtn.clicked.connect(self.projectsOverTime)
 
 		self.show()
 
@@ -1313,6 +1315,9 @@ class ViewAnalytics(QWidget, Ui_AnalyticsWindow):
 
 	def averageProjectTime(self) -> None:
 		self.phases_averages = ViewProjectAverages()
+
+	def projectsOverTime(self) -> None:
+		self.projects_by_phase = ViewProjectsOverTime()
 
 
 class ViewProjectPhases(QWidget, Ui_PhaseHoursWindow):
@@ -1670,7 +1675,7 @@ class ViewProjectAverages(QWidget, Ui_PhaseAveragesWindow):
 		start_date = self.StartDateEdit.date()
 		end_date = self.EndDateEdit.date()
 		pyDatetime_start = start_date.toPython()
-		pyDatetime_end = end_date .toPython()
+		pyDatetime_end = end_date.toPython()
 		int_start_time = int(datetime(pyDatetime_start.year, pyDatetime_start.month,
 			pyDatetime_start.day).timestamp())
 		int_end_time = int(datetime(pyDatetime_end.year, pyDatetime_end.month, 
@@ -1758,6 +1763,89 @@ class ViewProjectAverages(QWidget, Ui_PhaseAveragesWindow):
 		else:
 			self.Project3ComboBox.setCurrentIndex(self.original_project_row)
 
+class ViewProjectsOverTime(QWidget, Ui_ProjectsOverTimeWindow):
+	def __init__(self) -> None:
+		super(ViewProjectsOverTime, self).__init__()
+		self.setupUi(self)
+		self.setFixedSize(self.size())
+		self.setWindowTitle("Projects By Phase Over Time")
+
+		with get_db_connection() as conn:
+			cur = conn.cursor()
+			first_proj_start_date = earliest_start_date(cur)
+			self.earliest_start_date = first_proj_start_date[0]
+
+		end_time = datetime.now()
+		self.latest_end_date = int(end_time.timestamp())
+		self.current_start_date = self.earliest_start_date
+		self.current_end_date = self.latest_end_date
+		self.projs_over_time = []
+		self.projs_over_time_ids = []
+		self.projs_over_time_names = []
+		self.projs_over_time_list = []
+		self.shifted_projs_over_time = []
+		self.shifted_names_over_time = []
+
+		self.getData()
+
+		self.EndDateEdit.setDate(QDate.currentDate())
+		start_date_datetime = datetime.fromtimestamp(self.earliest_start_date)
+		self.start_date = QDate(start_date_datetime.year, start_date_datetime.month,
+			start_date_datetime.day)
+		self.StartDateEdit.setDate(self.start_date)
+
+		self.ProjectsOverTimeWidget.bars_projects_by_phase(
+			self.shifted_projs_over_time, self.shifted_names_over_time, "legend")
+
+		self.StartDateEdit.userDateChanged.connect(self.selectDateRange)
+		self.EndDateEdit.userDateChanged.connect(self.selectDateRange)
+
+		self.show()
+
+	def getData(self) -> None:
+		self.projs_over_time_list = []
+		with get_db_connection() as conn:
+			cur = conn.cursor()
+			self.projs_over_time = project_ids_over_time_period(
+				self.current_start_date, self.current_end_date, cur)
+			self.projs_over_time_ids = [proj[0] for proj in self.projs_over_time]
+			self.projs_over_time_names = [proj[1] for proj in self.projs_over_time]
+			for proj_id in self.projs_over_time_ids:
+				self.projs_over_time_list.append(
+					phase_duration_by_project(proj_id, cur, 
+						self.current_start_date, self.current_end_date))
+
+		if ("Administration" in self.projs_over_time_names and 
+			"Business Development" in self.projs_over_time_names):
+			self.shifted_projs_over_time = (self.projs_over_time_list[2:] 
+				+ self.projs_over_time_list[1:2] + self.projs_over_time_list[0:1])
+			self.shifted_names_over_time = (self.projs_over_time_names[2:] 
+				+ self.projs_over_time_names[1:2]  + self.projs_over_time_names[0:1])
+		elif ("Administration" in self.projs_over_time_names or 
+			"Business Development" in self.projs_over_time_names):
+			self.shifted_projs_over_time = (self.projs_over_time_list[1:] 
+				+ self.projs_over_time_list[0:1])
+			self.shifted_names_over_time = (self.projs_over_time_names[1:] 
+				+ self.projs_over_time_names[0:1])
+		else:
+			self.shifted_projs_over_time = self.projs_over_time_list
+			self.shifted_names_over_time = self.projs_over_time_names
+
+	def selectDateRange(self) -> None:
+		start_date = self.StartDateEdit.date()
+		end_date = self.EndDateEdit.date()
+		pyDatetime_start = start_date.toPython()
+		pyDatetime_end = end_date.toPython()
+		int_start_time = int(datetime(pyDatetime_start.year, pyDatetime_start.month,
+			pyDatetime_start.day).timestamp())
+		int_end_time = int(datetime(pyDatetime_end.year, pyDatetime_end.month, 
+			pyDatetime_end.day).timestamp())
+		self.current_start_date = int_start_time
+		self.current_end_date = int_end_time
+
+		self.getData()
+		self.ProjectsOverTimeWidget.bars_projects_by_phase(
+			self.shifted_projs_over_time, self.shifted_names_over_time, "legend")
 
 #		~~~TIME LOGGERS~~~
 

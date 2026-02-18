@@ -663,6 +663,7 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 		self.project_model.select()
 		self.ProjectComboBox.setModel(self.project_model)
 		self.ProjectComboBox.setModelColumn(1)
+		self.original_row = 0
 
 		self.timeEntriesTableView.setItemDelegate(QSqlRelationalDelegate(
 			self.timeEntriesTableView))
@@ -767,8 +768,9 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 			proj_match = self.project_model.match(self.project_model.index(0,0),
 			Qt.EditRole, proj_id, 1, Qt.MatchFlags(Qt.MatchExactly))
 			if proj_match:
-				row = proj_match[0].row()
-				self.ProjectComboBox.setCurrentIndex(row)
+				self.original_row = proj_match[0].row()
+				self.ProjectComboBox.setCurrentIndex(self.original_row)
+
 			self.updateFilter()
 
 		else:
@@ -777,12 +779,20 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 			self.updateFilter()
 
 	def showCompletedProjects(self, signal) -> None:
-		set_row = self.ProjectComboBox.currentIndex()
+		current_row = self.ProjectComboBox.currentIndex()
+		current_proj_id = self.project_model.data(
+			self.project_model.index(current_row, 0))
 		if signal == 2:
 			self.project_model.setFilter("")
 		else:
 			self.project_model.setFilter("status = 'Active'")
-		self.ProjectComboBox.setCurrentIndex(set_row)
+		proj_match = self.project_model.match(self.project_model.index(0,0),
+			Qt.EditRole, current_proj_id, 1, Qt.MatchFlags(Qt.MatchExactly))
+		if proj_match:
+			row = proj_match[0].row()
+			self.ProjectComboBox.setCurrentIndex(row)
+		else:
+			self.ProjectComboBox.setCurrentIndex(self.original_row)
 
 	def updateFilter(self) -> None:
 		"""Filter table depending on state of showInvoicedCheckBox and 

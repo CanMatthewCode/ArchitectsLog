@@ -6,15 +6,11 @@ import sqlite3
 
 from datetime import datetime
 
-from architectsLog_db import get_connection, create_architect_table, create_project_table, \
- create_phases_table, create_invoices_table, create_time_entries_table, add_architect, \
- initialize_phases, add_project, add_invoice, add_time_entry, load_all_active_architects, \
- load_all_architects, load_architect, load_all_active_projects, load_all_projects, \
- load_project, load_invoice, load_project_invoices, load_status_invoices, load_all_invoices, \
- load_time_entry, load_all_project_time_entries, load_all_architect_time_entries, \
- load_invoice_time_entries, load_all_time_entries, load_nonproject_phases_time_entries, \
- update_architect, update_project, update_invoice, update_time_entry, \
- delete_invoice, delete_time_entry
+from architectsLog_db import (get_connection, create_architect_table, create_project_table,
+ create_phases_table, create_invoices_table, create_time_entries_table, initialize_phases, 
+ initialize_projects, initialize_invoices, add_architect, add_project, add_invoice, add_time_entry,
+ get_most_recent_archid_and_projid, get_most_recent_project_phase, load_invoice_ids_no_time_entries,
+ update_project, update_time_entry, delete_invoice, delete_time_entry)
 
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry
@@ -63,8 +59,8 @@ def table_initialize(test_conn):
 
 	#create a test project with testArchitect and add it to the project table
 	date = "01-01-2025"
-	invoice_date = datetime.strptime(date, "%m-%d-%Y")
-	int_date = int(invoice_date.timestamp())
+	project_date = datetime.strptime(date, "%m-%d-%Y")
+	int_date = int(project_date.timestamp())
 	testProject = Project("NewProject", "NewClient", "123ClientStreet", int_date)
 	project_id = add_project(testProject, cur)
 
@@ -344,6 +340,76 @@ def test_create_time_entries_table_types(table_info):
 
 #	~~~INSERT FUNCTIONS TESTS~~~
 
+#test if the phases table is correctly initialized with the PHASES dictionary
+def test_initialize_phases(test_conn, table_initialize):
+	"""Test that the phases table is correctly populated by the PHASES dictionary"""
+	cur = test_conn.cursor()
+
+	#initialize the phases table a 2nd time to check for duplicate insertion
+	initialize_phases(cur)
+
+	#query all information from the initialized phases table
+	sql = "SELECT * FROM phases"
+	cur.execute(sql)
+	rows = cur.fetchall()
+
+	#test if number of items in phases table equals number of items in PHASES dictionary
+	#and test that table is only initialized once
+	assert len(rows) == 9
+
+	#test all rows for correct insertion 
+	assert rows[0] == (1, "Schematic Design")
+	assert rows[1] == (2, "Design Development")
+	assert rows[2] == (3, "Construction Documents")
+	assert rows[3] == (4, "Bidding Negotiation" )
+	assert rows[4] == (5, "Construction Administration")
+	assert rows[5] == (6, "Interior Design")
+	assert rows[6] == (7, "Add Service")
+	assert rows[7] == (8, "Administration")
+	assert rows[8] == (9, "Business Development")
+
+
+#test if the projects table is correctly initialized with Administration and Business Development
+def test_initialize_projects(test_conn, table_initialize):
+	"""Test that the projects table is correctly populated with 2 internal projects"""
+	cur = test_conn.cursor()
+
+	initialize_projects(cur)
+
+	sql = "SELECT * FROM projects"
+	cur.execute(sql)
+	rows = cur.fetchall()
+
+	assert len(rows) == 3
+
+	assert rows[0][0] == -2
+	assert rows[0][1] == "Business Development"
+	assert rows[0][2] == "Internal"
+	assert rows[0][3] == "N/A2"
+	assert rows[1][0] == -1
+	assert rows[1][1] == "Administration"
+	assert rows[1][2] == "Internal"
+	assert rows[1][3] == "N/A"
+
+#test if the invoices table is correctly initialized with invoice_id 0 for 'Not Invoiced'
+def test_initialize_invoices(test_conn, table_initialize):
+	"""Test that the invoices table is correctly populated with Not Invoiced invoice"""
+	cur = test_conn.cursor()
+
+	initialize_projects(cur)
+	initialize_invoices(cur)
+
+	sql = "SELECT * FROM invoices"
+	cur.execute(sql)
+	rows = cur.fetchall()
+
+	assert len(rows) == 2
+
+	assert rows[0][0] == 0
+	assert rows[0][1] == -1
+	assert rows[0][2] == 0
+	assert rows[0][3] == "Not Invoiced"
+ 
 #test if the add_architect function adds an architect to the architects table
 def test_add_architect(test_conn, table_initialize):
 	"""Test that the architects table has correctly added a new architect"""
@@ -372,35 +438,6 @@ def test_add_architect(test_conn, table_initialize):
 
 	#test if architect object was updated with architect_id
 	assert table_initialize['architect'].architect_id == 1
-
-
-#test if the phases table is correctly initialized with the PHASES dictionary
-def test_initialize_phases(test_conn, table_initialize):
-	"""Test that the phases table is correctly populated by the PHASES dictionary"""
-	cur = test_conn.cursor()
-
-	#initialize the phases table a 2nd time to check for duplicate insertion
-	initialize_phases(cur)
-
-	#query all information from the initialized phases table
-	sql = "SELECT * FROM phases"
-	cur.execute(sql)
-	rows = cur.fetchall()
-
-	#test if number of items in phases table equals number of items in PHASES dictionary
-	#and test that table is only initialized once
-	assert len(rows) == 9
-
-	#test all rows for correct insertion 
-	assert rows[0] == (1, "Schematic Design")
-	assert rows[1] == (2, "Design Development")
-	assert rows[2] == (3, "Construction Documents")
-	assert rows[3] == (4, "Bidding Negotiation" )
-	assert rows[4] == (5, "Construction Administration")
-	assert rows[5] == (6, "Interior Design")
-	assert rows[6] == (7, "Add Service")
-	assert rows[7] == (8, "Business Development")
-	assert rows[8] == (9, "Administration")
 
 
 #test if the add_project function adds a project to the projects table
@@ -502,638 +539,75 @@ def test_add_time_entries(test_conn, table_initialize):
 
 #	~~~LOAD OBJECT FROM DATABASE FUNCTIONS TESTS~~~
 
-#Test if the load_architect function correctly loads an architect object from the architects table
-def test_load_architect(test_conn, table_initialize):
-	"""Test that an Architect object successfully loads and returns from the architects table"""
+def test_get_most_recent_archid_and_projid(test_conn, table_initialize):
+	"""Test to get the architect_id and project_id from the last entered time_entry log"""
 	cur = test_conn.cursor()
-	testArchitect = load_architect(1, cur)
 
-	#test if all columns were correctly loaded into Architect object
-	assert testArchitect.name ==  "Name"
-	assert testArchitect.license_number == "LicenseNumber01"
-	assert testArchitect.phone_number == "123-456-7890"
-	assert testArchitect.email =="email@domain.com"
-	assert testArchitect.company_name == "MyCompany"
-	assert testArchitect.status == "Active"
-	assert testArchitect.architect_id == 1
-
-#Test if the load_all_active_architects function correctly loads and returns all the architect names and ids
-def test_load_all_active_architects(test_conn, table_initialize):
-	"""Test that all architect names and ids successfully load from the architects table and return as 
-	a list of tuples"""
-	cur = test_conn.cursor()
 	second_architect = Architect("Name 2", "LicenseNumber02", "987-654-3210", "email2@domain.com",
 		"Company 2")
-	third_architect = Architect("Name 3", "LicenseNumber03", "987-654-3211", "email3@domain.com",
-		"Company 3", status = 'Inactive')
 	add_architect(second_architect, cur)
-	add_architect(third_architect, cur)
-	test_conn.commit()
-	testArchitectList = load_all_active_architects(cur)
-
-	#test if the returned number of active architects matches the number in the table
-	assert len(testArchitectList) == 2
-
-	#test if all architects in the architect table were returned
-	assert testArchitectList[0][0] == 1
-	assert testArchitectList[0][1] == "Name"
-	assert testArchitectList[1][0] == 2
-	assert testArchitectList[1][1] == "Name 2"
-
-#Test if the load_all_architects function correctly loads and returns all the architect names, ids, and statuses
-def test_load_all_architects(test_conn, table_initialize):
-	"""Test that all architect names, ids, and statuses successfully load from the projects table and 
-	return as a list of tuples"""
-	cur = test_conn.cursor()
-	second_architect = Architect("Name 2", "LicenseNumber02", "987-654-3210", "email2@domain.com",
-		"Company 2")
-	third_architect = Architect("Name 3", "LicenseNumber03", "987-654-3211", "email3@domain.com",
-		"Company 3", status = 'Inactive')
-	add_architect(second_architect, cur)
-	add_architect(third_architect, cur)
-	test_conn.commit()
-	testArchitectList = load_all_architects(cur)
-
-	#test if the returned number of total architects matches the total number in the table
-	assert len(testArchitectList) == 3
-
-	#test if all architects in the architect table were returned
-	assert testArchitectList[0][0] == 1
-	assert testArchitectList[0][1] == "Name"
-	assert testArchitectList[0][2] == "Active"
-	assert testArchitectList[1][0] == 2
-	assert testArchitectList[1][1] == "Name 2"
-	assert testArchitectList[1][2] == "Active"
-	assert testArchitectList[2][0] == 3
-	assert testArchitectList[2][1] == "Name 3"
-	assert testArchitectList[2][2] == "Inactive"
-
-
-#Test if the load_projects function correctly loads a project object from the project table"""
-def test_load_project(test_conn, table_initialize):
-	"""Test that a Project object successfully loads and returns from the projects table"""
-	cur = test_conn.cursor()
-	testProject = load_project(1, cur)
-
-	date = "01-01-2025"
+	date = "02-02-2025"
 	project_date = datetime.strptime(date, "%m-%d-%Y")
 	int_date = int(project_date.timestamp())
-
-	#test if all columns were correctly loaded into Project object
-	assert testProject.project_name == "NewProject"
-	assert testProject.client_name == "NewClient"
-	assert testProject.client_address == "123ClientStreet"
-	assert testProject.start_date == int_date
-	assert testProject.current_phase_id == 1
-	assert testProject.status == "Active"
-	assert testProject.project_id == 1
-
-#Test if the load_all_active_projects function correctly loads and returns all the project names and ids"
-def test_load_all_active_projects(test_conn, table_initialize):
-	"""Test that all project names and ids successfully load from the projects table and return as
-	a list of tuples"""
-	cur = test_conn.cursor()
-	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", "02-02-2025")
-	third_project = Project("NewProject3", "NewClient3", "678ClientStreet", "03-03-2025",
-		status = 'Completed')
+	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", int_date)
 	add_project(second_project, cur)
-	add_project(third_project, cur)
-	test_conn.commit()
-	testProjectList = load_all_active_projects(cur)
-
-	#test if the returned number of active projects matches the number in the table
-	assert len(testProjectList) == 2
-
-	#test if all the projects in the project table were returned
-	assert testProjectList[0][0] == 1
-	assert testProjectList[0][1] == "NewProject"
-	assert testProjectList[1][0] == 2
-	assert testProjectList[1][1] == "NewProject2"
-
-#Test if the load_all_projects function correctly loads and returns all the project names, ids, and statuses"
-def test_load_all_projects(test_conn, table_initialize):
-	"""Test that all project names, ids, and statuses successfully load from the projects table and
-	return as a list of tuples"""
-	cur = test_conn.cursor()
-	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", "02-02-2025")
-	third_project = Project("NewProject3", "NewClient3", "678ClientStreet", "03-03-2025",
-		status = 'Completed')
-	add_project(second_project, cur)
-	add_project(third_project, cur)
-	test_conn.commit()
-	testProjectList = load_all_projects(cur)
-
-	#test if the returned number of total projects matches the number in the table
-	assert len(testProjectList) == 3
-
-	#test if all the projects in the project table were returned
-	assert testProjectList[0][0] == 1
-	assert testProjectList[0][1] == "NewProject"
-	assert testProjectList[0][2] == "Active"
-	assert testProjectList[1][0] == 2
-	assert testProjectList[1][1] == "NewProject2"
-	assert testProjectList[1][2] == "Active"
-	assert testProjectList[2][0] == 3
-	assert testProjectList[2][1] == "NewProject3"
-	assert testProjectList[2][2] == "Completed"
-
-
-#Test if the load_invoice function correctly loads an Invoice object from the invoices table
-def test_load_invoice(test_conn, table_initialize):
-	"""Test that an Invoice object successfully loads and returns from the invoices table"""
-	cur = test_conn.cursor()
-
-	testInvoice = load_invoice(1, cur)
-
-	#turn date into a timestamp int
-	date = "01-01-2025"
-	invoice_date = datetime.strptime(date, "%m-%d-%Y")
-	int_date = int(invoice_date.timestamp())
-
-	#test if all columns were correctly loaded into Invoice object
-	assert testInvoice.invoice_number == '1'
-	assert testInvoice.created_date == int_date
-	assert testInvoice.project_id == 1
-	assert testInvoice.status == "Draft"
-	assert testInvoice.invoice_id == 1
-
-#Test if the load_project_invoices correctly loads all project invoices rows
-def test_load_project_invoices(test_conn, table_initialize):
-	"""Test that all invoices associated with a project_id are returned as a
-	list of tuples containing invoice_id, invoice_number, created_date, status"""
-	cur = test_conn.cursor()
-	project = table_initialize['project']
-	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", "02-02-2025")
-	second_proj_id = add_project(second_project, cur)
-
-	#turn dates into a timestamp ints
-	date = "01-01-2025"
-	invoice_date = datetime.strptime(date, "%m-%d-%Y")
-	int_date = int(invoice_date.timestamp())
-	date2 = "02-02-2025"
-	invoice_date2 = datetime.strptime(date2, "%m-%d-%Y")
-	int_date2 = int(invoice_date.timestamp())
-	date3 = "03-03-2025"
-	invoice_date3 = datetime.strptime(date3, "%m-%d-%Y")
-	int_date3 = int(invoice_date.timestamp())
-	date4 = "03-03-2025"
-	invoice_date4 = datetime.strptime(date4, "%m-%d-%Y")
-	int_date4 = int(invoice_date.timestamp())
-
-	testInvoice2 = Invoice(2, int_date2, project.project_id)
-	testInvoice3 = Invoice(3, int_date3, project.project_id, status = "Billed")
-	testInvoice4 = Invoice(4, int_date4, second_proj_id)
-	add_invoice(testInvoice2, cur)
-	add_invoice(testInvoice3, cur)
-	add_invoice(testInvoice4, cur)
-	test_conn.commit()
-	testInvoices = load_project_invoices(1, cur)
-
-	#test if the returned number of invoices matches the number in the table
-	assert len(testInvoices) == 3
-
-	#test if all the columns were correctly loaded into the tuples in the correct order
-	assert testInvoices[0][0] == 3
-	assert testInvoices[0][1] == "3"
-	assert testInvoices[0][2] == int_date3
-	assert testInvoices[0][3] == "Billed"
-	assert testInvoices[1][0] == 1
-	assert testInvoices[1][1] == "1"
-	assert testInvoices[1][2] == int_date
-	assert testInvoices[1][3] == "Draft"
-	assert testInvoices[2][0] == 2
-	assert testInvoices[2][1] == "2"
-	assert testInvoices[2][2] == int_date2
-	assert testInvoices[2][3] == "Draft"
-
-def test_load_status_invoices(test_conn, table_initialize):
-	"""Test that all invoices associated with a status are returned as a list of tuples 
-	containing invoice_id, invoice_number, created_date, project_name"""
-	cur = test_conn.cursor()
-	project = table_initialize['project']
-	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", "02-02-2025")
-	add_project(second_project, cur)
-
-	#turn dates into a timestamp ints
-	date = "01-01-2025"
-	invoice_date = datetime.strptime(date, "%m-%d-%Y")
-	int_date = int(invoice_date.timestamp())
-	date2 = "02-02-2025"
-	invoice_date2 = datetime.strptime(date2, "%m-%d-%Y")
-	int_date2 = int(invoice_date.timestamp())
-	date3 = "03-03-2025"
-	invoice_date3 = datetime.strptime(date3, "%m-%d-%Y")
-	int_date3 = int(invoice_date.timestamp())
-	date4 = "03-03-2025"
-	invoice_date4 = datetime.strptime(date4, "%m-%d-%Y")
-	int_date4 = int(invoice_date.timestamp())
-
-	testInvoice2 = Invoice(2, int_date2, project.project_id)
-	testInvoice3 = Invoice(3, int_date3, project.project_id, status = "Billed")
-	testInvoice4 = Invoice(4, int_date4, second_project.project_id, status = "Billed")
-	add_invoice(testInvoice2, cur)
-	add_invoice(testInvoice3, cur)
-	add_invoice(testInvoice4, cur)
-	test_conn.commit()
-	testDraftInvoices = load_status_invoices("Draft", cur)
-	testBilledInvoices = load_status_invoices("Billed", cur)
-
-	#test if the returned number of invoices matches the number in the invoices table
-	assert len(testDraftInvoices) == 2
-	assert len(testBilledInvoices) == 2
-
-	#test if all columns were correctly loaded into the tuples in the correct order
-	assert testDraftInvoices[0][0] == 1
-	assert testDraftInvoices[0][1] == "1"
-	assert testDraftInvoices[0][2] == int_date
-	assert testDraftInvoices[0][3] == "NewProject"
-	assert testBilledInvoices[0][0] == 3
-	assert testBilledInvoices[0][1] == "3"
-	assert testBilledInvoices[0][2] == int_date3
-	assert testBilledInvoices[0][3] == "NewProject"
-	assert testBilledInvoices[1][0] == 4
-	assert testBilledInvoices[1][1] == "4"
-	assert testBilledInvoices[1][2] == int_date4
-	assert testBilledInvoices[1][3] == "NewProject2"
-
-def test_load_status_invoices_invalid_column(test_conn, table_initialize):
-	"""Test to see if inputting an invalid invoice status throws an exception"""
-	cur = test_conn.cursor()
-
-	with pytest.raises(ValueError, match='Invalid status'):
-		load_status_invoices("invalid", cur)
-
-def test_load_all_invoices(test_conn, table_initialize):
-	"""Test that all invoices were loaded into a list of tuples containing invoice_id, 
-	project name, created date, invoice number, status and ordered by project name, 
-	invoice status, then creation date"""
-	cur = test_conn.cursor()
-	project = table_initialize['project']
-	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", "02-02-2025")
-	add_project(second_project, cur)
-
-	#turn dates into a timestamp ints
-	date = "01-01-2025"
-	invoice_date = datetime.strptime(date, "%m-%d-%Y")
-	int_date = int(invoice_date.timestamp())
-	date2 = "02-02-2025"
-	invoice_date2 = datetime.strptime(date2, "%m-%d-%Y")
-	int_date2 = int(invoice_date.timestamp())
-	date3 = "03-03-2025"
-	invoice_date3 = datetime.strptime(date3, "%m-%d-%Y")
-	int_date3 = int(invoice_date.timestamp())
-	date4 = "03-03-2025"
-	invoice_date4 = datetime.strptime(date4, "%m-%d-%Y")
-	int_date4 = int(invoice_date.timestamp())
-
-	testInvoice2 = Invoice(2, int_date2, project.project_id, status = "Paid")
-	testInvoice3 = Invoice(3, int_date3, second_project.project_id, status = "Billed")
-	testInvoice4 = Invoice(4, int_date4, second_project.project_id, status = "Paid")
-	add_invoice(testInvoice2, cur)
-	add_invoice(testInvoice3, cur)
-	add_invoice(testInvoice4, cur)
-	test_conn.commit()
-	testInvoices = load_all_invoices(cur)
-
-	#test if the returned number of invoices match the number in the invoices table
-	assert len(testInvoices) == 4
-
-	#test if all columns were correctly loaded into the tuples in the correct order
-	assert testInvoices[0][0] == 1
-	assert testInvoices[0][1] == "NewProject"
-	assert testInvoices[0][2] == int_date
-	assert testInvoices[0][3] == "1"
-	assert testInvoices[0][4] == "Draft"
-	assert testInvoices[3][0] == 4
-	assert testInvoices[3][1] == "NewProject2"
-	assert testInvoices[3][2] == int_date4
-	assert testInvoices[3][3] == "4"
-	assert testInvoices[3][4] == "Paid"
-
-
-#Test if the load_time_entry function correctly loads a TimeEntry object from the time_entry table
-def test_load_time_entry(test_conn, table_initialize):
-	"""Test that a TimeEntry object successfully loads and returns from the time_entry table"""
-	cur = test_conn.cursor()
-	testTimeEntry = load_time_entry(1, cur)
-
-	date_time = "01-01-2025 12:00:00"
-	time_entry_date_time = datetime.strptime(date_time, "%m-%d-%Y %I:%M:%S")
-	int_date_time = int(time_entry_date_time.timestamp())
-
-	#test if all columns were correctly loaded into TimeEntry object
-	assert testTimeEntry.start_time == int_date_time
-	assert testTimeEntry.duration_minutes == 30
-	assert testTimeEntry.project_id == table_initialize['project'].project_id
-	assert testTimeEntry.architect_id == table_initialize['architect'].architect_id
-	assert testTimeEntry.phase_id == 1
-	assert testTimeEntry.notes == "Note"
-	assert testTimeEntry.invoice_id == 1
-	assert testTimeEntry.time_entry_id == 1
-
-#Test if the load_all_project_time_entries function correctly loads all project time_enties rows
-def test_load_all_project_time_entries(test_conn, table_initialize):
-	"""Test that all time_entry rows for a project are returned as a list of tuples
-	containing time_entry_id, start_time, duration_minutes, architect.name"""
-	cur = test_conn.cursor()
-	project = table_initialize['project']
-	architect = table_initialize['architect']
-	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", "02-02-2025")
-	add_project(second_project, cur)
-	test_conn.commit()
-
-	date_time = "01-01-2025 12:00:00"
-	time_entry_date_time = datetime.strptime(date_time, "%m-%d-%Y %I:%M:%S")
-	int_date_time = int(time_entry_date_time.timestamp())
-	date_time2 = "01-01-2025 1:00:00"
-	time_entry_date_time2 = datetime.strptime(date_time2, "%m-%d-%Y %I:%M:%S")
-	int_date_time2 = int(time_entry_date_time2.timestamp())
-	date_time3 = "02-02-2025 12:00:00"
-	time_entry_date_time3 = datetime.strptime(date_time3, "%m-%d-%Y %I:%M:%S")
-	int_date_time3 = int(time_entry_date_time2.timestamp())
-
-	testTimeEntry2 = TimeEntry(int_date_time2, 45, project.project_id, 
-		architect.architect_id)
-	testTimeEntry3 = TimeEntry(int_date_time3, 60, second_project.project_id, 
-		architect.architect_id)
+	date2 = "03-03-2025"
+	time_entry_date2 = datetime.strptime(date2, "%m-%d-%Y")
+	int_date2 = int(time_entry_date2.timestamp())
+	testTimeEntry2 = TimeEntry(int_date2, 45, second_project.project_id, 
+		second_architect.architect_id, 4)
 	add_time_entry(testTimeEntry2, cur)
-	add_time_entry(testTimeEntry3, cur)
 	test_conn.commit()
 
-	testTimeEntries = load_all_project_time_entries(project.project_id, cur)
+	arch_id_proj_id = get_most_recent_archid_and_projid(cur)
 
-	#test if the returned number of tuples matches the number of TimeEntry rows in time_entries
-	#table that corresponds to the same project
-	assert len(testTimeEntries) == 2
+	assert arch_id_proj_id[0] == second_architect.architect_id
+	assert arch_id_proj_id[1] == second_project.project_id
 
-	#test if all the columns were correctly loaded into the tuples
-	assert testTimeEntries[0][0] == 1
-	assert testTimeEntries[0][1] == int_date_time
-	assert testTimeEntries[0][2] == 30
-	assert testTimeEntries[0][3] == "Name"
-	assert testTimeEntries[1][0] == 2
-	assert testTimeEntries[1][1] == int_date_time2
-	assert testTimeEntries[1][2] == 45
-	assert testTimeEntries[1][3] == "Name"
-
-#Test if the load_all_architect_time_entries function correctly loads all architect time_entries rows
-def test_load_all_architect_time_entries(test_conn, table_initialize):
-	"""Test that all time_entry rows for an architect are returned as a list of tuples
-	containing time_entry_id, start_time, duration_minutes, project_name"""
+def test_get_most_recent_project_phase(test_conn, table_initialize):
+	"""Test to get the most recent phase from a project_id in the time_entries table"""
 	cur = test_conn.cursor()
-	project = table_initialize['project']
-	architect = table_initialize['architect']
+
 	second_architect = Architect("Name 2", "LicenseNumber02", "987-654-3210", "email2@domain.com",
 		"Company 2")
-	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", "02-02-2025")
 	add_architect(second_architect, cur)
+	date = "02-02-2025"
+	project_date = datetime.strptime(date, "%m-%d-%Y")
+	int_date = int(project_date.timestamp())
+	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", int_date)
 	add_project(second_project, cur)
-	test_conn.commit()
-
-	date_time = "01-01-2025 12:00:00"
-	time_entry_date_time = datetime.strptime(date_time, "%m-%d-%Y %I:%M:%S")
-	int_date_time = int(time_entry_date_time.timestamp())
-	date_time2 = "01-01-2025 1:00:00"
-	time_entry_date_time2 = datetime.strptime(date_time2, "%m-%d-%Y %I:%M:%S")
-	int_date_time2 = int(time_entry_date_time2.timestamp())
-	date_time3 = "02-02-2025 12:00:00"
-	time_entry_date_time3 = datetime.strptime(date_time3, "%m-%d-%Y %I:%M:%S")
-	int_date_time3 = int(time_entry_date_time3.timestamp())
-
-	testTimeEntry2 = TimeEntry(date_time2, 45, second_project.project_id, 
-		architect.architect_id)
-	testTimeEntry3 = TimeEntry(int_date_time3, 60, project.project_id, 
-		second_architect.architect_id)
+	date2 = "03-03-2025"
+	time_entry_date2 = datetime.strptime(date2, "%m-%d-%Y")
+	int_date2 = int(time_entry_date2.timestamp())
+	testTimeEntry2 = TimeEntry(int_date2, 45, second_project.project_id, 
+		second_architect.architect_id, 4)
 	add_time_entry(testTimeEntry2, cur)
-	add_time_entry(testTimeEntry3, cur)
 	test_conn.commit()
 
-	testTimeEntries = load_all_architect_time_entries(architect.architect_id, cur)
-	#test if the returned number of tuples matches the number of TimeEntry objects
-	#in the database that correspond to the same architect
-	assert len(testTimeEntries) == 2
+	proj_id_phase_id = get_most_recent_project_phase(1, cur)
+	proj_id_phase_id2 = get_most_recent_project_phase(2, cur)
 
-	#test if all the columns were correctly loaded into the tuples
-	assert testTimeEntries[0][0] == 1
-	assert testTimeEntries[0][1] == int_date_time
-	assert testTimeEntries[0][2] == 30
-	assert testTimeEntries[0][3] == "NewProject"
-	assert testTimeEntries[1][0] == 2
-	assert testTimeEntries[1][1] == date_time2
-	assert testTimeEntries[1][2] == 45
-	assert testTimeEntries[1][3] == "NewProject2"
+	assert proj_id_phase_id2 == 4
+	assert proj_id_phase_id == 1
 
-#Test if the load_invoice_time_entries function correctly loads all invoice time_entries rows
-def test_load_invoice_time_entries(test_conn, table_initialize):
-	"""Test that all time_entries rows for an invoice are returned as a list of tuples
-	containing time_entry_id, start_time, duration_minutes, project_id, notes. 
-	Test if passing in None returns all non-invoice affiliated time_entries rows"""
+def test_load_invoice_ids_no_time_entries(test_conn, table_initialize):
+	"""Test to ensure invoices with no assigned time_entries are correctly returned"""
 	cur = test_conn.cursor()
-	architect = table_initialize['architect']
-	project = table_initialize['project']
 
-	date2 = "02-02-2025"
-	invoice_date2 = datetime.strptime(date2, "%m-%d-%Y")
-	int_date2 = int(invoice_date2.timestamp())
-	testInvoice2 = Invoice(2, int_date2, project.project_id)
-	add_invoice(testInvoice2, cur)
+	project_id = table_initialize['project_id']
+	date = "02-02-2025"
+	invoice_date = datetime.strptime(date, "%m-%d-%Y")
+	int_date = int(invoice_date.timestamp())
+	testInvoice2 = Invoice(1, int_date, project_id)
+	invoice_id = add_invoice(testInvoice2, cur)
 
-	date_time = "01-01-2025 12:00:00"
-	time_entry_date_time = datetime.strptime(date_time, "%m-%d-%Y %I:%M:%S")
-	int_date_time = int(time_entry_date_time.timestamp())
-	date_time2 = "01-01-2025 1:00:00"
-	time_entry_date_time2 = datetime.strptime(date_time2, "%m-%d-%Y %I:%M:%S")
-	int_date_time2 = int(time_entry_date_time2.timestamp())
-	date_time3 = "02-02-2025 12:00:00"
-	time_entry_date_time3 = datetime.strptime(date_time3, "%m-%d-%Y %I:%M:%S")
-	int_date_time3 = int(time_entry_date_time3.timestamp())
-	date_time4 = "02-02-2025 12:00:00"
-	time_entry_date_time4 = datetime.strptime(date_time4, "%m-%d-%Y %I:%M:%S")
-	int_date_time4 = int(time_entry_date_time4.timestamp())
+	no_time_entries_invoice = load_invoice_ids_no_time_entries(cur)
 
-	testTimeEntry2 = TimeEntry(int_date_time2, 45, project.project_id, 
-		architect.architect_id, invoice_id=1)
-	testTimeEntry3 = TimeEntry(int_date_time3, 60, project.project_id, 
-		architect.architect_id, invoice_id=2)
-	testTimeEntry4 = TimeEntry(int_date_time4, 120, project.project_id, 
-		architect.architect_id, invoice_id=None)
-	add_time_entry(testTimeEntry2, cur)
-	add_time_entry(testTimeEntry3, cur)
-	add_time_entry(testTimeEntry4, cur)
-	test_conn.commit()
-
-	testTimeEntries = load_invoice_time_entries(1, cur)
-	testTimeEntries2 = load_invoice_time_entries(None, cur)
-	#test if the returned number of tuples matches the number of TimeEntry objects with the same invoice_id
-	assert len(testTimeEntries) == 2
-	assert len(testTimeEntries2) == 1
-
-	#test if all the columns were correctly loaded into the tuples in the correct order
-	assert testTimeEntries[0][0] == 1
-	assert testTimeEntries[0][1] == int_date_time
-	assert testTimeEntries[0][2] == 30
-	assert testTimeEntries[0][3] == 1
-	assert testTimeEntries[0][4] == "Note"
-	assert testTimeEntries[1][0] == 2
-	assert testTimeEntries[1][1] == int_date_time2
-	assert testTimeEntries[1][2] == 45
-	assert testTimeEntries[1][3] == 1
-	assert testTimeEntries[1][4] == None
-
-#Test if the load_all_time_entries function correctly loads all time entries from the table
-def test_load_all_time_entries(test_conn, table_initialize):
-	"""Test that all time_entry rows in the table are returned as a list of tuples
-	containing time_entry_id, start_time, duration_minutes, project_name, architect_name"""
-	cur = test_conn.cursor()
-	architect = table_initialize['architect']
-	project = table_initialize['project']
-	second_architect = Architect("Name 2", "LicenseNumber02", "987-654-3210", 
-		"email2@domain.com","Company 2")
-	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", 
-		"02-02-2025")
-	add_architect(second_architect, cur)
-	add_project(second_project, cur)
-	test_conn.commit()
-
-	date_time = "01-01-2025 12:00:00"
-	time_entry_date_time = datetime.strptime(date_time, "%m-%d-%Y %I:%M:%S")
-	int_date_time = int(time_entry_date_time.timestamp())
-
-	date_time2 = "02-02-2025 12:00:00"
-	time_entry_date_time2 = datetime.strptime(date_time2, "%m-%d-%Y %I:%M:%S")
-	int_date_time2 = int(time_entry_date_time2.timestamp())
-
-	date_time3 = "01-01-2025 1:00:00"
-	time_entry_date_time3 = datetime.strptime(date_time3, "%m-%d-%Y %I:%M:%S")
-	int_date_time3 = int(time_entry_date_time3.timestamp())
-
-	date_time4 = "03-03-2025 3:00:00"
-	time_entry_date_time4 = datetime.strptime(date_time4, "%m-%d-%Y %I:%M:%S")
-	int_date_time4 = int(time_entry_date_time4.timestamp())
-
-	testTimeEntry2 = TimeEntry(int_date_time2, 45, second_project.project_id,
-		architect.architect_id)
-	testTimeEntry3 = TimeEntry(int_date_time3, 60, project.project_id, 
-		second_architect.architect_id)
-	testTimeEntry4 = TimeEntry(int_date_time4, 120, None, 
-		second_architect.architect_id)
-	add_time_entry(testTimeEntry2, cur)
-	add_time_entry(testTimeEntry3, cur)
-	add_time_entry(testTimeEntry4, cur)
-	test_conn.commit()
-
-	testTimeEntries = load_all_time_entries(cur)
-	#test if the returned number of tuples matches the number of TimeEntry objects in the table
-	assert len(testTimeEntries) == 4
-
-	#test if all the columns were correctly loaded into the tuples
-	assert testTimeEntries[0][0] == 1
-	assert testTimeEntries[0][1] == int_date_time
-	assert testTimeEntries[0][2] == 30
-	assert testTimeEntries[0][3] == "NewProject"
-	assert testTimeEntries[0][4] == "Name"
-	assert testTimeEntries[1][0] == 3
-	assert testTimeEntries[1][1] == int_date_time3
-	assert testTimeEntries[1][2] == 60
-	assert testTimeEntries[1][3] == "NewProject"
-	assert testTimeEntries[1][4] == "Name 2"
-	assert testTimeEntries[2][0] == 2
-	assert testTimeEntries[2][1] == int_date_time2
-	assert testTimeEntries[2][2] == 45
-	assert testTimeEntries[2][3] == "NewProject2"
-	assert testTimeEntries[2][4] == "Name"
-	assert testTimeEntries[3][0] == 4
-	assert testTimeEntries[3][1] == int_date_time4
-	assert testTimeEntries[3][2] == 120
-	assert testTimeEntries[3][3] == None
-	assert testTimeEntries[3][4] == "Name 2"
-
-#Test if the load_nonproject_phases_time_entries correctly loads time_entries from phases 8 & 9 only
-def test_load_nonproject_phases_time_entries(test_conn, table_initialize):
-	"""Test that all time_entry rows for phases 8 and 9 are loaded and returned 
-	as a list of tuples containing time_entry_id, start time, duration_mionutes,
-	architect_name, phase_id"""
-	cur = test_conn.cursor()
-	architect = table_initialize['architect']
-	testTimeEntry2 = TimeEntry("01-01-2025 1:00:00", 45, None, architect.architect_id,
-		phase_id = 8)
-	testTimeEntry3 = TimeEntry("02-02-2025 12:00:00", 60, None, architect.architect_id, 
-		phase_id = 8)
-	testTimeEntry4 = TimeEntry("03-03-2025 3:00:00", 120, None, architect.architect_id, 
-		phase_id = 9)
-	add_time_entry(testTimeEntry2, cur)
-	add_time_entry(testTimeEntry3, cur)
-	add_time_entry(testTimeEntry4, cur)
-	test_conn.commit()
-
-	testTimeEntries = load_nonproject_phases_time_entries(cur)
-	#test if the returned number of tuples matches the number of TimeEntry objects 
-	#with phases 8 and 9 in the table, ordered by phase_id
-	assert len(testTimeEntries) == 3
-
-	#test if all the columns were correctly loaded into the tuples
-	assert testTimeEntries[0][0] == 2
-	assert testTimeEntries[0][1] == "01-01-2025 1:00:00"
-	assert testTimeEntries[0][2] == 45
-	assert testTimeEntries[0][3] == "Name"
-	assert testTimeEntries[0][4] == 8
-	assert testTimeEntries[2][0] == 4
-	assert testTimeEntries[2][1] == "03-03-2025 3:00:00"
-	assert testTimeEntries[2][2] == 120
-	assert testTimeEntries[2][3] == "Name"
-	assert testTimeEntries[2][4] == 9
+	assert no_time_entries_invoice[0][0] == 2
 
 
 
 #	~~~UPDATE FUNCTIONS TESTS~~~
-
-#test if the update_architect function updates the architect table
-def test_update_architect(test_conn, table_initialize):
-	"""Test that the architects table has been correctly updated with the new input values"""
-	cur = test_conn.cursor()
-	architect = table_initialize['architect']
-	
-	#update all columns in the architects table with new values
-	architect = update_architect('name', architect, 'New_Name', cur)
-	architect = update_architect('license_number', architect, 'LicenseNumber02', cur)
-	architect = update_architect('phone_number', architect, '987-654-3210', cur)
-	architect = update_architect('email', architect, 'new_email@domain.com', cur)
-	architect = update_architect('company_name', architect, 'MyNewCompany', cur)
-	architect = update_architect('status', architect, 'inactive', cur)
-	test_conn.commit()
-
-	#test if all column values were correctly updated
-	sql = "SELECT * FROM architects WHERE architect_id = ?"
-	cur.execute(sql, (architect.architect_id,))
-	row = cur.fetchone()
-
-	#unpack row for readability
-	arch_id, name, license_number, phone_number, email, company_name, status = row
-
-	assert name == "New_Name"
-	assert license_number == "LicenseNumber02"
-	assert phone_number == "987-654-3210"
-	assert email == "new_email@domain.com"
-	assert company_name == "MyNewCompany"
-	assert status == "inactive"
-
-	#test if all object attributes were correctly updated
-	assert architect.name == "New_Name"
-	assert architect.license_number == "LicenseNumber02"
-	assert architect.phone_number == "987-654-3210"
-	assert architect.email == "new_email@domain.com"
-	assert architect.company_name == "MyNewCompany"
-	assert architect.status == "inactive"
-
-#Test if the update_architect function raises an exception to an incorrect column name
-def test_update_architect_invalid_column(test_conn, table_initialize):
-	"""Test to see if trying to change an invalid column in the architects table throws an exception"""
-	cur = test_conn.cursor()
-	architect = table_initialize['architect']
-
-	with pytest.raises(ValueError, match="Invalid column"):
-		update_architect('invalid_column', architect, 'value', cur)
-
 
 #Test if the update_project function updates the project table
 def test_update_project(test_conn, table_initialize):
@@ -1173,51 +647,6 @@ def test_update_project_invalid_column(test_conn, table_initialize):
 
 	with pytest.raises(ValueError, match='Invalid column'):
 		update_project('invalid_column', project, 'value', cur)
-
-
-#Test if the update_invoice function updates the invoices table
-def test_update_invoice(test_conn, table_initialize):
-	"""Test that the invoices table has been correctly updated with the new input values"""
-	cur = test_conn.cursor()
-	invoice = table_initialize['invoice']
-	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", "02-02-2025")
-	add_project(second_project, cur)
-	test_conn.commit()
-
-	#update all columns in the invoices table with new values
-	invoice = update_invoice('project_id', invoice, 2, cur)
-	invoice = update_invoice('created_date', invoice, "02-02-2025", cur)
-	invoice = update_invoice('invoice_number', invoice, 2, cur)
-	invoice = update_invoice('status', invoice, "billed", cur)
-	test_conn.commit()
-
-	#test if all column values were correctly updated
-	sql = "SELECT * FROM invoices WHERE invoice_id = ?"
-	cur.execute(sql, (invoice.invoice_id,))
-	row = cur.fetchone()
-
-	#unpack row for readability
-	invoice_id, project_id, created_date, invoice_number, status = row
-
-	assert project_id == 2
-	assert created_date == "02-02-2025"
-	assert invoice_number == "2"
-	assert status == "billed"
-
-	#test if all object attributes were correctly updated
-	assert invoice.project.project_id == 2
-	assert invoice.created_date == "02-02-2025"
-	assert invoice.invoice_number == 2
-	assert invoice.status == "billed"
-
-#Test if the update_invoice function raises an exception to an incorrect column name
-def test_update_invoice_invalid_column(test_conn, table_initialize):
-	"""Test to see if trying to change an invalid column in the invoices table throws an exception"""
-	cur = test_conn.cursor()
-	invoice = table_initialize['invoice']
-
-	with pytest.raises(ValueError, match='Invalid column'):
-		update_invoice('invalid_column', invoice, 'value', cur)
 
 
 #Test if the update_time_entry function updates the time_entries table
@@ -1280,7 +709,12 @@ def test_delete_invoice(test_conn, table_initialize):
 	testInvoice2 = Invoice(2, "02-02-2025", project_id, status = "paid")
 	add_invoice(testInvoice2, cur)
 	test_conn.commit()
-	pre_delete_invoices = load_all_invoices(cur)
+	sql = "SELECT invoice_id, projects.project_name, created_date, invoice_number, \
+		invoices.status FROM invoices INNER JOIN projects \
+		ON invoices.project_id = projects.project_id \
+		ORDER BY project_name ASC, invoices.status ASC, created_date ASC"
+	cur.execute(sql)
+	pre_delete_invoices = cur.fetchall()
 
 	#test to see if there are 2 invoices to start
 	assert len(pre_delete_invoices) == 2
@@ -1288,7 +722,8 @@ def test_delete_invoice(test_conn, table_initialize):
 	#test delete_invoice function
 	delete_invoice(2, cur)
 	test_conn.commit()
-	post_delete_invoices = load_all_invoices(cur)
+	cur.execute(sql)
+	post_delete_invoices = cur.fetchall()
 	assert len(post_delete_invoices) == 1
 
 	date = "01-01-2025"
@@ -1313,7 +748,13 @@ def test_delete_time_entry(test_conn, table_initialize):
 		architect.architect_id, phase_id = 8)
 	add_time_entry(testTimeEntry2, cur)
 	test_conn.commit()
-	pre_delete_time_entries = load_all_time_entries(cur)
+	sql = "SELECT time_entry_id, start_time, duration_minutes, projects.project_name, \
+		architects.name FROM time_entries \
+		LEFT JOIN projects ON time_entries.project_id = projects.project_id \
+		INNER JOIN architects ON time_entries.architect_id = architects.architect_id \
+		ORDER BY project_name IS NULL, project_name ASC, name ASC"
+	cur.execute(sql)
+	pre_delete_time_entries = cur.fetchall()
 
 	#test to see if there are 2 time_entries to start
 	assert len(pre_delete_time_entries) == 2
@@ -1321,7 +762,8 @@ def test_delete_time_entry(test_conn, table_initialize):
 	#test delete_time_entries function
 	delete_time_entry(1, cur)
 	test_conn.commit()
-	post_delete_time_entries = load_all_time_entries(cur)
+	cur.execute(sql)
+	post_delete_time_entries = cur.fetchall()
 	assert len(post_delete_time_entries) == 1
 
 	#test the correct time_entry was deleted

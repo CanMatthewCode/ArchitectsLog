@@ -39,9 +39,9 @@ from architectsLog_classes import Architect, Project, Invoice, TimeEntry
 from architectsLog_constants import	(PHASES, ARCHITECT_STATUSES, PROJECT_STATUSES, 
 	INVOICE_STATUSES, ADMIN, BUSDEV)
 from architectsLog_db import (DB_FILE, get_db_connection, add_architect, add_project,
-	add_time_entry, add_invoice, update_project, update_time_entry,
-	get_most_recent_archid_and_projid, get_most_recent_project_phase,
-	load_invoice_ids_no_time_entries, delete_invoice, delete_time_entry)
+	add_time_entry, add_invoice, get_most_recent_archid_and_projid, 
+	get_most_recent_project_phase, load_invoice_ids_no_time_entries, 
+	update_project, update_time_entry, delete_invoice, delete_time_entry)
 
 from architectsLog_analytics import AnalyticsChartDesigner
 from architectsLog_analytics_db import (phase_duration_by_project, 

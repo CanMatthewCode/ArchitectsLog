@@ -160,11 +160,11 @@ def initialize_projects(cur: sqlite3.Cursor) -> None:
 	int_date = int(project_date.timestamp())
 	cur.execute("""INSERT INTO projects (project_id, project_name, client_name,
 		client_address, start_date, current_phase_id)
-		VALUES(-1, ?, ?, ?, ?, 8)""", ("Business Development", "Internal", "N/A", int_date,))
+		VALUES(-1, ?, ?, ?, ?, 8)""", ("Administration", "Internal", "N/A", int_date,))
 	# add Administration as id -2
 	cur.execute("""INSERT INTO projects (project_id, project_name, client_name,
 		client_address, start_date, current_phase_id)
-		VALUES(-2, ?, ?, ?, ?, 9)""", ("Administration", "Internal", "N/A2", int_date,))
+		VALUES(-2, ?, ?, ?, ?, 9)""", ("Business Development", "Internal", "N/A2", int_date,))
 
 def initialize_invoices(cur: sqlite3.Cursor) -> None:
 	"""Initialize the invoices table with a 0 id, None named invoice for default

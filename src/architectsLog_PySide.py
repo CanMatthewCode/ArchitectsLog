@@ -205,9 +205,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		proj_id = self.project_model.data(self.project_model.index(proj_index, 0))
 		
 		# Disable PhasesComboBox if phase is Business Development or Administration
-		if phase_id in (BUSDEV, ADMIN):
+		if phase_id in (ADMIN, BUSDEV):
 			self.PhasesComboBox.setEnabled(False)
-			if phase_id == BUSDEV:
+			if phase_id == ADMIN:
 				self.ProjectsComboBox.setCurrentIndex(1)
 			else:
 				self.ProjectsComboBox.setCurrentIndex(0)
@@ -314,9 +314,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			phase_model = manual_log_time.PhaseComboBox.model()
 			phase_id = phase_model.data(phase_model.index(phase_index, 0))
 
-			if phase_id == BUSDEV:
+			if phase_id == ADMIN:
 				proj_id = -1
-			elif phase_id == ADMIN:
+			elif phase_id == BUSDEV:
 				proj_id = -2
 			else:
 				proj_index = manual_log_time.ProjectComboBox.currentIndex()
@@ -1333,10 +1333,10 @@ class ViewAnalytics(QWidget, Ui_AnalyticsWindow):
 			for data, projects in zip(total_hours, num_projects_by_phase)]
 		avg_phases = [data[0] for data in total_hours]
 
-		if BUSDEV in avg_phases and ADMIN in avg_phases:
+		if ADMIN in avg_phases and BUSDEV in avg_phases:
 			shifted_avg_phases = avg_phases[:-2]
 			shifted_avg_data = avg_data[:-2]
-		elif BUSDEV in avg_phases or ADMIN in avg_phases:
+		elif ADMIN in avg_phases or BUSDEV in avg_phases:
 			shifted_avg_phases = avg_phases[:-1]
 			shifted_avg_data = avg_data[:-1]
 		else:
@@ -1606,11 +1606,11 @@ class ViewProjectAverages(QWidget, Ui_PhaseAveragesWindow):
 			for data, projects in zip(self.total_hours, num_projects_by_phase)]
 		avg_phases = [data[0] for data in self.total_hours]
 
-		if BUSDEV in avg_phases and ADMIN in avg_phases:
+		if ADMIN in avg_phases and BUSDEV in avg_phases:
 			shifted_avg_phases = avg_phases[:-2]
 			shifted_avg_data = avg_data[:-2]
 			self.shifted_total_hours = self.total_hours[:-2]
-		elif BUSDEV in avg_phases or ADMIN in avg_phases:
+		elif ADMIN in avg_phases or BUSDEV in avg_phases:
 			shifted_avg_phases = avg_phases[:-1]
 			shifted_avg_data = avg_data[:-1]
 			self.shifted_total_hours = self.total_hours[:-1]
@@ -2000,9 +2000,9 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 
 		# Set project ComboBox and disable phase ComboBox if phase is 
 		# 	Business Development or Administration
-		if phase_id in (BUSDEV, ADMIN):
+		if phase_id in (ADMIN, BUSDEV ):
 			self.PhaseComboBox.setEnabled(False)
-			if phase_id == BUSDEV:
+			if phase_id == ADMIN:
 				self.ProjectComboBox.setCurrentIndex(1)
 			else:
 				self.ProjectComboBox.setCurrentIndex(0)
@@ -2065,9 +2065,9 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 		phase_index = self.PhaseComboBox.currentIndex()
 		phase_id = self.phase_model.data(self.phase_model.index(phase_index, 0))
 
-		if phase_id == BUSDEV:
+		if phase_id == ADMIN:
 			proj_id = -1
-		elif phase_id == ADMIN:
+		elif phase_id == BUSDEV:
 			proj_id = -2
 		else:
 			proj_index = self.ProjectComboBox.currentIndex()
@@ -2187,9 +2187,9 @@ class ManualTimeLogger(QDialog, Ui_AddTimeDialog):
 
 		# Set project ComboBox and disable phase ComboBox if phase is 
 		# 	Business Development or Administration
-		if phase_id in (BUSDEV, ADMIN):
+		if phase_id in (ADMIN, BUSDEV):
 			self.PhaseComboBox.setEnabled(False)
-			if phase_id == BUSDEV:
+			if phase_id == ADMIN:
 				self.ProjectComboBox.setCurrentIndex(1)
 			else:
 				self.ProjectComboBox.setCurrentIndex(0)
@@ -2391,7 +2391,7 @@ class TimeEntriesRelationalTableModel(QSqlRelationalTableModel):
 			
 			phase_id = None
 			if new_proj_id < 0:
-				phase_id = ADMIN if new_proj_id == -2 else BUSDEV
+				phase_id = BUSDEV if new_proj_id == -2 else ADMIN
 
 			# if the phase id is currently 8 or 9, then change it to whatever 
 			#	the last phase was for the project in the database

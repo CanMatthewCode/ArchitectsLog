@@ -9,12 +9,12 @@ PHASES = {
 	5: "Construction Administration",
 	6: "Interior Design",
 	7: "Add Service",
-	8: "Business Development",
-	9: "Administration"
+	8: "Administration",
+	9: "Business Development"
 	}
 
-ADMIN = len(PHASES)
-BUSDEV = len(PHASES) - 1
+BUSDEV = len(PHASES)
+ADMIN = len(PHASES) - 1
 
 #Possible statuses
 ARCHITECT_STATUSES = ('Active', 'Inactive')

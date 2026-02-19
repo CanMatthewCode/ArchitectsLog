@@ -8,7 +8,7 @@ import matplotlib.dates as mdates
 from datetime import datetime
 from typing import Optional
 
-from architectsLog_constants import BUSDEV
+from architectsLog_constants import ADMIN
 
 class AnalyticsChartDesigner(FigureCanvasQTAgg):
 	"""Class to create Matplotlib charts for Analytics windows"""
@@ -26,8 +26,8 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 			"Construct Admin.",
 			"Interior Design",
 			"Add Service",
-			"Business Dev.",
-			"Administration"
+			"Administration",
+			"Business Dev."
 			]
 		self.PHASE_NAMES = [
 			"Schematic Design", 
@@ -37,8 +37,8 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 			"Construction Administration",
 			"Interior Design",
 			"Add Service",
-			"Business Development",
-			"Administration"
+			"Administration",
+			"Business Development"
 			]
 		self.PHASE_COLORS = [
 			'#ffffd9', 
@@ -111,8 +111,8 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 			phase_ids = [row[0] for row in data]
 			data_list = [row[1] for row in data]
 		else:
-			phase_ids = [row[0] for row in data if row[0] < BUSDEV]
-			data_list = [row[1] for row in data if row[0] < BUSDEV]
+			phase_ids = [row[0] for row in data if row[0] < ADMIN]
+			data_list = [row[1] for row in data if row[0] < ADMIN]
 		phase_name = [self.PHASE_NAMES[phase_id - 1] for phase_id in phase_ids]
 		colors = [self.PHASE_COLORS[phase_id - 1] for phase_id in phase_ids]
 

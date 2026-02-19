@@ -15,7 +15,7 @@ from PySide6.QtSql import (QSqlDatabase, QSqlTableModel, QSqlRelationalTableMode
 	QSqlRelation, QSqlRelationalDelegate)
 from PySide6.QtCore import (Qt, QDate, QDateTime, QModelIndex, QTimer, QTime, 
 	QRegularExpression, QEvent, QRect)
-from PySide6.QtGui import QRegularExpressionValidator
+from PySide6.QtGui import QRegularExpressionValidator, QAction, QKeySequence
 
 from ui.MainWindow import Ui_MainWindow
 from ui.AddArchitect import Ui_AddArchitectDialog
@@ -114,18 +114,69 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		else:
 			self.ProjectsComboBox.setCurrentIndex(0)
 
+		# add actions, triggers, and shortcut keys
+		new_architect_action = QAction("Add Architect", self)
+		new_architect_action.triggered.connect(self.addArchitect)
+		new_architect_action.setShortcut(QKeySequence("Ctrl+A"))
+		new_project_action = QAction("Add Project", self)
+		new_project_action.triggered.connect(self.addProject)
+		new_project_action.setShortcut(QKeySequence("Ctrl+P"))
+		log_time_action = QAction("Log Time", self)
+		log_time_action.triggered.connect(self.logTime)
+		log_time_action.setShortcut(QKeySequence("Ctrl+L"))
+		add_time_action = QAction("Add Time", self)
+		add_time_action.triggered.connect(self.addTime)
+		add_time_action.setShortcut(QKeySequence("Ctrl+T"))
+
+		view_architects_action = QAction("View Architects", self)
+		view_architects_action.triggered.connect(self.viewArchitects)
+		view_architects_action.setShortcut(QKeySequence("Ctrl+Shift+A"))
+		view_projects_action = QAction("View Projects", self)
+		view_projects_action.triggered.connect(self.viewProjects)
+		view_projects_action.setShortcut(QKeySequence("Ctrl+Shift+P"))
+		view_time_entries_action = QAction("View Time Logs", self)
+		view_time_entries_action.triggered.connect(self.viewTimeEntries)
+		view_time_entries_action.setShortcut(QKeySequence("Ctrl+Shift+L"))
+		view_invoices_action = QAction("View Invoices", self)
+		view_invoices_action.triggered.connect(self.viewInvoices)
+		view_invoices_action.setShortcut(QKeySequence("Ctrl+Shift+I"))
+		view_analytics_action = QAction("Analytics", self)
+		view_analytics_action.triggered.connect(self.viewAnalytics)
+		view_analytics_action.setShortcut(QKeySequence("Ctrl+Shift+N"))
+
+		close_window_action = QAction("Close Window", self)
+		close_window_action.triggered.connect(self.closeActiveWindow)
+		close_window_action.setShortcut(QKeySequence.StandardKey.Close)
+		close_window_action.setShortcutContext(Qt.ShortcutContext.ApplicationShortcut)
+		self.addAction(close_window_action)
+
+		# add menus
+		menu = self.menuBar()
+		file_menu = menu.addMenu("File")
+		file_menu.addAction(new_architect_action)
+		file_menu.addAction(new_project_action)
+		file_menu.addAction(log_time_action)
+		file_menu.addAction(add_time_action)
+		view_menu = menu.addMenu("Views")
+		view_menu.addAction(view_architects_action)
+		view_menu.addAction(view_projects_action)
+		view_menu.addAction(view_time_entries_action)
+		view_menu.addAction(view_invoices_action)
+		view_menu.addSeparator()
+		view_menu.addAction(view_analytics_action)
+
 		# enable button clicks
-		self.AddArchitectBtn.clicked.connect(self.addArchitect)
-		self.AddProjectBtn.clicked.connect(self.addProject)
-		self.LogTimeBtn.clicked.connect(self.logTime)
-		self.AddTimeBtn.clicked.connect(self.addTime)
+		self.AddArchitectBtn.clicked.connect(new_architect_action.trigger)
+		self.AddProjectBtn.clicked.connect(new_project_action.trigger)
+		self.LogTimeBtn.clicked.connect(log_time_action.trigger)
+		self.AddTimeBtn.clicked.connect(add_time_action.trigger)
 
-		self.ViewArchitectsBtn.clicked.connect(self.viewArchitects)
-		self.ViewProjectsBtn.clicked.connect(self.viewProjects)
-		self.ViewTimeLogsBtn.clicked.connect(self.viewTimeEntries)
-		self.ViewInvoicesBtn.clicked.connect(self.viewInvoices)
+		self.ViewArchitectsBtn.clicked.connect(view_architects_action.trigger)
+		self.ViewProjectsBtn.clicked.connect(view_projects_action.trigger)
+		self.ViewTimeLogsBtn.clicked.connect(view_time_entries_action.trigger)
+		self.ViewInvoicesBtn.clicked.connect(view_invoices_action.trigger)
 
-		self.AnalyticsBtn.clicked.connect(self.viewAnalytics)
+		self.AnalyticsBtn.clicked.connect(view_analytics_action.trigger)
 
 		self.show()
 
@@ -295,6 +346,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 			if self.view_time_entries_window is not None:
 				self.view_time_entries_window.model.select()
+
+	def closeActiveWindow(self) -> None:
+		window = QApplication.activeWindow()
+		if window:
+			window.close()
 
 
 class ArchitectWindow(QDialog, Ui_AddArchitectDialog):

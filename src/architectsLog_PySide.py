@@ -10,7 +10,7 @@ from typing import Optional
 
 from PySide6.QtWidgets import (QMainWindow, QApplication, QDialog, QMessageBox,
 	QStyledItemDelegate, QLineEdit, QComboBox, QWidget, QLCDNumber, 
-	QStyleOptionButton, QStyle, QAbstractItemView)
+	QStyleOptionButton, QStyle, QAbstractItemView, QHeaderView)
 from PySide6.QtSql import (QSqlDatabase, QSqlTableModel, QSqlRelationalTableModel, 
 	QSqlRelation, QSqlRelationalDelegate)
 from PySide6.QtCore import (Qt, QDate, QDateTime, QModelIndex, QTimer, QTime, 
@@ -463,7 +463,9 @@ class ViewArchitects(QWidget, Ui_ViewArchitectsWindow):
 	def __init__(self) -> None:
 		super(ViewArchitects, self).__init__()
 		self.setupUi(self)
-		self.setFixedSize(self.size())
+		self.setMinimumSize(self.size())
+		header = self.architectsTableView.horizontalHeader()
+		header.setSectionResizeMode(QHeaderView.Interactive)
 		self.setWindowTitle("Architects")
 
 		# create no-delete table model and set it on window's TableView
@@ -561,7 +563,9 @@ class ViewProjects(QWidget, Ui_ViewProjectsWindow):
 		super(ViewProjects, self).__init__()
 		self.main_window = main_window
 		self.setupUi(self)
-		self.setFixedSize(self.size())
+		self.setMinimumSize(self.size())
+		header = self.projectsTableView.horizontalHeader()
+		header.setSectionResizeMode(QHeaderView.Interactive)
 		self.setWindowTitle("Projects")
 
 		# create a relational table model and set its relation to the phases table
@@ -611,7 +615,7 @@ class ViewProjects(QWidget, Ui_ViewProjectsWindow):
 		self.model.select()
 		self.projectsTableView.setColumnHidden(self.model.fieldIndex("status"), 
 			True)
-		self.projectsTableView.setColumnWidth(1, 170)
+		self.projectsTableView.setColumnWidth(1, 200)
 		self.projectsTableView.setColumnWidth(2, 180)
 		self.projectsTableView.setColumnWidth(3, 340)
 		self.projectsTableView.setColumnWidth(4, 90)
@@ -657,7 +661,7 @@ class ViewProjects(QWidget, Ui_ViewProjectsWindow):
 			self.model.select()
 			self.projectsTableView.setColumnHidden(self.model.fieldIndex("status"), 
 				False)
-			self.projectsTableView.setColumnWidth(1, 150)
+			self.projectsTableView.setColumnWidth(1, 200)
 			self.projectsTableView.setColumnWidth(2, 160)
 			self.projectsTableView.setColumnWidth(3, 320)
 			self.projectsTableView.setColumnWidth(4, 90)
@@ -669,7 +673,7 @@ class ViewProjects(QWidget, Ui_ViewProjectsWindow):
 			self.model.select()
 			self.projectsTableView.setColumnHidden(self.model.fieldIndex("status"), 
 				True)
-			self.projectsTableView.setColumnWidth(1, 170)
+			self.projectsTableView.setColumnWidth(1, 200)
 			self.projectsTableView.setColumnWidth(2, 180)
 			self.projectsTableView.setColumnWidth(3, 340)
 			self.projectsTableView.setColumnWidth(4, 90)
@@ -683,7 +687,9 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 		super(ViewTimeEntries, self).__init__()
 		self.main_window = main_window
 		self.setupUi(self)
-		self.setFixedSize(self.size())
+		self.setMinimumSize(self.size())
+		header = self.timeEntriesTableView.horizontalHeader()
+		header.setSectionResizeMode(QHeaderView.Interactive)
 		self.setWindowTitle("Time Logs")
 
 		# create a relational table model and set its relation to the phases table
@@ -988,20 +994,20 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 		self.timeEntriesTableView.viewport().update()
 
 	def expandColumns(self) -> None:
-		self.timeEntriesTableView.setColumnWidth(1, 155)
+		self.timeEntriesTableView.setColumnWidth(1, 200)
 		self.timeEntriesTableView.setColumnWidth(2, 155)
 		self.timeEntriesTableView.setColumnWidth(3, 180)
 		self.timeEntriesTableView.setColumnWidth(4, 170)
 		self.timeEntriesTableView.setColumnWidth(5, 100)
-		self.timeEntriesTableView.setColumnWidth(6, 592)
+		self.timeEntriesTableView.setColumnWidth(6, 520)
 
 	def contractColumns(self) -> None:	
-		self.timeEntriesTableView.setColumnWidth(1, 155)
+		self.timeEntriesTableView.setColumnWidth(1, 200)
 		self.timeEntriesTableView.setColumnWidth(2, 140)
 		self.timeEntriesTableView.setColumnWidth(3, 180)
 		self.timeEntriesTableView.setColumnWidth(4, 152)
 		self.timeEntriesTableView.setColumnWidth(5, 80)
-		self.timeEntriesTableView.setColumnWidth(6, 550)
+		self.timeEntriesTableView.setColumnWidth(6, 480)
 		self.timeEntriesTableView.setColumnWidth(7, 100)
 
 	def eventFilter(self, obj, event) -> bool:
@@ -1037,7 +1043,9 @@ class ViewInvoices(QWidget, Ui_ViewInvoicesWindow):
 	def __init__(self) -> None:
 		super(ViewInvoices, self).__init__()
 		self.setupUi(self)
-		self.setFixedSize(self.size())
+		self.setMinimumSize(self.size())
+		header = self.invoicesTableView.horizontalHeader()
+		header.setSectionResizeMode(QHeaderView.Interactive)
 		self.setWindowTitle("Invoices")
 
 		self.model = InvoiceRelationalTableModel()
@@ -1138,7 +1146,7 @@ class ViewInvoices(QWidget, Ui_ViewInvoicesWindow):
 		else:
 			self.ProjectComboBox.hide()
 			self.showCompletedProjectsCheckBox.hide()
-			self.model.setFilter(f"")
+			self.model.setFilter(f"invoice_id > 0")
 
 	def updateFilter(self) -> None:
 		proj_index = self.ProjectComboBox.currentIndex()
@@ -1152,12 +1160,17 @@ class ViewInvoices(QWidget, Ui_ViewInvoicesWindow):
 		self.model.setFilter(f"project_name = '{proj_name}'")
 
 	def showCompletedProjects(self, signal) -> None:
-		set_row = self.ProjectComboBox.currentIndex()
+		proj_index = self.ProjectComboBox.currentIndex()
+		proj_id = self.project_model.data(self.project_model.index(proj_index, 0))
 		if signal == 2:
 			self.project_model.setFilter("project_id > 0")
 		else:
 			self.project_model.setFilter("status = 'Active' AND project_id > 0")
-		self.ProjectComboBox.setCurrentIndex(set_row)
+		proj_match = self.project_model.match(self.project_model.index(0,0),
+			Qt.EditRole, proj_id, 1, Qt.MatchFlags(Qt.MatchExactly))
+		if proj_match:
+			row = proj_match[0].row()
+			self.ProjectComboBox.setCurrentIndex(row)
 
 	def viewInvoice(self) -> None:
 		self.invoice_ids = []

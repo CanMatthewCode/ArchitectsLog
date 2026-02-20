@@ -26,19 +26,19 @@ def get_connection(db_file: str | None = None) -> sqlite3.Connection:
 #database connection function for production code
 @contextmanager
 def get_db_connection(db_file: str | None = None) -> sqlite3.Connection:
-    """Context manager for database connections"""
-    if db_file is None:
-        db_file = DB_FILE
-    conn = sqlite3.connect(db_file)
-    conn.execute('PRAGMA foreign_keys = ON;')
-    try:
-        yield conn
-        conn.commit()
-    except Exception:
-        conn.rollback()
-        raise
-    finally:
-        conn.close()
+	"""Context manager for database connections"""
+	if db_file is None:
+		db_file = DB_FILE
+	conn = sqlite3.connect(db_file)
+	conn.execute('PRAGMA foreign_keys = ON;')
+	try:
+		yield conn
+		conn.commit()
+	except Exception as e:
+		conn.rollback()
+		raise
+	finally:
+		conn.close()
 
 
 

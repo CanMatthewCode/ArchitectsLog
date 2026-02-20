@@ -6,13 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1034</width>
-    <height>450</height>
+    <width>1100</width>
+    <height>550</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>1000</width>
+    <width>1100</width>
     <height>450</height>
    </size>
   </property>
@@ -68,14 +68,14 @@
    <item>
     <widget class="QTableView" name="projectsTableView">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
      <property name="minimumSize">
       <size>
-       <width>1010</width>
+       <width>1050</width>
        <height>0</height>
       </size>
      </property>
@@ -87,6 +87,9 @@
      <property name="alternatingRowColors">
       <bool>true</bool>
      </property>
+     <attribute name="horizontalHeaderStretchLastSection">
+      <bool>true</bool>
+     </attribute>
     </widget>
    </item>
   </layout>

@@ -10,6 +10,12 @@
     <height>450</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
@@ -58,7 +64,7 @@
    <item alignment="Qt::AlignmentFlag::AlignHCenter">
     <widget class="QTableView" name="invoicesTableView">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -72,10 +78,16 @@
      <property name="alternatingRowColors">
       <bool>true</bool>
      </property>
+     <attribute name="horizontalHeaderStretchLastSection">
+      <bool>true</bool>
+     </attribute>
     </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="sizeConstraint">
+      <enum>QLayout::SizeConstraint::SetNoConstraint</enum>
+     </property>
      <item alignment="Qt::AlignmentFlag::AlignLeft">
       <widget class="QCheckBox" name="showByProjectCheckBox">
        <property name="sizePolicy">

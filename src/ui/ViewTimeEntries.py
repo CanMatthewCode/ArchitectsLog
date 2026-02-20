@@ -24,7 +24,7 @@ class Ui_ViewTimeEntriesWindow(object):
         if not ViewTimeEntriesWindow.objectName():
             ViewTimeEntriesWindow.setObjectName(u"ViewTimeEntriesWindow")
         ViewTimeEntriesWindow.resize(1424, 650)
-        sizePolicy = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(ViewTimeEntriesWindow.sizePolicy().hasHeightForWidth())
@@ -50,6 +50,22 @@ class Ui_ViewTimeEntriesWindow(object):
 
         self.verticalLayout.addWidget(self.timeLogsLabel)
 
+        self.timeEntriesTableView = QTableView(ViewTimeEntriesWindow)
+        self.timeEntriesTableView.setObjectName(u"timeEntriesTableView")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Expanding)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.timeEntriesTableView.sizePolicy().hasHeightForWidth())
+        self.timeEntriesTableView.setSizePolicy(sizePolicy1)
+        self.timeEntriesTableView.setMinimumSize(QSize(1200, 0))
+        self.timeEntriesTableView.setStyleSheet(u"QTableView{\n"
+"	color: #89D5D2;\n"
+"}")
+        self.timeEntriesTableView.setAlternatingRowColors(True)
+        self.timeEntriesTableView.horizontalHeader().setStretchLastSection(True)
+
+        self.verticalLayout.addWidget(self.timeEntriesTableView)
+
         self.showInvoicedCheckBox = QCheckBox(ViewTimeEntriesWindow)
         self.showInvoicedCheckBox.setObjectName(u"showInvoicedCheckBox")
         self.showInvoicedCheckBox.setStyleSheet(u"QCheckBox{\n"
@@ -57,21 +73,6 @@ class Ui_ViewTimeEntriesWindow(object):
 "}")
 
         self.verticalLayout.addWidget(self.showInvoicedCheckBox, 0, Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
-
-        self.timeEntriesTableView = QTableView(ViewTimeEntriesWindow)
-        self.timeEntriesTableView.setObjectName(u"timeEntriesTableView")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Expanding)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.timeEntriesTableView.sizePolicy().hasHeightForWidth())
-        self.timeEntriesTableView.setSizePolicy(sizePolicy1)
-        self.timeEntriesTableView.setMinimumSize(QSize(1400, 0))
-        self.timeEntriesTableView.setStyleSheet(u"QTableView{\n"
-"	color: #89D5D2;\n"
-"}")
-        self.timeEntriesTableView.setAlternatingRowColors(True)
-
-        self.verticalLayout.addWidget(self.timeEntriesTableView)
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")

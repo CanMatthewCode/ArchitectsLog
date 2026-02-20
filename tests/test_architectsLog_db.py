@@ -15,26 +15,8 @@ from architectsLog_db import (get_connection, create_architect_table, create_pro
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry
 
-TEST_DB = 'test_architectsLog.db'
 
 #	~~~PYTEST.FIXTURES AND DATABASE CONNECTIONS~~~
-
-#create a database auto cleanup before and after each test
-@pytest.fixture(autouse=True)
-def cleanup_test_db():
-    if os.path.exists(TEST_DB):
-        os.remove(TEST_DB)
-    yield
-    if os.path.exists(TEST_DB):
-        os.remove(TEST_DB)
-
-#create a connection for the databases then closes them before each test
-@pytest.fixture
-def test_conn():
-    """Fixture that provides a test connection and cleans up after"""
-    conn = get_connection(TEST_DB)
-    yield conn
-    conn.close()
 
 #create all tables and populate or initialize them 
 @pytest.fixture

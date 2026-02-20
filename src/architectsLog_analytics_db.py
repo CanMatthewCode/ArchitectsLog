@@ -60,7 +60,7 @@ def phase_time_entries_by_project(project_id: int,
 	cur.execute(sql, (project_id,))
 	return cur.fetchall()
 
-def phase_duration_all_projects( cur: sqlite3.Cursor, start_date: Optional[int] = None,
+def phase_duration_all_projects(cur: sqlite3.Cursor, start_date: Optional[int] = None,
 	end_date: Optional[int] = None) -> list[tuple[int, int]]:
 	"""Retrieve a summation of all your projects' phase duration + business dev & admin,
 	within a passed in time constraint (as integers), returns a list of tuples containing 

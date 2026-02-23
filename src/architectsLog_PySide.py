@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (QMainWindow, QApplication, QDialog, QMessageBox,
 	QStyledItemDelegate, QLineEdit, QComboBox, QWidget, QLCDNumber, 
 	QStyleOptionButton, QStyle, QAbstractItemView, QHeaderView)
 from PySide6.QtSql import (QSqlDatabase, QSqlTableModel, QSqlRelationalTableModel, 
-	QSqlRelation, QSqlRelationalDelegate)
+	QSqlRelation, QSqlRelationalDelegate, QSqlQuery)
 from PySide6.QtCore import (Qt, QDate, QDateTime, QModelIndex, QTimer, QTime, 
 	QRegularExpression, QEvent, QRect)
 from PySide6.QtGui import QRegularExpressionValidator, QAction, QKeySequence
@@ -70,7 +70,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.view_invoices_window = None
 		self.analytics_window = None
 
-		# create architect, project, phase models and set them on their combo box
 		self.architect_model = QSqlTableModel()
 		self.architect_model.setTable("architects")
 		self.architect_model.select()
@@ -89,13 +88,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.phase_model.select()
 		self.PhasesComboBox.setModel(self.phase_model)
 		self.PhasesComboBox.setModelColumn(1)					# Index 1 is phase name
-		# set the phases combo box to be the project's current phase - 
-		# 5 is phase_id column number in projects table
+
 		setCrossComboBox(self.ProjectsComboBox, self.PhasesComboBox, 5)
 		self.ProjectsComboBox.currentIndexChanged.connect(self.projectChanged)
 		self.PhasesComboBox.currentIndexChanged.connect(self.phaseChanged)
 
-		# set architect and project combo boxes on most recently added time entry
+		# Set architect and project combo boxes on most recently added time entry
 		with get_db_connection() as conn:
 			cur = conn.cursor()
 			arch_proj_ids = get_most_recent_archid_and_projid(cur)
@@ -114,7 +112,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		else:
 			self.ProjectsComboBox.setCurrentIndex(0)
 
-		# add actions, triggers, and shortcut keys
 		new_architect_action = QAction("Add Architect", self)
 		new_architect_action.triggered.connect(self.addArchitect)
 		new_architect_action.setShortcut(QKeySequence("Ctrl+A"))
@@ -150,7 +147,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		close_window_action.setShortcutContext(Qt.ShortcutContext.ApplicationShortcut)
 		self.addAction(close_window_action)
 
-		# add menus
 		menu = self.menuBar()
 		file_menu = menu.addMenu("File")
 		file_menu.addAction(new_architect_action)
@@ -227,7 +223,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		if self.view_proj_window is not None:
 			self.view_proj_window.model.select()
 
-	# button methods
+	# Button methods
 	def addArchitect(self) -> None:
 		"""Method to open new architect dialog, store results as a new Architect
 		object, then store that object in the architects table of the database"""
@@ -250,9 +246,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		proj_window = ProjectWindow()
 		result = proj_window.exec()
 		if result == QDialog.Accepted:
-			# Get the current index from the combo box
 			phase_index = proj_window.phaseComboBox.currentIndex()
-			# Get the phase_id from the phases table through the QComboBox model
 			model = proj_window.phaseComboBox.model()
 			phase_id = model.data(model.index(phase_index, 0))
 			# Turn the QDate object into a string
@@ -360,7 +354,7 @@ class ArchitectWindow(QDialog, Ui_AddArchitectDialog):
 		self.setFixedSize(self.size())
 		self.setWindowTitle("Add Architect")
 
-		# set validators on phone and email patterns to sanitize user input
+		# Set validators on phone and email patterns to sanitize user input
 		phone_regex = QRegularExpression(r'\(*(\d{3})\)*(\s|.)?(\d{3})(\s|.)?(\d{4})')
 		phone_validator = QRegularExpressionValidator(phone_regex, self.phoneInput)
 		self.phoneInput.setValidator(phone_validator)
@@ -406,7 +400,7 @@ class ArchitectWindow(QDialog, Ui_AddArchitectDialog):
 				"Invalid Phone Number, Please Correct")
 			return
 		 
-		# modify phone number to fix (xxx) xxx.xxxx style
+		# Modify phone number to fix (xxx) xxx.xxxx style
 		original_text = self.phoneInput.text()
 		result = phone_pattern.sub(r"(\g<1>) \g<3>-\g<5>", original_text)
 		self.phoneInput.setText(result)
@@ -421,10 +415,9 @@ class ProjectWindow(QDialog, Ui_AddProjectDialog):
 		self.setFixedSize(self.size())
 		self.setWindowTitle("Add Project")
 
-		# set current date onto the calendar drop down
 		self.projectStartDate.setDate(QDate.currentDate())
 
-		# set first phase to the Phase QComboBox
+		# Set first phase to the Phase QComboBox
 		self.phase_model = QSqlTableModel()
 		self.phase_model.setTable("phases")
 		self.phase_model.setFilter("phase_id < 8")
@@ -468,17 +461,16 @@ class ViewArchitects(QWidget, Ui_ViewArchitectsWindow):
 		header.setSectionResizeMode(QHeaderView.Interactive)
 		self.setWindowTitle("Architects")
 
-		# create no-delete table model and set it on window's TableView
+		# Create no-delete table model and set it on window's TableView
 		self.model = ArchitectsTableModel()
 		self.model.setTable("architects")
 
-		# set my model on my view
 		self.architectsTableView.setModel(self.model)
 
-		# allow editing of architect information
+		# Allow editing of architect information
 		self.model.setEditStrategy(QSqlTableModel.OnFieldChange)
 
-		# create and set column headers
+		# Create and set column headers
 		column_titles = {
 			"name" : "Name",
 			"license_number" : "License Number",
@@ -493,11 +485,9 @@ class ViewArchitects(QWidget, Ui_ViewArchitectsWindow):
 
 		self.model.select()
 
-		# hide architect_id column
 		self.architectsTableView.setColumnHidden(
 			self.model.fieldIndex("architect_id"), True)
 
-		# set column widths
 		self.model.setFilter("status != 'Inactive'")
 		self.model.select()
 		self.architectsTableView.setColumnHidden(self.model.fieldIndex("status"), 
@@ -508,32 +498,32 @@ class ViewArchitects(QWidget, Ui_ViewArchitectsWindow):
 		self.architectsTableView.setColumnWidth(4, 215)
 		self.architectsTableView.setColumnWidth(5, 170)
 
-		# move license number to after company name
+		# Move license number to after company name
 		header = self.architectsTableView.horizontalHeader()
 		header.moveSection(5, 2) 			# move company name to 2nd column
 		#self.model.select()
 
-		# set original sort by architect name
+		# Set original sort by architect name
 		index = self.model.fieldIndex("name")
 		self.architectsTableView.sortByColumn(index, Qt.AscendingOrder)
 
-		# allow table to be sorted by clicking top header tabs
+		# Allow table to be sorted by clicking top header tabs
 		self.architectsTableView.setSortingEnabled(True)
 
-		# only allow chosen options for status column - create a combo box and set
+		# Only allow chosen options for status column - create a combo box and set
 		# it on the column for status to allow only acceptable status options
 		status_delegate = StatusDelegate(ARCHITECT_STATUSES, self.architectsTableView)
 		status_column = self.model.fieldIndex("status")
 		self.architectsTableView.setItemDelegateForColumn(status_column, 
 			status_delegate)
 		
-		# set checkbox button to hide inactive architects
+		# Set checkbox button to hide inactive architects
 		self.showArchitectCheckBox.stateChanged.connect(self.showInactiveArchitects)
 		
 		self.show()
 
 	def showInactiveArchitects(self, state) -> None:
-		# create filter to hide inactive architects and status column
+		"""Create filter to hide inactive architects and status column"""
 		if state == 2:
 			self.model.setFilter("")
 			self.model.select()
@@ -568,30 +558,28 @@ class ViewProjects(QWidget, Ui_ViewProjectsWindow):
 		header.setSectionResizeMode(QHeaderView.Interactive)
 		self.setWindowTitle("Projects")
 
-		# create a relational table model and set its relation to the phases table
+		# Create a relational table model and set its relation to the phases table
 		self.model = ProjectsRelationalTableModel()
 
 		self.projectsTableView.setModel(self.model)
 
 		self.model.setTable("projects")
 		
-		# create a relation between 'projects' table and 'phases' with drop-down menu
+		# Create a relation between 'projects' table and 'phases' with drop-down menu
 		relation = QSqlRelation("phases", "phase_id", "project_phase")
 		self.model.setRelation(self.model.fieldIndex("current_phase_id"), relation)
 
 		self.projectsTableView.setItemDelegate(QSqlRelationalDelegate(
 			self.projectsTableView))
 
-		# set start date delegate
+		# Set start date delegate
 		start_date_column_index = self.model.fieldIndex("start_date")
 		self.projectsTableView.setItemDelegateForColumn(
 			start_date_column_index, CreatedDateDelegate(
 				self.projectsTableView))
 
-		# allow editing of project information
 		self.model.setEditStrategy(QSqlRelationalTableModel.OnFieldChange)
 
-		# create and set column headers
 		column_titles = {
 			"project_name" : "Project Name",
 			"client_name" : "Client Name",
@@ -606,11 +594,9 @@ class ViewProjects(QWidget, Ui_ViewProjectsWindow):
 
 		self.model.select()
 
-		# hide project_id column
 		self.projectsTableView.setColumnHidden(
 			self.model.fieldIndex("project_id"), True)
 
-		# set column widths
 		self.model.setFilter("status != 'Completed' and project_id > 0")
 		self.model.select()
 		self.projectsTableView.setColumnHidden(self.model.fieldIndex("status"), 
@@ -621,23 +607,20 @@ class ViewProjects(QWidget, Ui_ViewProjectsWindow):
 		self.projectsTableView.setColumnWidth(4, 90)
 		self.projectsTableView.setColumnWidth(5, 202)
 
-		# set original sort by project name
 		index = self.model.fieldIndex("project_name")
 		self.projectsTableView.sortByColumn(index, Qt.AscendingOrder)
 
-		# allow table to be sorted by clicking top header tabs
 		self.projectsTableView.setSortingEnabled(True)
 
-		# allow only chosen options for status column combo box
+		# Allow only chosen options for status column combo box
 		status_delegate = StatusDelegate(PROJECT_STATUSES, self.projectsTableView)
 		status_column = self.model.fieldIndex("status")
 		self.projectsTableView.setItemDelegateForColumn(status_column, 
 			status_delegate)
 
-		# set checkbox button to show completed projects
 		self.showProjectCheckBox.stateChanged.connect(self.showCompletedProjects)
 
-		# set the main window phases combo box when user changes project phase
+		# Set the main window phases combo box when user changes project phase
 		self.model.dataChanged.connect(self.dataChanged)
 
 		self.show()
@@ -655,7 +638,7 @@ class ViewProjects(QWidget, Ui_ViewProjectsWindow):
 				self.main_window.PhasesComboBox, 5)
 
 	def showCompletedProjects(self, signal) -> None:
-		"""create filter to hide completed projects and status column"""
+		"""Create filter to hide completed projects and status column"""
 		if signal == 2:
 			self.model.setFilter("project_id > 0")
 			self.model.select()
@@ -692,30 +675,23 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 		header.setSectionResizeMode(QHeaderView.Interactive)
 		self.setWindowTitle("Time Logs")
 
-		# create a relational table model and set its relation to the phases table
 		self.model = TimeEntriesRelationalTableModel()
 		self.timeEntriesTableView.setModel(self.model)
 		self.model.setTable("time_entries")
 
-		# allow table to be sorted by clicking top header tabs
 		self.timeEntriesTableView.setSortingEnabled(True)
 
-		# allow editing of time_entries information
 		self.model.setEditStrategy(QSqlRelationalTableModel.OnFieldChange)
 
-		# add a relation between 'time_entries' table and 'phases' with drop-down menu
 		phase_relation = QSqlRelation("phases", "phase_id", "project_phase")
 		self.model.setRelation(self.model.fieldIndex("phase_id"), phase_relation)
 
-		# add relation between 'time_entries' table and 'architects' with drop-down menu
 		arch_relation = QSqlRelation("architects", "architect_id", "name")
 		self.model.setRelation(self.model.fieldIndex("architect_id"), arch_relation)
 
-		# add relation between 'time_entries' table and 'projects' with drop-down menu
 		project_relation = QSqlRelation("projects", "project_id", "project_name")
 		self.model.setRelation(self.model.fieldIndex("project_id"), project_relation)
 
-		# add relation between 'time_entries' table and 'invoices' with drop-down menu
 		invoice_relation = QSqlRelation("invoices", "invoice_id", "invoice_number")
 		self.model.setRelation(self.model.fieldIndex("invoice_id"), invoice_relation)
 
@@ -730,25 +706,24 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 		self.timeEntriesTableView.setItemDelegate(QSqlRelationalDelegate(
 			self.timeEntriesTableView))
 
-		# set duration delegate
+		# Set duration delegate
 		duration_column_index = self.model.fieldIndex("duration_minutes")
 		self.timeEntriesTableView.setItemDelegateForColumn(
 			duration_column_index, DurationDelegate(
 				self.timeEntriesTableView))
 
-		# set start time delegate
+		# Set start time delegate
 		start_time_column_index = self.model.fieldIndex("start_time")
 		self.timeEntriesTableView.setItemDelegateForColumn(
 			start_time_column_index, TimeStartDelegate(
 				self.timeEntriesTableView))
 
-		# set checkbox delegate
+		# Set checkbox delegate
 		self.invoice_checkbox_delegate = InvoiceCheckboxDelegate(self.model, self)
 		invoice_col = self.model.fieldIndex("invoice_id")
 		self.timeEntriesTableView.setItemDelegateForColumn(invoice_col, 
 			self.invoice_checkbox_delegate)
 
-		# create and set column headers
 		column_titles = {
 			"project_id" : "Project Name",
 			"architect_id" : "Architect's Name",
@@ -764,7 +739,6 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 
 		self.model.select()
 
-		# hide time_entry_id column
 		self.timeEntriesTableView.setColumnHidden(
 			self.model.fieldIndex("time_entry_id"), True)
 
@@ -772,17 +746,15 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 		header.moveSection(1, 2)
 		header.moveSection(7, 6)
 
-		# set original sort by start time
 		index = self.model.fieldIndex("start_time")
 		self.timeEntriesTableView.sortByColumn(index, Qt.DescendingOrder)
 
-		# set column widths
 		self.model.setFilter("invoice_number = 'Not Invoiced'")
 		self.timeEntriesTableView.setColumnHidden(self.model.fieldIndex(
 			"invoice_number"), True)
 		self.expandColumns()
 
-		# create an event filter so the table view sees delete key presses
+		# Create an event filter so the table view sees delete key presses
 		self.timeEntriesTableView.installEventFilter(self)
 
 		self.cancelInvoiceBtn.hide()
@@ -790,7 +762,7 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 		self.ProjectComboBox.hide()
 		self.showCompletedProjectsCheckBox.hide()
 
-		# click box activation
+		# Click box activation
 		self.showInvoicedCheckBox.stateChanged.connect(self.showInvoicedTimes)
 
 		self.showByProjectCheckBox.stateChanged.connect(self.showProjectCombo)
@@ -900,7 +872,7 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 			self.invoice_checkbox_delegate.selection_mode = False
 			self.createInvoiceBtn.setText("Create Invoice")
 
-			# add time_entry_ids and proj_ids to list
+			# Add time_entry_ids and proj_ids to list
 			checked_invoice_time_entry_ids = []
 			checked_invoice_proj_names = set()
 			for row in self.invoice_checkbox_delegate.checked_rows:
@@ -943,18 +915,40 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 				date = datetime.now()
 				start_date = int(date.timestamp())
 
-				with get_db_connection() as conn:
-					cur = conn.cursor()
-					query = "SELECT project_id FROM projects WHERE project_name = ?"
-					cur.execute(query, (project_name,))
-					proj_id = cur.fetchone()[0]
-					if proj_id:
-						# Create invoice
-						new_invoice = Invoice(invoice_number, start_date, proj_id)
-						invoice_id = add_invoice(new_invoice, cur)
-						# Update time_entry invoice_id columns for selected time_entries
+				db = QSqlDatabase.database()
+				db.transaction()
+
+				try:
+					query = QSqlQuery()
+					query.prepare("SELECT project_id FROM projects WHERE project_name = ?")
+					query.addBindValue(project_name)
+					query.exec()
+					if query.next():
+						proj_id = query.value(0)
+				        
+				        # Create invoice
+						query2 = QSqlQuery()
+						query2.prepare("INSERT INTO invoices (project_id, created_date, invoice_number, status) VALUES (?, ?, ?, ?)")
+						query2.addBindValue(proj_id)
+						query2.addBindValue(start_date)
+						query2.addBindValue(invoice_number)
+						query2.addBindValue("Draft")
+						query2.exec()
+						invoice_id = query2.lastInsertId()
+				        
+				        # Update time entries
 						for time_entry in checked_invoice_time_entry_ids:
-							update_time_entry("invoice_id", time_entry, invoice_id, cur)
+							query3 = QSqlQuery()
+							query3.prepare("UPDATE time_entries SET invoice_id = ? WHERE time_entry_id = ?")
+							query3.addBindValue(invoice_id)
+							query3.addBindValue(time_entry)
+							query3.exec()
+				    
+					db.commit()
+				except:
+					db.rollback()
+					raise
+
 				self.model.select()
 
 				# Refresh the invoice_number model's drop down menu
@@ -1023,9 +1017,13 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 						if result == QDialog.Accepted:
 							for row in selected_rows:
 								time_entry_id = self.model.data(self.model.index(row, 0))
-								with get_db_connection() as conn:
-									cur = conn.cursor()
-									delete_time_entry(time_entry_id, cur)
+								query = QSqlQuery()
+								query.prepare(
+									"DELETE FROM time_entries WHERE time_entry_id = ?")
+								query.addBindValue(time_entry_id)
+								if not query.exec():
+									print(f"Delete failed: {query.lastError().text()}")
+
 							self.model.select()
 						else:
 							return False
@@ -1072,14 +1070,13 @@ class ViewInvoices(QWidget, Ui_ViewInvoicesWindow):
 
 		self.model.select()
 
-		# create an event filter so the table view sees delete key presses
+		# Create an event filter so the table view sees delete key presses
 		self.invoicesTableView.installEventFilter(self)
 
-		# hide invoice_id column
 		self.invoicesTableView.setColumnHidden(
 			self.model.fieldIndex("invoice_id"), True)
 
-		# set created date delegate
+		# Set created date delegate
 		created_date_column_index = self.model.fieldIndex("created_date")
 		self.invoicesTableView.setItemDelegateForColumn(
 			created_date_column_index, CreatedDateDelegate(
@@ -1088,7 +1085,6 @@ class ViewInvoices(QWidget, Ui_ViewInvoicesWindow):
 		header = self.invoicesTableView.horizontalHeader()
 		header.moveSection(3, 1)
 
-		# set original sort by start time
 		index = self.model.fieldIndex("created_date")
 		self.invoicesTableView.sortByColumn(index, Qt.DescendingOrder)
 
@@ -1096,9 +1092,7 @@ class ViewInvoices(QWidget, Ui_ViewInvoicesWindow):
 		self.invoicesTableView.setColumnWidth(2, 150)
 		self.invoicesTableView.setColumnWidth(3, 150)
 		self.invoicesTableView.setColumnWidth(4, 100)
-		
-		# only allow chosen options for status column - create a combo box and set
-		# it on the column for status to allow only acceptable status options
+
 		status_delegate = StatusDelegate(INVOICE_STATUSES, self.invoicesTableView)
 		status_column = self.model.fieldIndex("status")
 		self.invoicesTableView.setItemDelegateForColumn(status_column, 
@@ -1198,9 +1192,12 @@ class ViewInvoices(QWidget, Ui_ViewInvoicesWindow):
 						if result == QDialog.Accepted:
 							for row in selected_rows:
 								invoice_id = self.model.data(self.model.index(row, 0))
-								with get_db_connection() as conn:
-									cur = conn.cursor()
-									delete_invoice(invoice_id, cur)
+								query = QSqlQuery()
+								query.prepare("DELETE FROM invoices \
+									WHERE invoice_id = ?")
+								query.addBindValue(invoice_id)
+								if not query.exec():
+									print(f"Delete failed: {query.lastError().text()}")
 							self.model.select()
 						else:
 							return False
@@ -1325,8 +1322,6 @@ class ViewAnalytics(QWidget, Ui_AnalyticsWindow):
 			phase_data = phase_duration_by_project(rand_id, cur)
 			phase_time_data = phase_time_entries_by_project(rand_id, cur)
 			total_hours = phase_duration_all_projects(cur)
-			phase_data_with_name = phase_duration_by_project_with_name(rand_id, cur)
-			num_proj_by_phase_tuple = total_number_of_projects_by_phase(cur)
 			projs_over_time = project_ids_over_time_period(start_date_int, end_date_int, cur)
 			projs_over_time_ids = [proj[0] for proj in projs_over_time]
 			projs_over_time_names = [proj[1] for proj in projs_over_time]
@@ -1340,25 +1335,6 @@ class ViewAnalytics(QWidget, Ui_AnalyticsWindow):
 			phase_time_data)
 		self.phaseAveragesWidget.pie_by_phase(
 			total_hours, "Total Time Breakdown")
-
-		num_projects_by_phase = [projects[1] for projects in num_proj_by_phase_tuple]
-		avg_data = [round(data[1]/projects, 1) 
-			for data, projects in zip(total_hours, num_projects_by_phase)]
-		avg_phases = [data[0] for data in total_hours]
-
-		if ADMIN in avg_phases and BUSDEV in avg_phases:
-			shifted_avg_phases = avg_phases[:-2]
-			shifted_avg_data = avg_data[:-2]
-		elif ADMIN in avg_phases or BUSDEV in avg_phases:
-			shifted_avg_phases = avg_phases[:-1]
-			shifted_avg_data = avg_data[:-1]
-		else:
-			shifted_avg_phases = avg_phases
-			shifted_avg_data = avg_data
-		avg_data_tuple = list(zip(shifted_avg_phases, shifted_avg_data))
-
-		#self.phaseAveragesWidget.bars_by_phase(
-		#	avg_data_tuple, "Average Hours Per Phase")
 
 		if ("Administration" in projs_over_time_names and 
 			"Business Development" in projs_over_time_names):
@@ -1926,6 +1902,7 @@ class ViewProjectsOverTime(QWidget, Ui_ProjectsOverTimeWindow):
 		self.ProjectsOverTimeWidget.bars_projects_by_phase(
 			self.shifted_projs_over_time, self.shifted_names_over_time, "legend")
 
+
 #		~~~TIME LOGGERS~~~
 
 class TimerDisplay(QLCDNumber):
@@ -1983,7 +1960,6 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 		self.PhaseComboBox.currentIndexChanged.connect(self.phaseChanged)
 		self.ProjectComboBox.currentIndexChanged.connect(self.projectChanged)
 
-		# link buttons
 		self.startPauseTimer.clicked.connect(self.startPauseTime)
 		self.stopTimer.clicked.connect(self.stopTime)
 
@@ -2054,7 +2030,6 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 			self.time_log.timer_state = "paused"
 		total_time = ((end_time - self.time_log.start_time).total_seconds() - 
 			self.time_log.total_pause_duration)
-		# Convert to int to store in database
 		start_time = int(self.time_log.start_time.timestamp())
 		
 		total_minutes = total_time // 60
@@ -2068,7 +2043,6 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 			self.close()
 			return
 
-		# Pop up notes dialog
 		self.timeNotes = TimeEntriesNotesWindow()
 		self.timeNotes.exec()
 
@@ -2088,15 +2062,22 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 
 		time_notes = self.timeNotes.notesTextEdit.toPlainText()
 
-		# Create TimeEntry object with created data
-		new_time_entry = TimeEntry(start_time = start_time, 
-			duration_minutes = total_time_logged, project_id = proj_id, 
-			architect_id = arch_id, phase_id = phase_id, notes = time_notes, 
-			invoice_id = 0)
+		query = QSqlQuery()
+		query.prepare("""INSERT INTO time_entries\
+			(project_id, architect_id, phase_id, start_time, duration_minutes, notes) \
+			VALUES (?, ?, ?, ?, ?, ?)""")
+		query.addBindValue(proj_id)
+		query.addBindValue(arch_id)
+		query.addBindValue(phase_id)
+		query.addBindValue(start_time)
+		query.addBindValue(total_time_logged)
+		query.addBindValue(time_notes)
 
-		with get_db_connection() as conn:
-			cur = conn.cursor()
-			add_time_entry(new_time_entry, cur)
+		if not query.exec():
+			print(f"Insert failed: {query.lastError().text()}")
+		else:
+			if self.main_window.view_time_entries_window is not None:
+				self.main_window.view_time_entries_window.model.select()
 
 		self.main_window.showNormal()
 		self.close()
@@ -2121,7 +2102,7 @@ class TimeLog():
 				- self.total_pause_duration)
 		return self.total_time
 
-class TimeEntriesNotesWindow(QDialog, Ui_AddInvoiceDialog):
+class TimeEntriesNotesWindow(QDialog, Ui_TimeNotesDialog):
 	def __init__(self) -> None:
 		super(TimeEntriesNotesWindow, self).__init__()
 		self.setupUi(self)
@@ -2138,7 +2119,6 @@ class ManualTimeLogger(QDialog, Ui_AddTimeDialog):
 		self.main_window = main_window
 		self.setWindowTitle("Add Time")
 		
-		# Set models
 		self.architect_model = QSqlTableModel()
 		self.architect_model.setTable("architects")
 		self.architect_model.select()
@@ -2301,7 +2281,6 @@ class ProjectsRelationalTableModel(QSqlRelationalTableModel):
 		return super().data(index, role)
 
 	def setData(self, index, value, role = Qt.EditRole) -> bool:
-		# Get column database names to safety desired column entries by user
 		field_name = self.record().fieldName(index.column())
 
 		# Check start date is a valid date and reformat to chosen syntax
@@ -2311,8 +2290,7 @@ class ProjectsRelationalTableModel(QSqlRelationalTableModel):
 					for fmt in ['%m-%d-%Y', '%m/%d/%Y', '%d-%m-%Y', '%d/%m/%Y']:
 						try:
 							date_obj = datetime.strptime(value, fmt)
-							formatted_date = date_obj.strftime('%m/%d/%Y')
-							value = int(formatted_date.timestamp())
+							value = int(date_obj.timestamp())
 							break
 						except ValueError:
 							continue
@@ -2335,13 +2313,7 @@ class ProjectsRelationalTableModel(QSqlRelationalTableModel):
 		return super().setData(index, value, role)
 
 class TimeEntriesRelationalTableModel(QSqlRelationalTableModel):
-	"""Class to make invoice_id column read only in ViewTimeEntries window,
-	display duration time in hour:minute format instead of total minutes, 
-	display start_time as mm/dd/yyyy hh:mm am/pm,
-	reformat user duration input from hour:min to total minutes,
-	reformat user start_time input from mm/dd/yyyy hh:mm am/pm to total ints"""
-
-
+	"""Class to ensure proper formatting and display of ViewTimeEntries model"""
 	def data(self, index, role = Qt.DisplayRole) -> any:
 		# Get column database names to change display of time duration
 		if role != Qt.DisplayRole:
@@ -2435,7 +2407,7 @@ class TimeEntriesRelationalTableModel(QSqlRelationalTableModel):
 				return False
 
 		if field_name == "invoice_number":
-			# ignore firing twice issue
+			# Ignore firing twice issue
 			if isinstance(value, str):
 				return super().setData(index, value, role)
 
@@ -2517,20 +2489,20 @@ class StatusDelegate(QStyledItemDelegate):
 		self.options = options
 
 	def createEditor(self, parent, options, index) -> QComboBox:
-		# create and return a combo box as the editor
+		# Create and return a combo box as the editor
 		combo = QComboBox(parent)
 		combo.addItems(self.options)
 		return combo
 
 	def setEditorData(self, editor, index) -> None:
-		# set the current value on the combo box
+		# Set the current value on the combo box
 		current_value = index.data()
 		current_index = editor.findText(current_value)
 		if current_index >= 0:
 			editor.setCurrentIndex(current_index)
 
 	def setModelData(self, editor, model, index) -> None:
-		# save the value back to the model
+		# Save the value back to the model
 		value = editor.currentText()
 		model.setData(index, value)
 
@@ -2550,7 +2522,7 @@ class TimeStartDelegate(QStyledItemDelegate):
 	def createEditor(self, parent, options, index) -> QLineEdit:
 		editor = QLineEdit(parent)
 		regex = QRegularExpression(
-			r"^(([0]?[1-9])|([1][1-2]))(-|\/)(([0]?[1-9])|([1-2][0-9])|([3][0-1]))"
+			r"^(([0]?[1-9])|([1][0-2]))(-|\/)(([0]?[1-9])|([1-2][0-9])|([3][0-1]))"
 			r"(-|\/)(\d{2}|(20\d{2}))\s+(([0]?[1-9])|([1][0-2])):[0-5]\d"
 			r"\s(AM|PM|am|pm)$"
 			)
@@ -2564,7 +2536,7 @@ class CreatedDateDelegate(QStyledItemDelegate):
 	def createEditor(self, parent, options, index) -> QLineEdit:
 		editor = QLineEdit(parent)
 		regex = QRegularExpression(
-			r"^(([0]?[1-9])|([1][1-2]))(-|\/)(([0]?[1-9])|([1-2][0-9])|([3][0-1]))"
+			r"^(([0]?[1-9])|([1][0-2]))(-|\/)(([0]?[1-9])|([1-2][0-9])|([3][0-1]))"
 			r"(-|\/)(\d{2}|(20\d{2}))$"
 			)
 		validator = QRegularExpressionValidator(regex, editor)
@@ -2574,7 +2546,6 @@ class CreatedDateDelegate(QStyledItemDelegate):
 
 class InvoiceCheckboxDelegate(QStyledItemDelegate):
 	"""Delegate to show check-boxes in selection mode or drop-down in normal mode"""
-	
 	def __init__(self, model, parent=None) -> None:
 		super().__init__(parent)
 		self.selection_mode = False

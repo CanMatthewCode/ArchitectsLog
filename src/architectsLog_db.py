@@ -1,7 +1,6 @@
 # Database functions for the Architect's Log
 
 import sqlite3
-import os
 from datetime import datetime
 from contextlib import contextmanager
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry
@@ -9,9 +8,7 @@ from architectsLog_constants import PHASES, UPDATABLE_ARCHITECTS_COLUMNS, \
 	UPDATABLE_PROJECTS_COLUMNS, UPDATABLE_INVOICES_COLUMNS, UPDATABLE_TIME_ENTRIES_COLUMNS, \
 	ARCHITECT_STATUSES, INVOICE_STATUSES, PROJECT_STATUSES
 
-log_name = 'architectsLog.db'
-basedir = os.path.dirname(os.path.abspath(__file__))
-DB_FILE = os.path.join(basedir, log_name)
+DB_FILE = ""
 
 #database connection function for testing
 def get_connection(db_file: str | None = None) -> sqlite3.Connection:
@@ -228,7 +225,8 @@ def add_time_entry(time_entry: TimeEntry, cur: sqlite3.Cursor) -> int:
 
 def add_invoice(invoice: Invoice, cur: sqlite3.Cursor) -> int:
 	"""Add an Invoice object to the invoices table, add invoice_id to the Invoice object, 
-	return newly added invoice_id"""
+	return newly added invoice_id.  Function was refactored out, but kept for testing
+	SQL validity"""
 	sql = "INSERT INTO invoices (project_id, created_date, invoice_number, status) \
 		VALUES (?, ?, ?, ?)"
 

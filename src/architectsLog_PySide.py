@@ -768,10 +768,13 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 		header.moveSection(1, 2)
 		header.moveSection(7, 6)
 
+		self.updateFilter()
+
 		index = self.model.fieldIndex("start_time")
 		self.timeEntriesTableView.sortByColumn(index, Qt.DescendingOrder)
 
-		self.model.setFilter("invoice_number = 'Not Invoiced'")
+		#self.model.setFilter("invoice_number = 'Not Invoiced' AND \
+		#	project_phase NOT IN ('Administration', 'Business Development')")
 		self.timeEntriesTableView.setColumnHidden(self.model.fieldIndex(
 			"invoice_number"), True)
 		self.expandColumns()
@@ -786,6 +789,7 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 
 		# Click box activation
 		self.showInvoicedCheckBox.stateChanged.connect(self.showInvoicedTimes)
+		self.showInternalsCheckBox.stateChanged.connect(self.updateFilter)
 
 		self.showByProjectCheckBox.stateChanged.connect(self.showProjectCombo)
 		self.ProjectComboBox.currentIndexChanged.connect(self.updateFilter)
@@ -870,6 +874,10 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 				proj_row = cur.fetchone()
 			proj_name = proj_row[1]
 			filters.append(f"project_name = '{proj_name}'")
+		else:
+			if not self.showInternalsCheckBox.isChecked():
+				filters.append(
+					"project_phase NOT IN ('Administration', 'Business Development')")
 
 		# Combine filters from both check-boxes
 		if filters:
@@ -1236,7 +1244,7 @@ class ViewInvoice(Ui_ViewInvoiceWindow, QWidget):
 		self.setMinimumSize(self.size())
 		header = self.invoiceTableView.horizontalHeader()
 		header.setSectionResizeMode(QHeaderView.Interactive)
-		
+
 		self.invoice_number = invoice_number
 		invoice_number_str = str(invoice_number)
 		

@@ -61,10 +61,13 @@ class Ui_ViewInvoicesWindow(object):
         sizePolicy1.setHeightForWidth(self.invoicesTableView.sizePolicy().hasHeightForWidth())
         self.invoicesTableView.setSizePolicy(sizePolicy1)
         self.invoicesTableView.setMinimumSize(QSize(620, 0))
+        self.invoicesTableView.setStyleSheet(u"QTableView{\n"
+"	color: #89D5D2;\n"
+"}")
         self.invoicesTableView.setAlternatingRowColors(True)
         self.invoicesTableView.horizontalHeader().setStretchLastSection(True)
 
-        self.verticalLayout.addWidget(self.invoicesTableView, 0, Qt.AlignmentFlag.AlignHCenter)
+        self.verticalLayout.addWidget(self.invoicesTableView)
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")

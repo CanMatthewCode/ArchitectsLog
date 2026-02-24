@@ -1233,7 +1233,10 @@ class ViewInvoice(Ui_ViewInvoiceWindow, QWidget):
 	def __init__(self, invoice_number: int) -> None:
 		super(ViewInvoice, self).__init__()
 		self.setupUi(self)
-		self.setFixedSize(self.size())
+		self.setMinimumSize(self.size())
+		header = self.invoiceTableView.horizontalHeader()
+		header.setSectionResizeMode(QHeaderView.Interactive)
+		
 		self.invoice_number = invoice_number
 		invoice_number_str = str(invoice_number)
 		

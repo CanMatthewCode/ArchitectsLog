@@ -33,9 +33,9 @@ class Ui_ViewInvoiceWindow(object):
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.invoiceNumberLayout = QHBoxLayout()
         self.invoiceNumberLayout.setObjectName(u"invoiceNumberLayout")
-        self.horizontalSpacer_2 = QSpacerItem(270, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
-        self.invoiceNumberLayout.addItem(self.horizontalSpacer_2)
+        self.invoiceNumberLayout.addItem(self.horizontalSpacer)
 
         self.invoiceNumberLabel = QLabel(ViewInvoiceWindow)
         self.invoiceNumberLabel.setObjectName(u"invoiceNumberLabel")
@@ -60,14 +60,18 @@ class Ui_ViewInvoiceWindow(object):
 "	color: #008080;\n"
 "}")
 
-        self.invoiceNumberLayout.addWidget(self.addInvoiceNumberLabel)
+        self.invoiceNumberLayout.addWidget(self.addInvoiceNumberLabel, 0, Qt.AlignmentFlag.AlignLeft)
 
-        self.horizontalSpacer = QSpacerItem(20, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
-        self.invoiceNumberLayout.addItem(self.horizontalSpacer)
+        self.invoiceNumberLayout.addItem(self.horizontalSpacer_2)
 
 
         self.verticalLayout.addLayout(self.invoiceNumberLayout)
+
+        self.verticalSpacer_2 = QSpacerItem(20, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+
+        self.verticalLayout.addItem(self.verticalSpacer_2)
 
         self.projectNameLabel = QLabel(ViewInvoiceWindow)
         self.projectNameLabel.setObjectName(u"projectNameLabel")
@@ -93,6 +97,7 @@ class Ui_ViewInvoiceWindow(object):
         self.invoiceTableView = QTableView(ViewInvoiceWindow)
         self.invoiceTableView.setObjectName(u"invoiceTableView")
         self.invoiceTableView.setAlternatingRowColors(True)
+        self.invoiceTableView.horizontalHeader().setStretchLastSection(True)
 
         self.verticalLayout.addWidget(self.invoiceTableView)
 
@@ -139,7 +144,7 @@ class Ui_ViewInvoiceWindow(object):
 
     def retranslateUi(self, ViewInvoiceWindow):
         ViewInvoiceWindow.setWindowTitle(QCoreApplication.translate("ViewInvoiceWindow", u"Form", None))
-        self.invoiceNumberLabel.setText(QCoreApplication.translate("ViewInvoiceWindow", u"Invoice Number", None))
+        self.invoiceNumberLabel.setText(QCoreApplication.translate("ViewInvoiceWindow", u"Invoice Number:", None))
         self.addInvoiceNumberLabel.setText("")
         self.projectNameLabel.setText("")
         self.totalHoursLabel.setText(QCoreApplication.translate("ViewInvoiceWindow", u"Total Time: ", None))

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>CreateDatabaseDialog</class>
- <widget class="QDialog" name="CreateDatabaseDialog">
+ <class>LoadDatabaseDialog</class>
+ <widget class="QDialog" name="LoadDatabaseDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -77,7 +77,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.AppleSystemUIFont'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This will revert your Architects, Projects, Time Entries, and Invoices to a previous version.  &lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;        Your current work will be archived and labeled with today's date.  Proceed?&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;	       Your current work will be archived.  Proceed?&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </item>
@@ -120,7 +120,7 @@ QPushButton:pressed {
   <connection>
    <sender>loadDatabaseButtonBox</sender>
    <signal>accepted()</signal>
-   <receiver>CreateDatabaseDialog</receiver>
+   <receiver>LoadDatabaseDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -136,7 +136,7 @@ QPushButton:pressed {
   <connection>
    <sender>loadDatabaseButtonBox</sender>
    <signal>rejected()</signal>
-   <receiver>CreateDatabaseDialog</receiver>
+   <receiver>LoadDatabaseDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

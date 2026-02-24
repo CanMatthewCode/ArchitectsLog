@@ -19,22 +19,22 @@ from PySide6.QtWidgets import (QAbstractButton, QApplication, QDialog, QDialogBu
     QLabel, QSizePolicy, QSpacerItem, QTextBrowser,
     QVBoxLayout, QWidget)
 
-class Ui_CreateDatabaseDialog(object):
-    def setupUi(self, CreateDatabaseDialog):
-        if not CreateDatabaseDialog.objectName():
-            CreateDatabaseDialog.setObjectName(u"CreateDatabaseDialog")
-        CreateDatabaseDialog.resize(570, 217)
+class Ui_LoadDatabaseDialog(object):
+    def setupUi(self, LoadDatabaseDialog):
+        if not LoadDatabaseDialog.objectName():
+            LoadDatabaseDialog.setObjectName(u"LoadDatabaseDialog")
+        LoadDatabaseDialog.resize(570, 217)
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(CreateDatabaseDialog.sizePolicy().hasHeightForWidth())
-        CreateDatabaseDialog.setSizePolicy(sizePolicy)
-        CreateDatabaseDialog.setStyleSheet(u"QWidget{\n"
+        sizePolicy.setHeightForWidth(LoadDatabaseDialog.sizePolicy().hasHeightForWidth())
+        LoadDatabaseDialog.setSizePolicy(sizePolicy)
+        LoadDatabaseDialog.setStyleSheet(u"QWidget{\n"
 "	background-color: #1E2E34;\n"
 "}")
-        self.verticalLayout = QVBoxLayout(CreateDatabaseDialog)
+        self.verticalLayout = QVBoxLayout(LoadDatabaseDialog)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.loadDatabaseLabel = QLabel(CreateDatabaseDialog)
+        self.loadDatabaseLabel = QLabel(LoadDatabaseDialog)
         self.loadDatabaseLabel.setObjectName(u"loadDatabaseLabel")
         font = QFont()
         font.setPointSize(36)
@@ -51,7 +51,7 @@ class Ui_CreateDatabaseDialog(object):
 
         self.verticalLayout.addItem(self.verticalSpacer)
 
-        self.loadDatabaseWarning = QTextBrowser(CreateDatabaseDialog)
+        self.loadDatabaseWarning = QTextBrowser(LoadDatabaseDialog)
         self.loadDatabaseWarning.setObjectName(u"loadDatabaseWarning")
         self.loadDatabaseWarning.setStyleSheet(u"QTextBrowser{\n"
 "	color: #89D5D2;\n"
@@ -59,7 +59,7 @@ class Ui_CreateDatabaseDialog(object):
 
         self.verticalLayout.addWidget(self.loadDatabaseWarning)
 
-        self.loadDatabaseButtonBox = QDialogButtonBox(CreateDatabaseDialog)
+        self.loadDatabaseButtonBox = QDialogButtonBox(LoadDatabaseDialog)
         self.loadDatabaseButtonBox.setObjectName(u"loadDatabaseButtonBox")
         self.loadDatabaseButtonBox.setStyleSheet(u"QPushButton{\n"
 "	border-radius: 12px;\n"
@@ -87,17 +87,17 @@ class Ui_CreateDatabaseDialog(object):
         self.verticalLayout.addWidget(self.loadDatabaseButtonBox, 0, Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignBottom)
 
 
-        self.retranslateUi(CreateDatabaseDialog)
-        self.loadDatabaseButtonBox.accepted.connect(CreateDatabaseDialog.accept)
-        self.loadDatabaseButtonBox.rejected.connect(CreateDatabaseDialog.reject)
+        self.retranslateUi(LoadDatabaseDialog)
+        self.loadDatabaseButtonBox.accepted.connect(LoadDatabaseDialog.accept)
+        self.loadDatabaseButtonBox.rejected.connect(LoadDatabaseDialog.reject)
 
-        QMetaObject.connectSlotsByName(CreateDatabaseDialog)
+        QMetaObject.connectSlotsByName(LoadDatabaseDialog)
     # setupUi
 
-    def retranslateUi(self, CreateDatabaseDialog):
-        CreateDatabaseDialog.setWindowTitle(QCoreApplication.translate("CreateDatabaseDialog", u"Dialog", None))
-        self.loadDatabaseLabel.setText(QCoreApplication.translate("CreateDatabaseDialog", u"LOAD ARCHIVED DATABASE?", None))
-        self.loadDatabaseWarning.setHtml(QCoreApplication.translate("CreateDatabaseDialog", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+    def retranslateUi(self, LoadDatabaseDialog):
+        LoadDatabaseDialog.setWindowTitle(QCoreApplication.translate("LoadDatabaseDialog", u"Dialog", None))
+        self.loadDatabaseLabel.setText(QCoreApplication.translate("LoadDatabaseDialog", u"LOAD ARCHIVED DATABASE?", None))
+        self.loadDatabaseWarning.setHtml(QCoreApplication.translate("LoadDatabaseDialog", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "hr { height: 1px; border-width: 0; }\n"
@@ -106,7 +106,7 @@ class Ui_CreateDatabaseDialog(object):
 "</style></head><body style=\" font-family:'.AppleSystemUIFont'; font-size:13pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">This will revert your Architects, Projects, Time Entries, and Invoices to a previous version.  </p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">       "
-                        " Your current work will be archived and labeled with today's date.  Proceed?</p></body></html>", None))
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">	      "
+                        " Your current work will be archived.  Proceed?</p></body></html>", None))
     # retranslateUi
 

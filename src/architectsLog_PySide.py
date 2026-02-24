@@ -29,6 +29,7 @@ from ui.ViewInvoices import Ui_ViewInvoicesWindow
 from ui.AddInvoiceNumber import Ui_AddInvoiceDialog
 from ui.DeleteInvoiceWarning import Ui_DeleteInvoiceDialog
 from ui.DeleteTimeEntryWarning import Ui_DeleteTimeEntryDialog
+from ui.CreateDatabaseWarning import Ui_CreateDatabaseDialog
 from ui.ViewInvoice import Ui_ViewInvoiceWindow
 from ui.Analytics import Ui_AnalyticsWindow
 from ui.PhaseHoursAnalytics import Ui_PhaseHoursWindow
@@ -42,6 +43,7 @@ from architectsLog_db import (DB_FILE, get_db_connection, add_architect, add_pro
 	add_time_entry, add_invoice, get_most_recent_archid_and_projid, 
 	get_most_recent_project_phase, load_invoice_ids_no_time_entries, 
 	update_project, update_time_entry, delete_invoice, delete_time_entry)
+from architectsLog_utils import new_database
 
 from architectsLog_analytics import AnalyticsChartDesigner
 from architectsLog_analytics_db import (phase_duration_by_project, 
@@ -141,6 +143,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		view_analytics_action.triggered.connect(self.viewAnalytics)
 		view_analytics_action.setShortcut(QKeySequence("Ctrl+Shift+N"))
 
+		new_database_action = QAction("Create New Database", self)
+		new_database_action.triggered.connect(self.newDatabase)
+
 		close_window_action = QAction("Close Window", self)
 		close_window_action.triggered.connect(self.closeActiveWindow)
 		close_window_action.setShortcut(QKeySequence.StandardKey.Close)
@@ -153,6 +158,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		file_menu.addAction(new_project_action)
 		file_menu.addAction(log_time_action)
 		file_menu.addAction(add_time_action)
+		file_menu.addSeparator()
+		file_menu.addAction(new_database_action)
 		view_menu = menu.addMenu("Views")
 		view_menu.addAction(view_architects_action)
 		view_menu.addAction(view_projects_action)
@@ -345,6 +352,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		window = QApplication.activeWindow()
 		if window:
 			window.close()
+
+	def newDatabase(self) -> None:
+		new_database = CreateNewDatabase()
+		result = new_database.exec()
+		if result == QDialog.Accepted:
+			new_database()
 
 
 class ArchitectWindow(QDialog, Ui_AddArchitectDialog):
@@ -2222,6 +2235,13 @@ class DeleteTimeEntryWarning(QDialog, Ui_DeleteTimeEntryDialog):
 		self.setupUi(self)
 		self.setFixedSize(self.size())
 		self.setWindowTitle("DELETE Time Log")
+
+class CreateNewDatabase(QDialog, Ui_CreateDatabaseDialog):
+	def __init__(self) -> None:
+		super(CreateNewDatabase, self).__init__()
+		self.setupUi(self)
+		self.setFixedSize(self.size())
+		self.setWindowTitle("Create New Database")
 
 
 #		~~~TABLE MODELS~~~

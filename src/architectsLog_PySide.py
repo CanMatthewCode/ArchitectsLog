@@ -30,6 +30,7 @@ from ui.AddInvoiceNumber import Ui_AddInvoiceDialog
 from ui.DeleteInvoiceWarning import Ui_DeleteInvoiceDialog
 from ui.DeleteTimeEntryWarning import Ui_DeleteTimeEntryDialog
 from ui.CreateDatabaseWarning import Ui_CreateDatabaseDialog
+from ui.LoadDatabaseWarning import Ui_LoadDatabaseDialog
 from ui.ViewInvoice import Ui_ViewInvoiceWindow
 from ui.Analytics import Ui_AnalyticsWindow
 from ui.PhaseHoursAnalytics import Ui_PhaseHoursWindow
@@ -43,7 +44,7 @@ from architectsLog_db import (DB_FILE, get_db_connection, add_architect, add_pro
 	add_time_entry, add_invoice, get_most_recent_archid_and_projid, 
 	get_most_recent_project_phase, load_invoice_ids_no_time_entries, 
 	update_project, update_time_entry, delete_invoice, delete_time_entry)
-from architectsLog_utils import new_database
+from architectsLog_utils import new_database, load_database
 
 from architectsLog_analytics import AnalyticsChartDesigner
 from architectsLog_analytics_db import (phase_duration_by_project, 
@@ -112,7 +113,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 				row = proj_match[0].row()
 				self.ProjectsComboBox.setCurrentIndex(row)
 		else:
-			self.ProjectsComboBox.setCurrentIndex(0)
+			self.ProjectsComboBox.setCurrentIndex(1)
 
 		new_architect_action = QAction("Add Architect", self)
 		new_architect_action.triggered.connect(self.addArchitect)
@@ -145,6 +146,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 		new_database_action = QAction("Create New Database", self)
 		new_database_action.triggered.connect(self.newDatabase)
+		load_database_action = QAction("Load Existing Database", self)
+		load_database_action.triggered.connect(self.loadDatabase)
 
 		close_window_action = QAction("Close Window", self)
 		close_window_action.triggered.connect(self.closeActiveWindow)
@@ -160,6 +163,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		file_menu.addAction(add_time_action)
 		file_menu.addSeparator()
 		file_menu.addAction(new_database_action)
+		file_menu.addAction(load_database_action)
 		view_menu = menu.addMenu("Views")
 		view_menu.addAction(view_architects_action)
 		view_menu.addAction(view_projects_action)
@@ -354,11 +358,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			window.close()
 
 	def newDatabase(self) -> None:
-		new_database = CreateNewDatabase()
-		result = new_database.exec()
+		create_new_database = CreateNewDatabase()
+		result = create_new_database.exec()
 		if result == QDialog.Accepted:
 			new_database()
 
+	def loadDatabase(self) -> None:
+		load_old_database = LoadOldDatabase()
+		result = load_old_database.exec()
+		if result == QDialog.Accepted:
+			load_database()
 
 class ArchitectWindow(QDialog, Ui_AddArchitectDialog):
 	def __init__(self) -> None:
@@ -811,7 +820,8 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 			with get_db_connection() as conn:
 				cur = conn.cursor()
 				arch_proj_ids = get_most_recent_archid_and_projid(cur)
-			arch_id, proj_id = arch_proj_ids
+			if arch_proj_ids:
+				arch_id, proj_id = arch_proj_ids
 			proj_match = self.project_model.match(self.project_model.index(0,0),
 			Qt.EditRole, proj_id, 1, Qt.MatchFlags(Qt.MatchExactly))
 			if proj_match:
@@ -1142,7 +1152,8 @@ class ViewInvoices(QWidget, Ui_ViewInvoicesWindow):
 			with get_db_connection() as conn:
 				cur = conn.cursor()
 				arch_proj_ids = get_most_recent_archid_and_projid(cur)
-			arch_id, proj_id = arch_proj_ids
+			if arch_proj_ids:
+				arch_id, proj_id = arch_proj_ids
 			proj_match = self.project_model.match(self.project_model.index(0,0),
 			Qt.EditRole, proj_id, 1, Qt.MatchFlags(Qt.MatchExactly))
 			if proj_match:
@@ -2242,6 +2253,13 @@ class CreateNewDatabase(QDialog, Ui_CreateDatabaseDialog):
 		self.setupUi(self)
 		self.setFixedSize(self.size())
 		self.setWindowTitle("Create New Database")
+
+class LoadOldDatabase(QDialog, Ui_LoadDatabaseDialog):
+	def __init__(self) -> None:
+		super(LoadOldDatabase, self).__init__()
+		self.setupUi(self)
+		self.setFixedSize(self.size())
+		self.setWindowTitle("Load Archived Database")
 
 
 #		~~~TABLE MODELS~~~

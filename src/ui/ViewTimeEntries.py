@@ -66,13 +66,30 @@ class Ui_ViewTimeEntriesWindow(object):
 
         self.verticalLayout.addWidget(self.timeEntriesTableView)
 
+        self.horizontalLayout_2 = QHBoxLayout()
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_2.addItem(self.horizontalSpacer_2)
+
+        self.showInternalsCheckBox = QCheckBox(ViewTimeEntriesWindow)
+        self.showInternalsCheckBox.setObjectName(u"showInternalsCheckBox")
+        self.showInternalsCheckBox.setStyleSheet(u"QCheckBox{\n"
+"	color: #35B5AC;\n"
+"}")
+
+        self.horizontalLayout_2.addWidget(self.showInternalsCheckBox, 0, Qt.AlignmentFlag.AlignRight)
+
         self.showInvoicedCheckBox = QCheckBox(ViewTimeEntriesWindow)
         self.showInvoicedCheckBox.setObjectName(u"showInvoicedCheckBox")
         self.showInvoicedCheckBox.setStyleSheet(u"QCheckBox{\n"
 "	color: #35B5AC;\n"
 "}")
 
-        self.verticalLayout.addWidget(self.showInvoicedCheckBox, 0, Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
+        self.horizontalLayout_2.addWidget(self.showInvoicedCheckBox, 0, Qt.AlignmentFlag.AlignRight)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout_2)
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
@@ -168,6 +185,7 @@ class Ui_ViewTimeEntriesWindow(object):
     def retranslateUi(self, ViewTimeEntriesWindow):
         ViewTimeEntriesWindow.setWindowTitle(QCoreApplication.translate("ViewTimeEntriesWindow", u"Form", None))
         self.timeLogsLabel.setText(QCoreApplication.translate("ViewTimeEntriesWindow", u"Time Logs", None))
+        self.showInternalsCheckBox.setText(QCoreApplication.translate("ViewTimeEntriesWindow", u"Show Internal Time Logs", None))
         self.showInvoicedCheckBox.setText(QCoreApplication.translate("ViewTimeEntriesWindow", u"Show Invoiced Logs", None))
         self.showByProjectCheckBox.setText(QCoreApplication.translate("ViewTimeEntriesWindow", u"Display By Project", None))
         self.showCompletedProjectsCheckBox.setText(QCoreApplication.translate("ViewTimeEntriesWindow", u"Show Completed Projects", None))

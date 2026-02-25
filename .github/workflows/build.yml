@@ -24,7 +24,7 @@ jobs:
           - os: ubuntu-latest
             name: linux
             icon: assets/ArchitectsLog_icon.png
-            ext: ''
+            ext: '-Linux'
             artifact: ArchitectsLog-linux
 
     runs-on: ${{ matrix.os }}
@@ -92,5 +92,5 @@ jobs:
           files: |
             ArchitectsLog-mac/ArchitectsLog
             ArchitectsLog-windows/ArchitectsLog.exe
-            ArchitectsLog-linux/ArchitectsLog
+            ArchitectsLog-linux/ArchitectsLog-Linux
           generate_release_notes: true

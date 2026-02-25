@@ -6,11 +6,13 @@ import sqlite3
 
 from datetime import datetime
 
-from architectsLog_db import (get_connection, create_architect_table, create_project_table,
- create_phases_table, create_invoices_table, create_time_entries_table, initialize_phases, 
- initialize_projects, initialize_invoices, add_architect, add_project, add_invoice, add_time_entry,
- get_most_recent_archid_and_projid, get_most_recent_project_phase, load_invoice_ids_no_time_entries,
- update_project, update_time_entry, delete_invoice, delete_time_entry)
+from architectsLog_db import (get_connection, create_architect_table, 
+	create_project_table, create_phases_table, create_invoices_table, 
+	create_time_entries_table, initialize_phases, initialize_projects, 
+	initialize_invoices, add_architect, add_project, add_invoice, add_time_entry,
+ 	load_architect, load_project, get_most_recent_archid_and_projid, 
+ 	get_most_recent_project_phase, load_invoice_ids_no_time_entries, update_project,
+ 	update_time_entry, delete_invoice, delete_time_entry)
 
 
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry
@@ -21,8 +23,8 @@ from architectsLog_classes import Architect, Project, Invoice, TimeEntry
 #create all tables and populate or initialize them 
 @pytest.fixture
 def table_initialize(test_conn):
-	#create cursor, create architects table, create projects table, create invoices table and
-	#commit them to the database
+	#create cursor, create architects table, create projects table, create invoices 
+	#table and commit them to the database
 	cur = test_conn.cursor()
 	create_architect_table(cur)
 	create_phases_table(cur)
@@ -53,7 +55,8 @@ def table_initialize(test_conn):
 	testInvoice = Invoice(1, int_date, project_id)
 	invoice_id = add_invoice(testInvoice, cur)
 
-	#create a test time entry with testProject and testArchitect and add it to the time_entries table
+	#create a test time entry with testProject and testArchitect and add it to the 
+	#time_entries table
 	date_time = "01-01-2025 12:00:00"
 	time_entry_date_time = datetime.strptime(date_time, "%m-%d-%Y %I:%M:%S")
 	int_date_time = int(time_entry_date_time.timestamp())
@@ -76,13 +79,11 @@ def table_initialize(test_conn):
 	}
 
 
-#tests if the database connection works
 def test_get_connection_creates_connection(test_conn):
     """Test that get_connection returns a valid connection"""
     assert test_conn is not None
     assert isinstance(test_conn, sqlite3.Connection)
 
-#tests if foreign keys are actually enabled 
 def test_foreign_keys_enabled(test_conn):
     """Test that foreign keys are enabled on connection"""
     cursor = test_conn.cursor()
@@ -94,7 +95,6 @@ def test_foreign_keys_enabled(test_conn):
 
 #	~~~TABLE CREATION TESTS~~~
 
-#test if architects table was created
 def test_architect_table_creation(test_conn):
 	"""Test that the architects table is created"""
 	cursor = test_conn.cursor()
@@ -109,7 +109,6 @@ def test_architect_table_creation(test_conn):
 	assert result[0] == 'architects'
 
 
-#test if projects table was created
 def test_project_table_creation(test_conn):
 	"""Test that the projects table is created"""
 	cursor = test_conn.cursor()
@@ -124,7 +123,6 @@ def test_project_table_creation(test_conn):
 	assert result[0] == 'projects'
 
 
-#test if phases table was created
 def test_phase_table_creation(test_conn):
 	"""Test that the phases table is created"""
 	cursor = test_conn.cursor()
@@ -139,7 +137,6 @@ def test_phase_table_creation(test_conn):
 	assert result[0] == 'phases'
 
 
-#test if invoices table was created
 def test_create_invoices_table(test_conn):
 	"""Test that the invoices table is created"""
 	cursor = test_conn.cursor()
@@ -154,7 +151,6 @@ def test_create_invoices_table(test_conn):
 	assert result[0] == 'invoices'
 
 
-#test if time_entries table was created
 def test_create_time_entries_table(test_conn):
 	"""Test that the time_entries table is created"""
 	cursor = test_conn.cursor()
@@ -172,7 +168,7 @@ def test_create_time_entries_table(test_conn):
 
 #	~~FIXTURE FOR GETTING TABLE INFORMATION~~
 
-#create a generic fixture so I can get table information for all table tests
+#create a generic fixture to can get table information for all table tests
 @pytest.fixture
 def table_info(test_conn):
 	"""Generic fixture that returns table info for a given table"""
@@ -196,10 +192,10 @@ def table_info(test_conn):
 
 #	~~~TABLE COLUMN NAME AND COLUMN TYPE TESTS~~~
 
-#test if architects table has correct column names
 def test_architect_table_column_names(table_info):
 	"""Test that the architects table has correct column names"""
-	column_names = [col[1] for col in table_info('architects', create_architect_table)]
+	column_names = [col[1] for col in table_info('architects', 
+		create_architect_table)]
 
 	assert 'architect_id' in column_names
 	assert 'name' in column_names
@@ -209,10 +205,10 @@ def test_architect_table_column_names(table_info):
 	assert 'company_name' in column_names
 	assert 'status' in column_names
 
-#test if architects table has correct column types
 def test_architect_table_column_types(table_info):
 	"""Test that the architects table has correct column types"""
-	column_types = {col[1] : col[2] for col in table_info('architects', create_architect_table)}
+	column_types = {col[1] : col[2] for col in table_info('architects', 
+		create_architect_table)}
 
 	assert column_types['architect_id'] == 'INTEGER'
 	assert column_types['name'] == 'TEXT'
@@ -223,7 +219,6 @@ def test_architect_table_column_types(table_info):
 	assert column_types['status'] == 'TEXT'
 
 
-#test if projects table has correct column names
 def test_project_table_column_names(table_info):
 	"""Test that the projects table has correct column names"""
 	column_names = [col[1] for col in table_info('projects', create_project_table)]
@@ -236,10 +231,10 @@ def test_project_table_column_names(table_info):
 	assert 'current_phase_id' in column_names
 	assert 'status' in column_names
 
-#test if projects table has correct column types
 def test_project_table_column_types(table_info):
 	"""Test that the projects table has correct column types"""
-	column_types = {col[1] : col[2] for col in table_info('projects', create_project_table)}
+	column_types = {col[1] : col[2] for col in table_info('projects', 
+		create_project_table)}
 
 	assert column_types['project_id'] == 'INTEGER'
 	assert column_types['project_name'] == 'TEXT'
@@ -250,7 +245,6 @@ def test_project_table_column_types(table_info):
 	assert column_types['status'] == 'TEXT'
 
 
-#test if phases table has correct column names
 def test_phases_table_column_names(table_info):
 	"""Test that the phases table has correct column names"""
 	column_names = [col[1] for col in table_info('phases', create_phases_table)]
@@ -258,16 +252,15 @@ def test_phases_table_column_names(table_info):
 	assert 'phase_id' in column_names
 	assert 'project_phase' in column_names
 
-#test if phases table has correct column types
 def test_phase_table_column_types(table_info):
 	"""Test that the phases table has the correct column types"""
-	column_types = {col[1] : col[2] for col in table_info('phases', create_phases_table)}
+	column_types = {col[1] : col[2] for col in table_info('phases', 
+		create_phases_table)}
 
 	assert column_types['phase_id'] == 'INTEGER'
 	assert column_types['project_phase'] == 'TEXT'
 
 
-#test if the invoices table has correct column names
 def test_create_invoices_table_column_names(table_info):
 	"""Test that the invoices table has correct column names"""
 	column_names = [col[1] for col in table_info('invoices', create_invoices_table)]
@@ -278,10 +271,10 @@ def test_create_invoices_table_column_names(table_info):
 	assert 'invoice_number' in column_names
 	assert 'status' in column_names
 
-#test if the invoices table has correct column types
 def test_create_invoices_table_column_types(table_info):
 	"""Test that the invoices table has correct column types"""
-	column_types = {col[1] : col[2] for col in table_info('invoices', create_invoices_table)}
+	column_types = {col[1] : col[2] for col in table_info('invoices', 
+		create_invoices_table)}
 
 	assert column_types['invoice_id'] == 'INTEGER'
 	assert column_types['project_id'] == 'INTEGER'
@@ -290,10 +283,10 @@ def test_create_invoices_table_column_types(table_info):
 	assert column_types['status'] == 'TEXT'
 
 
-#test if the time_entries table has correct column names
 def test_create_time_entries_table_names(table_info):
 	"""Test that the time_entries table has correct column names"""
-	column_names = [col[1] for col in table_info('time_entries', create_time_entries_table)]
+	column_names = [col[1] for col in table_info('time_entries', 
+		create_time_entries_table)]
 
 	assert 'time_entry_id' in column_names
 	assert 'project_id' in column_names
@@ -304,10 +297,10 @@ def test_create_time_entries_table_names(table_info):
 	assert 'notes' in column_names
 	assert 'invoice_id' in column_names
 
-#test if the time_entries table has correct column types
 def test_create_time_entries_table_types(table_info):
 	"""Test that the time_entries table has correct column types"""
-	column_types = {col[1] : col[2] for col in table_info('time_entries', create_time_entries_table)}
+	column_types = {col[1] : col[2] for col in table_info('time_entries', 
+		create_time_entries_table)}
 
 	assert column_types['time_entry_id'] == 'INTEGER'
 	assert column_types['project_id'] == 'INTEGER'
@@ -322,7 +315,6 @@ def test_create_time_entries_table_types(table_info):
 
 #	~~~INSERT FUNCTIONS TESTS~~~
 
-#test if the phases table is correctly initialized with the PHASES dictionary
 def test_initialize_phases(test_conn, table_initialize):
 	"""Test that the phases table is correctly populated by the PHASES dictionary"""
 	cur = test_conn.cursor()
@@ -351,7 +343,6 @@ def test_initialize_phases(test_conn, table_initialize):
 	assert rows[8] == (9, "Business Development")
 
 
-#test if the projects table is correctly initialized with Administration and Business Development
 def test_initialize_projects(test_conn, table_initialize):
 	"""Test that the projects table is correctly populated with 2 internal projects"""
 	cur = test_conn.cursor()
@@ -373,7 +364,6 @@ def test_initialize_projects(test_conn, table_initialize):
 	assert rows[1][2] == "Internal"
 	assert rows[1][3] == "N/A"
 
-#test if the invoices table is correctly initialized with invoice_id 0 for 'Not Invoiced'
 def test_initialize_invoices(test_conn, table_initialize):
 	"""Test that the invoices table is correctly populated with Not Invoiced invoice"""
 	cur = test_conn.cursor()
@@ -391,8 +381,7 @@ def test_initialize_invoices(test_conn, table_initialize):
 	assert rows[0][1] == -1
 	assert rows[0][2] == 0
 	assert rows[0][3] == "Not Invoiced"
- 
-#test if the add_architect function adds an architect to the architects table
+
 def test_add_architect(test_conn, table_initialize):
 	"""Test that the architects table has correctly added a new architect"""
 	#create cursor, create architect table, and commit it to the database
@@ -422,7 +411,6 @@ def test_add_architect(test_conn, table_initialize):
 	assert table_initialize['architect'].architect_id == 1
 
 
-#test if the add_project function adds a project to the projects table
 def test_add_project(test_conn, table_initialize):
 	"""Test that the projects table has correctly added a new project"""
 	cur = test_conn.cursor()
@@ -436,7 +424,8 @@ def test_add_project(test_conn, table_initialize):
 	assert row is not None
 
 	#unpack row for readability 
-	project_id, project_name, client_name, client_address, start_date, current_phase_id, status = row
+	(project_id, project_name, client_name, client_address, start_date, 
+		current_phase_id, status) = row
 
 	date = "01-01-2025"
 	invoice_date = datetime.strptime(date, "%m-%d-%Y")
@@ -455,7 +444,6 @@ def test_add_project(test_conn, table_initialize):
 	assert table_initialize['project'].project_id == 1
 
 
-#test if the add_invoice function adds an invoice to the projects table
 def test_add_invoice(test_conn, table_initialize):
 	"""Test that the invoices table has correctly added a new invoice"""
 	cur = test_conn.cursor()
@@ -465,7 +453,7 @@ def test_add_invoice(test_conn, table_initialize):
 	cur.execute(sql, (table_initialize['invoice_id'],))
 	row = cur.fetchone()
 
-	#test if row was created - if so, it validates the add_invoice function's return value
+	#test if row was created - validate the add_invoice function's return value
 	assert row is not None
 
 	#unpack row for readability
@@ -486,7 +474,6 @@ def test_add_invoice(test_conn, table_initialize):
 	assert table_initialize['invoice'].invoice_id == 1
 
 
-#test if the add_time_entry function adds a time_entry to the time_entries table
 def test_add_time_entries(test_conn, table_initialize):
 	"""Test that the time_entries table has correctly added a new time_entry"""
 	cur = test_conn.cursor()
@@ -496,12 +483,13 @@ def test_add_time_entries(test_conn, table_initialize):
 	cur.execute(sql, (table_initialize['time_entry_id'],))
 	row = cur.fetchone()
 
-	time_entry_id, project_id, architect_id, phase_id, start_time, duration_minutes, notes, invoice_id = row
+	(time_entry_id, project_id, architect_id, phase_id, start_time, duration_minutes,
+		notes, invoice_id) = row
 
 	date_time = "01-01-2025 12:00:00"
 	time_entry_date_time = datetime.strptime(date_time, "%m-%d-%Y %I:%M:%S")
 	int_date_time = int(time_entry_date_time.timestamp())
-	#test if row was created - if so, it validates the add_time_entry function's return value
+	#test if row was created - validate the add_time_entry function's return value
 	assert row is not None
 
 	#test table columns for correct insertion
@@ -521,9 +509,9 @@ def test_add_time_entries(test_conn, table_initialize):
 
 #	~~~LOAD OBJECT FROM DATABASE FUNCTIONS TESTS~~~
 
- #Test if the load_architect function correctly loads an architect object from the architects table
 def test_load_architect(test_conn, table_initialize):
-	"""Test that an Architect object successfully loads and returns from the architects table"""
+	"""Test that an Architect object successfully loads and returns 
+	from the architects table"""
 	cur = test_conn.cursor()
 	testArchitect = load_architect(1, cur)
 
@@ -536,9 +524,9 @@ def test_load_architect(test_conn, table_initialize):
 	assert testArchitect.status == "Active"
 	assert testArchitect.architect_id == 1
 
-#Test if the load_projects function correctly loads a project object from the project table"""
 def test_load_project(test_conn, table_initialize):
-	"""Test that a Project object successfully loads and returns from the projects table"""
+	"""Test that a Project object successfully loads and returns from the 
+	projects table"""
 	cur = test_conn.cursor()
 	testProject = load_project(1, cur)
 
@@ -554,14 +542,15 @@ def test_load_project(test_conn, table_initialize):
 	assert testProject.current_phase_id == 1
 	assert testProject.status == "Active"
 	assert testProject.project_id == 1
-	
+
 
 def test_get_most_recent_archid_and_projid(test_conn, table_initialize):
-	"""Test to get the architect_id and project_id from the last entered time_entry log"""
+	"""Test to get the architect_id and project_id from the last 
+	entered time_entry log"""
 	cur = test_conn.cursor()
 
-	second_architect = Architect("Name 2", "LicenseNumber02", "987-654-3210", "email2@domain.com",
-		"Company 2")
+	second_architect = Architect("Name 2", "LicenseNumber02", "987-654-3210", 
+		"email2@domain.com", "Company 2")
 	add_architect(second_architect, cur)
 	date = "02-02-2025"
 	project_date = datetime.strptime(date, "%m-%d-%Y")
@@ -585,8 +574,8 @@ def test_get_most_recent_project_phase(test_conn, table_initialize):
 	"""Test to get the most recent phase from a project_id in the time_entries table"""
 	cur = test_conn.cursor()
 
-	second_architect = Architect("Name 2", "LicenseNumber02", "987-654-3210", "email2@domain.com",
-		"Company 2")
+	second_architect = Architect("Name 2", "LicenseNumber02", "987-654-3210", 
+		"email2@domain.com", "Company 2")
 	add_architect(second_architect, cur)
 	date = "02-02-2025"
 	project_date = datetime.strptime(date, "%m-%d-%Y")
@@ -626,9 +615,9 @@ def test_load_invoice_ids_no_time_entries(test_conn, table_initialize):
 
 #	~~~UPDATE FUNCTIONS TESTS~~~
 
-#Test if the update_project function updates the project table
 def test_update_project(test_conn, table_initialize):
-	"""Test that the projects table has been correctly updated with the new input values"""
+	"""Test that the projects table has been correctly updated with the 
+	new input values"""
 	cur = test_conn.cursor()
 	project_id = table_initialize['project_id']
 
@@ -647,7 +636,8 @@ def test_update_project(test_conn, table_initialize):
 	row = cur.fetchone()
 
 	#unpack row for readability 
-	project_id, project_name, client_name, client_address, start_date, current_phase_id, status = row
+	(project_id, project_name, client_name, client_address, start_date, 
+		current_phase_id, status) = row
 
 	assert project_name == "NewProject2"
 	assert client_name == "NewClient2"
@@ -656,9 +646,9 @@ def test_update_project(test_conn, table_initialize):
 	assert current_phase_id == 2
 	assert status == 'Completed'
 
-#Test if the update_project function raises an exception to an incorrect column name
 def test_update_project_invalid_column(test_conn, table_initialize):
-	"""Test to see if trying to change an invalid column in the projects table throws an exception"""
+	"""Test to see if trying to change an invalid column in the projects table
+	throws an exception"""
 	cur = test_conn.cursor()
 	project = table_initialize['project']
 
@@ -666,14 +656,15 @@ def test_update_project_invalid_column(test_conn, table_initialize):
 		update_project('invalid_column', project, 'value', cur)
 
 
-#Test if the update_time_entry function updates the time_entries table
 def test_update_time_entry(test_conn, table_initialize):
-	"""Test that the time_entries table has been correctly updated with the new input values"""
+	"""Test that the time_entries table has been correctly updated with the
+	new input values"""
 	cur = test_conn.cursor()
 	time_entry_id = table_initialize['time_entry_id']
-	second_architect = Architect("Name 2", "LicenseNumber02", "987-654-3210", "email2@domain.com",
-		"Company 2")
-	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", "02-02-2025")
+	second_architect = Architect("Name 2", "LicenseNumber02", "987-654-3210",
+		"email2@domain.com", "Company 2")
+	second_project = Project("NewProject2", "NewClient2", "345ClientStreet",
+		"02-02-2025")
 	add_architect(second_architect, cur)
 	add_project(second_project, cur)
 	test_conn.commit()
@@ -682,7 +673,8 @@ def test_update_time_entry(test_conn, table_initialize):
 	time_entry = update_time_entry('project_id', time_entry_id, 2, cur)
 	time_entry = update_time_entry('architect_id', time_entry_id, 2, cur)
 	time_entry = update_time_entry('phase_id', time_entry_id, 2, cur)
-	time_entry = update_time_entry('start_time', time_entry_id, '02-02-2025 1:00:00', cur)
+	time_entry = update_time_entry('start_time', time_entry_id, 
+		'02-02-2025 1:00:00', cur)
 	time_entry = update_time_entry('duration_minutes', time_entry_id, 60, cur)
 	time_entry = update_time_entry('notes', time_entry_id, 'New Note', cur)
 	time_entry = update_time_entry('invoice_id', time_entry_id, 1, cur)
@@ -705,9 +697,9 @@ def test_update_time_entry(test_conn, table_initialize):
 	assert notes == "New Note"
 	assert invoice_id == 1
 
-#Test if the update_time_entry function raises an exception to an incorrect column name
 def test_update_time_entry_invalid_column(test_conn, table_initialize):
-	"""Test to see if trying to change an invalid column in the time_entry table throws an exception"""
+	"""Test to see if trying to change an invalid column in the time_entry table 
+	throws an exception"""
 	cur = test_conn.cursor()
 	time_entry = table_initialize['time_entry']
 
@@ -718,7 +710,6 @@ def test_update_time_entry_invalid_column(test_conn, table_initialize):
 
 #	~~~DELETE FUNCTIONS TESTS~~~
 
-#Test if the delete_invoice function deletes the correct row from the invoices table
 def test_delete_invoice(test_conn, table_initialize):
 	"""Test to see if the delete_invoice function deletes the correct row"""
 	cur = test_conn.cursor()
@@ -755,7 +746,6 @@ def test_delete_invoice(test_conn, table_initialize):
 	assert post_delete_invoices[0][4] == "Draft"
 
 
-#Test if the delete_time_entry function deletes the correct row from the time_entry table
 def test_delete_time_entry(test_conn, table_initialize):
 	"""Test to see if the delete_time_entry function deletes the correct row"""
 	cur = test_conn.cursor()

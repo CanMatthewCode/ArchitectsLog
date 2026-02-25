@@ -14,8 +14,14 @@ __pycache__/
 *.swp
 *.swo
 
+# PyInstaller
+dist/
+build/
+*.spec
+
 # Databases (don't commit test or local databases)
 *.db
+!src/demo_ArchitectsLog.db
 test_*.db
 
 # OS

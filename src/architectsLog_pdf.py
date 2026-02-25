@@ -18,8 +18,8 @@ def generate_invoice_pdf(invoice_id: int, cur: sqlite3.Cursor) -> None:
 	arch_sql = "SELECT DISTINCT architect_id FROM time_entries WHERE invoice_id = ?"
 	cur.execute(arch_sql, (invoice_id,))
 	arch_row = cur.fetchone()
-	archictect_id = arch_row[0]
-	architect = load_architect(archictect_id, cur)
+	architect_id = arch_row[0]
+	architect = load_architect(architect_id, cur)
 
 	proj_sql = "SELECT DISTINCT project_id FROM invoices WHERE invoice_id = ?"
 	cur.execute(proj_sql, (invoice_id,))

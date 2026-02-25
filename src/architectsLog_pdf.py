@@ -8,7 +8,6 @@ from platformdirs import PlatformDirs
 from PySide6.QtWidgets import QFileDialog
 
 from architectsLog_db import load_architect, load_project
-from architectsLog_classes import Architect, Project
 from architectsLog_constants import PHASES
 
 
@@ -126,4 +125,3 @@ def generate_invoice_pdf(invoice_id: int, cur: sqlite3.Cursor) -> None:
 		None, "Save Invoice as PDF", default_path, "PDF Files (*.pdf)")
 	if file_path:
 		pdf.output(file_path)
-

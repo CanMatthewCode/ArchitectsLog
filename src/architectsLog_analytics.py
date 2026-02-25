@@ -1,7 +1,5 @@
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
-import matplotlib.pyplot as plt
-from matplotlib import font_manager as fm
 from matplotlib.patches import Patch
 import matplotlib.dates as mdates
 
@@ -27,8 +25,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 			"Interior Design",
 			"Add Service",
 			"Administration",
-			"Business Dev."
-			]
+			"Business Dev."]
 		self.PHASE_NAMES = [
 			"Schematic Design", 
 			"Design Development", 
@@ -38,8 +35,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 			"Interior Design",
 			"Add Service",
 			"Administration",
-			"Business Development"
-			]
+			"Business Development"]
 		self.PHASE_COLORS = [
 			'#ffffd9', 
 			'#c7e9b4', 
@@ -49,8 +45,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 			'#2c7fb8', 
 			'#2d5a8a', 
 			'#aa99ff', 
-			'#d47fff',
-			]
+			'#d47fff',]
 
 	def bars_by_phase(self, data: list[tuple[int, int]],
 		title: str = 'Phase Hours Breakdown', phase_names_length: int = 0) -> None:
@@ -117,7 +112,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		colors = [self.PHASE_COLORS[phase_id - 1] for phase_id in phase_ids]
 
 		total_time = sum(data_list)
-		explode = [0.03 if v/total_time < .04 else 0 for v in data_list]
+		explode = [0.03 if v / total_time < .04 else 0 for v in data_list]
 
 		wedges, texts, autotexts = self.ax.pie(
 			data_list, 
@@ -136,8 +131,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 			bbox_to_anchor=(1, 0, 0.5, 1),
 			prop={'size': 10},
 			facecolor='#A0E0DD',
-			edgecolor='#1E2E34'
-			)
+			edgecolor='#1E2E34')
 
 		legend.get_title().set_fontsize(12)
 		legend.get_title().set_weight('bold')
@@ -158,7 +152,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		self.ax.set_position([0.1, 0.1, 0.65, 0.8])
 
 		phase_ids = [row[0] for row in data]
-		duration_list = [row[1]/60 for row in data]
+		duration_list = [row[1] / 60 for row in data]
 		start_times = [row[2] for row in data]
 		dates = [datetime.fromtimestamp(time) for time in start_times]
 		colors = [self.PHASE_COLORS[phase_id - 1] for phase_id in phase_ids]
@@ -180,8 +174,8 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		self.ax.set_ylabel('Hours', color='#89D5D2')
 
 		unique_phases = sorted(set(phase_ids))
-		legend_elements = [Patch(facecolor=self.PHASE_COLORS[pid-1], 
-			label=self.PHASE_NAMES[pid-1]) 
+		legend_elements = [Patch(facecolor=self.PHASE_COLORS[pid - 1], 
+			label=self.PHASE_NAMES[pid - 1]) 
  			for pid in unique_phases]
 		legend = self.ax.legend(
 			handles=legend_elements, 
@@ -218,21 +212,21 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 				temp_date = temp_dates[-1]
 				temp_time = temp_cumulative_time[-1]
 				self.ax.step(temp_dates, temp_cumulative_time, 
-					self.PHASE_COLORS[current_phase-1])
+					self.PHASE_COLORS[current_phase - 1])
 				current_phase = item[0]
 				temp_dates.clear()
 				temp_cumulative_time.clear()
 				temp_dates.append(temp_date)
 				temp_cumulative_time.append(temp_time)
-			cumulative_time += item[1]/60
+			cumulative_time += item[1] / 60
 			x = datetime.fromtimestamp(item[2])
-			self.ax.vlines(x, 0, cumulative_time, color=self.PHASE_COLORS[item[0]-1],
+			self.ax.vlines(x, 0, cumulative_time, color=self.PHASE_COLORS[item[0] - 1],
 				linewidth=.9, alpha=.6)
 			temp_cumulative_time.append(cumulative_time)
 			temp_dates.append(datetime.fromtimestamp(item[2]))
 			phase_ids.append(item[0])
 		self.ax.step(temp_dates, temp_cumulative_time,
-			self.PHASE_COLORS[current_phase-1])
+			self.PHASE_COLORS[current_phase - 1])
 
 		self.ax.set_facecolor('#2A3F45')  # Plot area
 		self.ax.spines['bottom'].set_color('#4A6F75')
@@ -248,8 +242,8 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		self.ax.set_ylabel('Total Hours', color='#89D5D2')
 
 		unique_phases = sorted(set(phase_ids))
-		legend_elements = [Patch(facecolor=self.PHASE_COLORS[pid-1], 
-			label=self.PHASE_NAMES[pid-1]) 
+		legend_elements = [Patch(facecolor=self.PHASE_COLORS[pid - 1], 
+			label=self.PHASE_NAMES[pid - 1]) 
  			for pid in unique_phases]
 		legend = self.ax.legend(
 			handles=legend_elements, 
@@ -312,17 +306,17 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		bars = self.ax.bar(all_phases, avg_y, width, color=self.PHASE_COLORS[7])
 		self.ax.bar_label(bars, label_type='edge', 
 			color = '#A0E0DD', fontsize=6)
-		bars2 = self.ax.bar([x-width for x in x1], y1, width, 
+		bars2 = self.ax.bar([x - width for x in x1], y1, width, 
 			color=self.PHASE_COLORS[5])
 		self.ax.bar_label(bars2, label_type='edge', 
 			color = '#A0E0DD', fontsize=6)
 		if data2:
-			bars3 = self.ax.bar([x-2*width for x in x2], y2, width, 
+			bars3 = self.ax.bar([x - 2 * width for x in x2], y2, width, 
 				color=self.PHASE_COLORS[3])
 			self.ax.bar_label(bars3, label_type='edge', 
 				color = '#A0E0DD', fontsize=6)
 		if data3:
-			bars4 = self.ax.bar([x-3*width for x in x3], y3, width, 
+			bars4 = self.ax.bar([x - 3 * width for x in x3], y3, width, 
 				color=self.PHASE_COLORS[2])
 			self.ax.bar_label(bars4, label_type='edge', 
 				color = '#A0E0DD', fontsize=6)
@@ -373,15 +367,15 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		phase_num = 1
 		j = 0
 		for i in range(len(projects_phase_data)):
-			while phase_num - 1  < len(self.PHASE_NAMES):
+			while phase_num - 1 < len(self.PHASE_NAMES):
 				if j >= len(projects_phase_data[i]):
-					projects_by_phase_list[phase_num-1].append(0)
+					projects_by_phase_list[phase_num - 1].append(0)
 				elif projects_phase_data[i][j][0] == phase_num:
-					projects_by_phase_list[phase_num-1].append(
+					projects_by_phase_list[phase_num - 1].append(
 						projects_phase_data[i][j][1])
 					phase_ids.append(phase_num)
 				elif projects_phase_data[i][j][0] > phase_num:
-					projects_by_phase_list[phase_num-1].append(0)
+					projects_by_phase_list[phase_num - 1].append(0)
 					j -= 1
 				phase_num += 1
 				j += 1
@@ -395,7 +389,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		x_positions = range(len(projects_phase_data))
 
 		for i in range(len(self.PHASE_NAMES)):
-			bars = self.ax.bar(x_positions, projects_by_phase_list[i], bottom = bottoms, 
+			self.ax.bar(x_positions, projects_by_phase_list[i], bottom = bottoms, 
 				color=self.PHASE_COLORS[i])
 			bottoms = [bottom + phase_hours for bottom, phase_hours in 
 				zip(bottoms, projects_by_phase_list[i])]
@@ -430,8 +424,8 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		if add_legend:
 			self.ax.set_position([0.05, 0.1, 0.77, 0.8])
 			unique_phases = sorted(set(phase_ids))
-			legend_elements = [Patch(facecolor=self.PHASE_COLORS[pid-1], 
-				label=self.PHASE_NAMES[pid-1]) 
+			legend_elements = [Patch(facecolor=self.PHASE_COLORS[pid - 1], 
+				label=self.PHASE_NAMES[pid - 1]) 
 	 			for pid in unique_phases]
 			legend = self.ax.legend(
 				handles=legend_elements, 

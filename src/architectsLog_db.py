@@ -4,9 +4,8 @@ import sqlite3
 from datetime import datetime
 from contextlib import contextmanager
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry
-from architectsLog_constants import PHASES, UPDATABLE_ARCHITECTS_COLUMNS, \
-	UPDATABLE_PROJECTS_COLUMNS, UPDATABLE_INVOICES_COLUMNS, UPDATABLE_TIME_ENTRIES_COLUMNS, \
-	ARCHITECT_STATUSES, INVOICE_STATUSES, PROJECT_STATUSES
+from architectsLog_constants import (PHASES, UPDATABLE_PROJECTS_COLUMNS,
+	UPDATABLE_TIME_ENTRIES_COLUMNS)
 
 DB_FILE = ""
 
@@ -31,7 +30,7 @@ def get_db_connection(db_file: str | None = None) -> sqlite3.Connection:
 	try:
 		yield conn
 		conn.commit()
-	except Exception as e:
+	except Exception:
 		conn.rollback()
 		raise
 	finally:
@@ -292,7 +291,7 @@ def load_invoice_ids_no_time_entries(cur:sqlite3.Cursor) -> list[tuple[int]]:
 	cur.execute(sql)
 	no_time_entries_invoices = cur.fetchall()
 
-	return  no_time_entries_invoices
+	return no_time_entries_invoices
 
 
 

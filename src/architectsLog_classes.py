@@ -49,4 +49,3 @@ class TimeEntry:
 		self.notes = notes
 		self.invoice_id = invoice_id
 		self.time_entry_id = time_entry_id
-		

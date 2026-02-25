@@ -1,11 +1,8 @@
 # PySide6 functions for the Architect's Log
 
-import sys
-import os
 import re
 from datetime import datetime, timedelta
 import random
-import sqlite3
 from typing import Optional
 
 from PySide6.QtWidgets import (QMainWindow, QApplication, QDialog, QMessageBox,
@@ -37,26 +34,25 @@ from ui.PhaseHoursAnalytics import Ui_PhaseHoursWindow
 from ui.PhaseAveragesAnalytics import Ui_PhaseAveragesWindow
 from ui.ProjectsOverTime import Ui_ProjectsOverTimeWindow
 
-from architectsLog_classes import Architect, Project, Invoice, TimeEntry 
-from architectsLog_constants import	(PHASES, ARCHITECT_STATUSES, PROJECT_STATUSES, 
+from architectsLog_classes import Architect, Project, TimeEntry 
+from architectsLog_constants import (PHASES, ARCHITECT_STATUSES, PROJECT_STATUSES,
 	INVOICE_STATUSES, ADMIN, BUSDEV)
-from architectsLog_db import (DB_FILE, get_db_connection, add_architect, add_project,
-	add_time_entry, add_invoice, get_most_recent_archid_and_projid, 
+from architectsLog_db import (get_db_connection, add_architect, add_project,
+	add_time_entry, get_most_recent_archid_and_projid,
 	get_most_recent_project_phase, load_invoice_ids_no_time_entries, 
-	update_project, update_time_entry, delete_invoice, delete_time_entry)
+	update_project, delete_invoice)
 from architectsLog_utils import new_database, load_database, WelcomeSign
 from architectsLog_pdf import generate_invoice_pdf
 
-from architectsLog_analytics import AnalyticsChartDesigner
 from architectsLog_analytics_db import (phase_duration_by_project, 
 	phase_time_entries_by_project, phase_duration_all_projects, 
 	phase_duration_by_project_with_name, total_number_of_projects_by_phase,
 	project_ids_over_time_period, earliest_start_date)
 
-def initialize_database(DB_FILE: str) -> None:
+def initialize_database(db_file: str) -> None:
 	"""Open the persistent global Qt connection to the database"""
 	db = QSqlDatabase.addDatabase("QSQLITE")
-	db.setDatabaseName(DB_FILE)
+	db.setDatabaseName(db_file)
 	if not db.open():
 		raise Exception("Failed to open database")
 
@@ -898,7 +894,7 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 		self.model.select()
 
 	def createInvoice(self) -> None:
-		if self.invoice_checkbox_delegate.selection_mode == False:
+		if self.invoice_checkbox_delegate.selection_mode is False:
 			self.invoice_checkbox_delegate.selection_mode = True
 			self.createInvoiceBtn.setText("Generate Invoice")
 			self.timeEntriesTableView.setColumnHidden(self.model.fieldIndex(
@@ -987,7 +983,7 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 							query3.exec()
 				    
 					db.commit()
-				except:
+				except Exception:
 					db.rollback()
 					raise
 
@@ -1183,7 +1179,7 @@ class ViewInvoices(QWidget, Ui_ViewInvoicesWindow):
 		else:
 			self.ProjectComboBox.hide()
 			self.showCompletedProjectsCheckBox.hide()
-			self.model.setFilter(f"invoice_id > 0")
+			self.model.setFilter("invoice_id > 0")
 
 	def updateFilter(self) -> None:
 		proj_index = self.ProjectComboBox.currentIndex()
@@ -1257,7 +1253,6 @@ class ViewInvoice(Ui_ViewInvoiceWindow, QWidget):
 		header.setSectionResizeMode(QHeaderView.Interactive)
 
 		self.invoice_number = invoice_number
-		invoice_number_str = str(invoice_number)
 		
 		self.model = TimeEntriesRelationalTableModel()
 		self.invoiceTableView.setModel(self.model)
@@ -1394,11 +1389,11 @@ class ViewAnalytics(QWidget, Ui_AnalyticsWindow):
 			shifted_projs_over_time = (projs_over_time_list[2:] 
 				+ projs_over_time_list[1:2] + projs_over_time_list[0:1])
 			shifted_names_over_time = (projs_over_time_names[2:] 
-				+ projs_over_time_names[1:2]  + projs_over_time_names[0:1])
-		elif ("Administration" in projs_over_time_names or 
+				+ projs_over_time_names[1:2] + projs_over_time_names[0:1])
+		elif ("Administration" in projs_over_time_names or
 			"Business Development" in projs_over_time_names):
 			shifted_projs_over_time = (projs_over_time_list[1:] 
-				+  projs_over_time_list[0:1])
+				+ projs_over_time_list[0:1])
 			shifted_names_over_time = (projs_over_time_names[1:] 
 				+ projs_over_time_names[0:1])
 		else:
@@ -1443,7 +1438,6 @@ class ViewProjectPhases(QWidget, Ui_PhaseHoursWindow):
 		self.original_row = 0
 
 		end_date = datetime.now()
-		end_date_int = int(end_date.timestamp())
 		start_date = end_date - timedelta(weeks=102)
 		self.start_date_int = int(start_date.timestamp())
 
@@ -1579,7 +1573,6 @@ class ViewProjectAverages(QWidget, Ui_PhaseAveragesWindow):
 
 		# ComboBoxes Model setup
 		end_date = datetime.now()
-		end_date_int = int(end_date.timestamp())
 		start_date = end_date - timedelta(weeks=102)
 		self.start_date_int = int(start_date.timestamp())
 		self.project_model = QSqlTableModel()
@@ -1644,7 +1637,7 @@ class ViewProjectAverages(QWidget, Ui_PhaseAveragesWindow):
 			arch_proj_ids = get_most_recent_archid_and_projid(cur)
 
 		num_projects_by_phase = [projects[1] for projects in num_proj_by_phase_tuple]
-		avg_data = [round(data[1]/projects, 1) 
+		avg_data = [round(data[1] / projects, 1) 
 			for data, projects in zip(self.total_hours, num_projects_by_phase)]
 		avg_phases = [data[0] for data in self.total_hours]
 
@@ -1928,7 +1921,7 @@ class ViewProjectsOverTime(QWidget, Ui_ProjectsOverTimeWindow):
 			self.shifted_projs_over_time = (self.projs_over_time_list[2:] 
 				+ self.projs_over_time_list[1:2] + self.projs_over_time_list[0:1])
 			self.shifted_names_over_time = (self.projs_over_time_names[2:] 
-				+ self.projs_over_time_names[1:2]  + self.projs_over_time_names[0:1])
+				+ self.projs_over_time_names[1:2] + self.projs_over_time_names[0:1])
 		elif ("Administration" in self.projs_over_time_names or 
 			"Business Development" in self.projs_over_time_names):
 			self.shifted_projs_over_time = (self.projs_over_time_list[1:] 
@@ -1974,8 +1967,9 @@ class TimerDisplay(QLCDNumber):
 		qt_time = QTime(0, 0, 0).addSecs(int(elapsed_time))
 		self.display(qt_time.toString("   hh:mm"))
 
+
 # Import ui.TimeLogger after TimerDisplay to stop circular import
-from ui.TimeLogger import Ui_TimeLoggerWindow
+from ui.TimeLogger import Ui_TimeLoggerWindow	  # noqa: E402
 
 class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 	def __init__(self, main_window) -> None:
@@ -2042,7 +2036,7 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 
 		# Set project ComboBox and disable phase ComboBox if phase is 
 		# 	Business Development or Administration
-		if phase_id in (ADMIN, BUSDEV ):
+		if phase_id in (ADMIN, BUSDEV):
 			self.PhaseComboBox.setEnabled(False)
 			if phase_id == ADMIN:
 				self.ProjectComboBox.setCurrentIndex(1)
@@ -2482,7 +2476,6 @@ class TimeEntriesRelationalTableModel(QSqlRelationalTableModel):
 			row = index.row()
 			project_index = self.index(row, project_column)
 			project_name = self.data(project_index)
-			old_invoice_num = self.data(index, role)
 
 			# Get project_id from invoice and from project to make sure they are equal
 			with get_db_connection() as conn:
@@ -2591,8 +2584,7 @@ class TimeStartDelegate(QStyledItemDelegate):
 		regex = QRegularExpression(
 			r"^(([0]?[1-9])|([1][0-2]))(-|\/)(([0]?[1-9])|([1-2][0-9])|([3][0-1]))"
 			r"(-|\/)(\d{2}|(20\d{2}))\s+(([0]?[1-9])|([1][0-2])):[0-5]\d"
-			r"\s(AM|PM|am|pm)$"
-			)
+			r"\s(AM|PM|am|pm)$")
 		validator = QRegularExpressionValidator(regex, editor)
 		editor.setValidator(validator)
 
@@ -2604,8 +2596,7 @@ class CreatedDateDelegate(QStyledItemDelegate):
 		editor = QLineEdit(parent)
 		regex = QRegularExpression(
 			r"^(([0]?[1-9])|([1][0-2]))(-|\/)(([0]?[1-9])|([1-2][0-9])|([3][0-1]))"
-			r"(-|\/)(\d{2}|(20\d{2}))$"
-			)
+			r"(-|\/)(\d{2}|(20\d{2}))$")
 		validator = QRegularExpressionValidator(regex, editor)
 		editor.setValidator(validator)
 
@@ -2661,7 +2652,7 @@ class InvoiceCheckboxDelegate(QStyledItemDelegate):
 		if not self.selection_mode:
 			self.relational_delegate.setModelData(editor, model, index)
 	
-	def editorEvent(self, event, model, option, index) ->None:
+	def editorEvent(self, event, model, option, index) -> None:
 		# Handle checkbox clicks in selection mode
 		if self.selection_mode:
 			invoice_id = index.data(Qt.EditRole)
@@ -2716,7 +2707,7 @@ def validateDuration(duration: str) -> int:
 		return
 	minutes = 0
 	hours = 0
-	if isinstance (duration, str) and ":" in duration:
+	if isinstance(duration, str) and ":" in duration:
 		if duration.count(":") != 1:
 			raise ValueError
 		if duration[0] == ":":

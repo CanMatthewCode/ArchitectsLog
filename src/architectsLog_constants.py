@@ -10,8 +10,7 @@ PHASES = {
 	6: "Interior Design",
 	7: "Add Service",
 	8: "Administration",
-	9: "Business Development"
-	}
+	9: "Business Development"}
 
 BUSDEV = len(PHASES)
 ADMIN = len(PHASES) - 1
@@ -30,8 +29,7 @@ UPDATABLE_ARCHITECTS_COLUMNS = (
 	"phone_number",
 	"email",
 	"company_name",
-	"status"
-	)
+	"status")
 
 UPDATABLE_PROJECTS_COLUMNS = (
 	"project_name",
@@ -39,15 +37,13 @@ UPDATABLE_PROJECTS_COLUMNS = (
 	"client_address",
 	"start_date",
 	"current_phase_id",
-	"status"
-	)
+	"status")
 
 UPDATABLE_INVOICES_COLUMNS = (
 	"project_id",
 	"created_date",
 	"invoice_number",
-	"status"
-	)
+	"status")
 
 UPDATABLE_TIME_ENTRIES_COLUMNS = (
 	"project_id",
@@ -57,5 +53,4 @@ UPDATABLE_TIME_ENTRIES_COLUMNS = (
 	"end_time",
 	"duration_minutes",
 	"notes",
-	"invoice_id"
-	)
+	"invoice_id")

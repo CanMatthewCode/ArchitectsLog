@@ -243,6 +243,26 @@ def add_invoice(invoice: Invoice, cur: sqlite3.Cursor) -> int:
 
 #	~~~LOAD EXISTING VALUES FROM TABLE FUNCTIONS~~~
 
+def load_architect(architect_id: int, cur: sqlite3.Cursor) -> Architect:
+	"""Load Architect object from the architects table and return it"""
+	sql = "SELECT * FROM architects WHERE architect_id = ?"
+	cur.execute(sql, (architect_id,))
+	arch_info = cur.fetchone()
+	loaded_architect = Architect(arch_info[1], arch_info[2], arch_info[3],
+		arch_info[4], arch_info[5], arch_info[6], arch_info[0])
+
+	return loaded_architect
+
+def load_project(project_id: int, cur: sqlite3.Cursor) -> Project:
+	"""Load Project object from the projects table and return it"""
+	sql = "SELECT * FROM projects WHERE project_id = ?"
+	cur.execute(sql, (project_id,))
+	proj_info = cur.fetchone()
+	loaded_project = Project(proj_info[1], proj_info[2], proj_info[3], proj_info[4],
+		proj_info[5], proj_info[6], proj_info[0])
+
+	return loaded_project
+
 def get_most_recent_archid_and_projid(cur: sqlite3.Cursor) -> list[tuple[int, int]]:
 	"""Function to retrieve the most recent architect and project from the
 	time_entries table in the database"""

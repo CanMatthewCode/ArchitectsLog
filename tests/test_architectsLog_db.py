@@ -521,6 +521,41 @@ def test_add_time_entries(test_conn, table_initialize):
 
 #	~~~LOAD OBJECT FROM DATABASE FUNCTIONS TESTS~~~
 
+ #Test if the load_architect function correctly loads an architect object from the architects table
+def test_load_architect(test_conn, table_initialize):
+	"""Test that an Architect object successfully loads and returns from the architects table"""
+	cur = test_conn.cursor()
+	testArchitect = load_architect(1, cur)
+
+	#test if all columns were correctly loaded into Architect object
+	assert testArchitect.name ==  "Name"
+	assert testArchitect.license_number == "LicenseNumber01"
+	assert testArchitect.phone_number == "123-456-7890"
+	assert testArchitect.email =="email@domain.com"
+	assert testArchitect.company_name == "MyCompany"
+	assert testArchitect.status == "Active"
+	assert testArchitect.architect_id == 1
+
+#Test if the load_projects function correctly loads a project object from the project table"""
+def test_load_project(test_conn, table_initialize):
+	"""Test that a Project object successfully loads and returns from the projects table"""
+	cur = test_conn.cursor()
+	testProject = load_project(1, cur)
+
+	date = "01-01-2025"
+	project_date = datetime.strptime(date, "%m-%d-%Y")
+	int_date = int(project_date.timestamp())
+
+	#test if all columns were correctly loaded into Project object
+	assert testProject.project_name == "NewProject"
+	assert testProject.client_name == "NewClient"
+	assert testProject.client_address == "123ClientStreet"
+	assert testProject.start_date == int_date
+	assert testProject.current_phase_id == 1
+	assert testProject.status == "Active"
+	assert testProject.project_id == 1
+	
+
 def test_get_most_recent_archid_and_projid(test_conn, table_initialize):
 	"""Test to get the architect_id and project_id from the last entered time_entry log"""
 	cur = test_conn.cursor()

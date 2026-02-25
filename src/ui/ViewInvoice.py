@@ -16,8 +16,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QHBoxLayout, QHeaderView, QLabel,
-    QSizePolicy, QSpacerItem, QTableView, QVBoxLayout,
-    QWidget)
+    QPushButton, QSizePolicy, QSpacerItem, QTableView,
+    QVBoxLayout, QWidget)
 
 class Ui_ViewInvoiceWindow(object):
     def setupUi(self, ViewInvoiceWindow):
@@ -96,6 +96,11 @@ class Ui_ViewInvoiceWindow(object):
 
         self.invoiceTableView = QTableView(ViewInvoiceWindow)
         self.invoiceTableView.setObjectName(u"invoiceTableView")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Expanding)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.invoiceTableView.sizePolicy().hasHeightForWidth())
+        self.invoiceTableView.setSizePolicy(sizePolicy1)
         self.invoiceTableView.setAlternatingRowColors(True)
         self.invoiceTableView.horizontalHeader().setStretchLastSection(True)
 
@@ -103,7 +108,41 @@ class Ui_ViewInvoiceWindow(object):
 
         self.invoiceTotalLayout = QHBoxLayout()
         self.invoiceTotalLayout.setObjectName(u"invoiceTotalLayout")
-        self.horizontalSpacer_3 = QSpacerItem(1000, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
+        self.saveToPDFBtn = QPushButton(ViewInvoiceWindow)
+        self.saveToPDFBtn.setObjectName(u"saveToPDFBtn")
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.saveToPDFBtn.sizePolicy().hasHeightForWidth())
+        self.saveToPDFBtn.setSizePolicy(sizePolicy2)
+        self.saveToPDFBtn.setMinimumSize(QSize(97, 42))
+        font3 = QFont()
+        font3.setPointSize(18)
+        self.saveToPDFBtn.setFont(font3)
+        self.saveToPDFBtn.setStyleSheet(u"QPushButton{\n"
+"	border-radius: 12px;\n"
+"	border: 1px solid black;\n"
+"	border-style: solid;\n"
+"	min-width: 60px;\n"
+"	min-height: 30px;\n"
+"	padding: 5px 10px;\n"
+"	margin-left: 5px;\n"
+"	margin-right: 10px;\n"
+"	background-color: #008080;\n"
+"	color: black;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: #006666;\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: #004D4D;\n"
+"}")
+
+        self.invoiceTotalLayout.addWidget(self.saveToPDFBtn)
+
+        self.horizontalSpacer_3 = QSpacerItem(200, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.invoiceTotalLayout.addItem(self.horizontalSpacer_3)
 
@@ -120,11 +159,11 @@ class Ui_ViewInvoiceWindow(object):
 
         self.addTotalHoursLabel = QLabel(ViewInvoiceWindow)
         self.addTotalHoursLabel.setObjectName(u"addTotalHoursLabel")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
-        sizePolicy1.setHorizontalStretch(100)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.addTotalHoursLabel.sizePolicy().hasHeightForWidth())
-        self.addTotalHoursLabel.setSizePolicy(sizePolicy1)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        sizePolicy3.setHorizontalStretch(100)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.addTotalHoursLabel.sizePolicy().hasHeightForWidth())
+        self.addTotalHoursLabel.setSizePolicy(sizePolicy3)
         self.addTotalHoursLabel.setMinimumSize(QSize(100, 0))
         self.addTotalHoursLabel.setFont(font2)
         self.addTotalHoursLabel.setStyleSheet(u"QLabel{\n"
@@ -147,6 +186,7 @@ class Ui_ViewInvoiceWindow(object):
         self.invoiceNumberLabel.setText(QCoreApplication.translate("ViewInvoiceWindow", u"Invoice Number:", None))
         self.addInvoiceNumberLabel.setText("")
         self.projectNameLabel.setText("")
+        self.saveToPDFBtn.setText(QCoreApplication.translate("ViewInvoiceWindow", u"Save To PDF", None))
         self.totalHoursLabel.setText(QCoreApplication.translate("ViewInvoiceWindow", u"Total Time: ", None))
         self.addTotalHoursLabel.setText("")
     # retranslateUi

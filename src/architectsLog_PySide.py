@@ -45,6 +45,7 @@ from architectsLog_db import (DB_FILE, get_db_connection, add_architect, add_pro
 	get_most_recent_project_phase, load_invoice_ids_no_time_entries, 
 	update_project, update_time_entry, delete_invoice, delete_time_entry)
 from architectsLog_utils import new_database, load_database
+from architectsLog_pdf import generate_invoice_pdf
 
 from architectsLog_analytics import AnalyticsChartDesigner
 from architectsLog_analytics_db import (phase_duration_by_project, 
@@ -1287,7 +1288,7 @@ class ViewInvoice(Ui_ViewInvoiceWindow, QWidget):
 		self.invoiceTableView.setColumnWidth(3, 180)
 		self.invoiceTableView.setColumnWidth(4, 152)
 		self.invoiceTableView.setColumnWidth(5, 80)
-		self.invoiceTableView.setColumnWidth(6, 550)
+		self.invoiceTableView.setColumnWidth(6, 530)
 		self.invoiceTableView.setColumnWidth(7, 100)
 
 		# Hide unused columns
@@ -1319,7 +1320,14 @@ class ViewInvoice(Ui_ViewInvoiceWindow, QWidget):
 		self.project_name = self.model.data(self.model.index(0, 1))
 		self.projectNameLabel.setText(self.project_name)
 
+		self.saveToPDFBtn.clicked.connect(self.makePDF)
+
 		self.show()
+
+	def makePDF(self):
+		with get_db_connection() as conn:
+			cur = conn.cursor()
+			generate_invoice_pdf(self.invoice_number, cur)
 
 
 #	~~ANALYTICS~~

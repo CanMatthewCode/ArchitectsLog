@@ -30,9 +30,9 @@ Pre-built standalone desktop applications are available for all major platforms:
 
 | Platform | Download |
 |----------|----------|
-| macOS | [Download for Mac](#) |
-| Windows | [Download for PC](#) |
-| Linux | [Download for Linux](#) |
+| macOS | [Download for Mac](https://github.com/CanMatthewCode/ArchitectsLog/releases/download/v1.0.0/ArchitectsLog) |
+| Windows | [Download for PC](https://github.com/CanMatthewCode/ArchitectsLog/releases/download/v1.0.0/ArchitectsLog.exe) |
+| Linux | [Download for Linux](https://github.com/CanMatthewCode/ArchitectsLog/releases/download/v1.0.0/ArchitectsLog-Linux) |
 
 ---
 

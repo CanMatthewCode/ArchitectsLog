@@ -54,7 +54,7 @@ jobs:
             --icon "${{ matrix.icon }}" \
             --add-data "assets:assets" \
             --add-data "src/ui:ui" \
-            --add-data "src/demo.db:." \
+            --add-data "src/demo_ArchitectsLog.db:." \
             src/architectsLog_main.py
 
       - name: Build with PyInstaller (Windows)
@@ -67,7 +67,7 @@ jobs:
             --icon "${{ matrix.icon }}" `
             --add-data "assets;assets" `
             --add-data "src/ui;ui" `
-            --add-data "src/demo.db;." `
+            --add-data "src/demo_ArchitectsLog.db;." `
             src/architectsLog_main.py
 
       - name: Upload artifact

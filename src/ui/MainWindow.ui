@@ -62,7 +62,7 @@
 }</string>
       </property>
       <property name="text">
-       <string>The Architects Log</string>
+       <string>The Architect's Log</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignmentFlag::AlignCenter</set>

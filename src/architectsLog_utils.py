@@ -6,8 +6,9 @@ import shutil
 import json
 from platformdirs import PlatformDirs
 from datetime import datetime
-from PySide6.QtWidgets import QFileDialog
+from PySide6.QtWidgets import QFileDialog, QDialog
 
+from ui.ProgramStartupWelcome import Ui_ProgramStartupDialog
 import architectsLog_db
 
 def program_loadup() -> str:
@@ -16,6 +17,8 @@ def program_loadup() -> str:
 	data_dir = dirs.user_data_path
 	DB_FILE = ""
 	if not settings_path.exists():
+		welcome_sign = WelcomeSign()
+		welcome_sign.exec()
 		log_name = "demo_ArchitectsLog.db"
 		basedir = os.path.dirname(os.path.abspath(__file__))
 		DB_FILE = os.path.join(basedir, log_name)
@@ -65,3 +68,10 @@ def load_database() -> None:
 				data_dir, "architectsLog_old_" + YYYYMMDD + ".db"))
 			os.rename(returned_database, os.path.join(data_dir, "architectsLog.db"))
 			os.execv(sys.executable, [sys.executable] + sys.argv)
+
+class WelcomeSign(QDialog, Ui_ProgramStartupDialog):
+	def __init__(self) -> None:
+		super(WelcomeSign, self).__init__()
+		self.setupUi(self)
+		self.setFixedSize(self.size())
+		self.setWindowTitle("Welcome")

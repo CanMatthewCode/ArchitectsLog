@@ -44,7 +44,7 @@ from architectsLog_db import (DB_FILE, get_db_connection, add_architect, add_pro
 	add_time_entry, add_invoice, get_most_recent_archid_and_projid, 
 	get_most_recent_project_phase, load_invoice_ids_no_time_entries, 
 	update_project, update_time_entry, delete_invoice, delete_time_entry)
-from architectsLog_utils import new_database, load_database
+from architectsLog_utils import new_database, load_database, WelcomeSign
 from architectsLog_pdf import generate_invoice_pdf
 
 from architectsLog_analytics import AnalyticsChartDesigner
@@ -144,11 +144,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		view_analytics_action = QAction("Analytics", self)
 		view_analytics_action.triggered.connect(self.viewAnalytics)
 		view_analytics_action.setShortcut(QKeySequence("Ctrl+Shift+N"))
+		view_welcome_sign = QAction("Read Welcome Information", self)
+		view_welcome_sign.triggered.connect(self.viewWelcome)
 
 		new_database_action = QAction("Create New Database", self)
 		new_database_action.triggered.connect(self.newDatabase)
 		load_database_action = QAction("Load Existing Database", self)
 		load_database_action.triggered.connect(self.loadDatabase)
+
 
 		close_window_action = QAction("Close Window", self)
 		close_window_action.triggered.connect(self.closeActiveWindow)
@@ -172,6 +175,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		view_menu.addAction(view_invoices_action)
 		view_menu.addSeparator()
 		view_menu.addAction(view_analytics_action)
+		view_menu.addSeparator()
+		view_menu.addAction(view_welcome_sign)
 
 		# enable button clicks
 		self.AddArchitectBtn.clicked.connect(new_architect_action.trigger)
@@ -298,6 +303,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 	def viewAnalytics(self) -> None:
 		"""Method to access the analytics window"""
 		self.analytics_window = ViewAnalytics()
+
+	def viewWelcome(self) -> None:
+		"""Method to access the intoructory text"""
+		self.view_welcome_sign = WelcomeSign()
+		self.view_welcome_sign.exec()
 
 	def logTime(self) -> None:
 		"""Method to activate TimeLogger window and store resulting 

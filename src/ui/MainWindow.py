@@ -460,7 +460,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
-        self.theArchitectsLogLabel.setText(QCoreApplication.translate("MainWindow", u"The Architects Log", None))
+        self.theArchitectsLogLabel.setText(QCoreApplication.translate("MainWindow", u"The Architect's Log", None))
         self.Architects.setText(QCoreApplication.translate("MainWindow", u"Architect", None))
         self.AddArchitectBtn.setText(QCoreApplication.translate("MainWindow", u"Add New Architect", None))
         self.Projects.setText(QCoreApplication.translate("MainWindow", u"Project", None))

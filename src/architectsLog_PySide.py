@@ -66,7 +66,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.setupUi(self) 
 		self.setFixedSize(self.size())
 
-		self.setWindowTitle("The Architects Log")
+		self.setWindowTitle("The Architect's Log")
 
 		self.view_arch_window = None
 		self.view_proj_window = None

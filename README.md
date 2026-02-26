@@ -10,7 +10,7 @@ Have you ever wondered how long your project's Design Development phase actually
 
 **The Architect's Log** lets you log your work by project and phase, building out your own personal analytics over time — so you can finally understand how your time really breaks down.
 
-Whether you're billing a client, estimating a future project, or just satisfying your own curiosity, The Architect's Log gives you the data-backed clarity to back it up.
+Whether you're billing a client, estimating a future project, or just satisfying your own curiosity, the Architect's Log gives you the data-backed clarity you'll need to properly handle your workflow.
 
 ---
 
@@ -33,6 +33,26 @@ Pre-built standalone desktop applications are available for all major platforms:
 | macOS | [Download for Mac](https://github.com/CanMatthewCode/ArchitectsLog/releases/download/v1.0.0/ArchitectsLog-mac.zip) |
 | Windows | [Download for PC](https://github.com/CanMatthewCode/ArchitectsLog/releases/download/v1.0.0/ArchitectsLog.exe) |
 | Linux | [Download for Linux](https://github.com/CanMatthewCode/ArchitectsLog/releases/download/v1.0.0/ArchitectsLog-Linux) |
+
+When you first run the program you may encounter an OS warning due to system securities and the lack of a developer certificate. 
+
+To move past this:
+
+- **Mac** -	   	After unzipping the file and double-clicking the app you will get a system warning. Click 'Done'.  
+			   	Then go to 'System Settings' -> 'Privacy & Security' -> scroll down to 'Security' where it says:
+			   	"ArchitectsLog.app" was blocked to protect your Mac.  Click 'Open Anyway' and enter your password.
+			   	The program will now run normally.
+
+- **Windows** - After double-clicking the app you will get a 'Windows protected your PC' popup against 
+				potentially unsafe software. Click 'More Info' followed by 'Run Anyway' to open the application.
+				The program will now run normally.
+
+- **Linux** -	Right-click the program and select 'Properties' -> 'Permissions' and check 'Run as Program'.
+				If that is not an option, open a terminal, cd to where the program exists and run:
+```
+chmod +x ArchitectsLog-Linux
+./ArchitectsLog-Linux
+```
 
 ---
 

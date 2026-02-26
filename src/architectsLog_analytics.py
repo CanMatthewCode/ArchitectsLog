@@ -70,7 +70,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		bars = self.ax.bar(x_positions, data_list, color=colors)
 
 		self.ax.bar_label(bars, label_type='edge', 
-			color = 'white', fontsize=8)
+			color = '#A0E0DD', fontsize=8)
 		self.ax.set_facecolor('#2A3F45')  # Plot area
 		self.ax.spines['bottom'].set_color('#4A6F75')
 		self.ax.spines['left'].set_color('#4A6F75')
@@ -396,11 +396,11 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 
 		fontsize = 6
 		if len(x_positions) <= 8:
-			fontsize = 8
-		if len(x_positions) <= 4:
 			fontsize = 10
+		if len(x_positions) <= 4:
+			fontsize = 12
 		for x, height in zip(x_positions, bottoms):
-			self.ax.text(x, height + 5, str(height), 
+			self.ax.text(x, height + 2, str(height), 
 				ha='center', color = '#A0E0DD', fontsize=fontsize)
 
 		max_height = max(bottoms)
@@ -418,7 +418,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		self.ax.set_xticklabels(project_names, ha='right')
 
 		self.fig.suptitle("Projects By Phase", color='#89D5D2', 
-			fontsize=12, y=0.97)
+			fontsize=14, y=0.97)
 		self.ax.set_ylabel('Total Hours', color='#89D5D2')
 
 		if add_legend:

@@ -1429,7 +1429,7 @@ class ViewProjectPhases(QWidget, Ui_PhaseHoursWindow):
 	def __init__(self, chart_type: str) -> None:
 		super(ViewProjectPhases, self).__init__()
 		self.setupUi(self)
-		self.setFixedSize(self.size())
+		self.setMinimumSize(self.size())
 		self.setWindowTitle("Projects By Phase")
 
 		self.chart_type = chart_type
@@ -1544,7 +1544,7 @@ class ViewProjectAverages(QWidget, Ui_PhaseAveragesWindow):
 	def __init__(self) -> None:
 		super(ViewProjectAverages, self).__init__()
 		self.setupUi(self)
-		self.setFixedSize(self.size())
+		self.setMinimumSize(self.size())
 		self.setWindowTitle("Phase Time Averages")
 		self.bar_or_pie = 0
 		self.project_vs_average = 0
@@ -1868,7 +1868,7 @@ class ViewProjectsOverTime(QWidget, Ui_ProjectsOverTimeWindow):
 	def __init__(self) -> None:
 		super(ViewProjectsOverTime, self).__init__()
 		self.setupUi(self)
-		self.setFixedSize(self.size())
+		self.setMinimumSize(self.size())
 		self.setWindowTitle("Projects By Phase Over Time")
 
 		with get_db_connection() as conn:

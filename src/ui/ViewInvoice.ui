@@ -162,6 +162,11 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="styleSheet">
+      <string notr="true">QTableView{
+	color: #89D5D2;
+}</string>
+     </property>
      <property name="alternatingRowColors">
       <bool>true</bool>
      </property>

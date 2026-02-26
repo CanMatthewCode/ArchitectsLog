@@ -26,6 +26,9 @@ class Ui_AddArchitectDialog(object):
         AddArchitectDialog.resize(576, 450)
         AddArchitectDialog.setStyleSheet(u"QWidget{\n"
 "	background-color: #1E2E34;\n"
+"}\n"
+"QLineEdit{\n"
+"	color: #89D5D2;\n"
 "}")
         self.verticalLayout_3 = QVBoxLayout(AddArchitectDialog)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")

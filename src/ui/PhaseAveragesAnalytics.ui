@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1390</width>
+    <width>1674</width>
     <height>983</height>
    </rect>
   </property>
@@ -16,6 +16,12 @@
   <property name="styleSheet">
    <string notr="true">QWidget{
 	background-color: #1E2E34;
+}
+QComboBox{
+	color: #89D5D2;
+}
+QComboBox QAbstractItemView{
+	color: #89D5D2;
 }</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">

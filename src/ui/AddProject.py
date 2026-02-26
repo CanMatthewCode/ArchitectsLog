@@ -26,6 +26,18 @@ class Ui_AddProjectDialog(object):
         AddProjectDialog.resize(576, 450)
         AddProjectDialog.setStyleSheet(u"QWidget{\n"
 "	background-color: #1E2E34;\n"
+"}\n"
+"QLineEdit{\n"
+"	color: #89D5D2;\n"
+"}\n"
+"QDateEdit{\n"
+"	color: #89D5D2;\n"
+"}\n"
+"QComboBox{\n"
+"	color: #89D5D2;\n"
+"}\n"
+"QComboBox QAbstractItemView{\n"
+"	color: #89D5D2;\n"
 "}")
         self.verticalLayout_3 = QVBoxLayout(AddProjectDialog)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
@@ -119,7 +131,7 @@ class Ui_AddProjectDialog(object):
         self.projectStartDate = QDateEdit(AddProjectDialog)
         self.projectStartDate.setObjectName(u"projectStartDate")
         self.projectStartDate.setMaximumDate(QDate(2100, 12, 31))
-        self.projectStartDate.setMinimumDate(QDate(2024, 12, 30))
+        self.projectStartDate.setMinimumDate(QDate(2024, 12, 29))
         self.projectStartDate.setCurrentSection(QDateTimeEdit.Section.MonthSection)
         self.projectStartDate.setCalendarPopup(True)
         self.projectStartDate.setTimeSpec(Qt.TimeSpec.LocalTime)

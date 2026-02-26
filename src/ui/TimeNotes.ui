@@ -22,6 +22,9 @@
   <property name="styleSheet">
    <string notr="true">QWidget{
 	background-color: #1E2E34;
+}
+QTextEdit{
+	color: #89D5D2;
 }</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">

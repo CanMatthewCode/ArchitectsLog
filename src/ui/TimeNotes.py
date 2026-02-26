@@ -31,6 +31,9 @@ class Ui_TimeNotesDialog(object):
         TimeNotesDialog.setSizePolicy(sizePolicy)
         TimeNotesDialog.setStyleSheet(u"QWidget{\n"
 "	background-color: #1E2E34;\n"
+"}\n"
+"QTextEdit{\n"
+"	color: #89D5D2;\n"
 "}")
         self.verticalLayout = QVBoxLayout(TimeNotesDialog)
         self.verticalLayout.setObjectName(u"verticalLayout")

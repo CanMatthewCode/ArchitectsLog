@@ -28,6 +28,12 @@ class Ui_TimeLoggerWindow(object):
         TimeLoggerWindow.resize(424, 211)
         TimeLoggerWindow.setStyleSheet(u"QWidget{\n"
 "	background-color: #1E2E34;\n"
+"}\n"
+"QComboBox{\n"
+"	color: #89D5D2;\n"
+"}\n"
+"QComboBox QAbstractItemView{\n"
+"	color: #89D5D2;\n"
 "}")
         self.verticalLayout = QVBoxLayout(TimeLoggerWindow)
         self.verticalLayout.setObjectName(u"verticalLayout")

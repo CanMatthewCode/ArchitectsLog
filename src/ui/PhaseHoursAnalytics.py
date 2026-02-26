@@ -28,6 +28,12 @@ class Ui_PhaseHoursWindow(object):
         PhaseHoursWindow.resize(1390, 983)
         PhaseHoursWindow.setStyleSheet(u"QWidget{\n"
 "	background-color: #1E2E34;\n"
+"}\n"
+"QComboBox{\n"
+"	color: #89D5D2;\n"
+"}\n"
+"QComboBox QAbstractItemView{\n"
+"	color: #89D5D2;\n"
 "}")
         self.verticalLayout = QVBoxLayout(PhaseHoursWindow)
         self.verticalLayout.setObjectName(u"verticalLayout")

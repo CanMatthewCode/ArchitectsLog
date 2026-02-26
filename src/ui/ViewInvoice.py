@@ -101,6 +101,9 @@ class Ui_ViewInvoiceWindow(object):
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.invoiceTableView.sizePolicy().hasHeightForWidth())
         self.invoiceTableView.setSizePolicy(sizePolicy1)
+        self.invoiceTableView.setStyleSheet(u"QTableView{\n"
+"	color: #89D5D2;\n"
+"}")
         self.invoiceTableView.setAlternatingRowColors(True)
         self.invoiceTableView.horizontalHeader().setStretchLastSection(True)
 

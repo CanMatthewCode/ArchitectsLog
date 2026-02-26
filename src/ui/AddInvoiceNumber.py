@@ -32,7 +32,9 @@ class Ui_AddInvoiceDialog(object):
         AddInvoiceDialog.setStyleSheet(u"QWidget{\n"
 "	background-color: #1E2E34;\n"
 "}\n"
-"")
+"QLineEdit{\n"
+"	color: #89D5D2;\n"
+"}")
         self.verticalLayout = QVBoxLayout(AddInvoiceDialog)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.addInvoiceLabel = QLabel(AddInvoiceDialog)

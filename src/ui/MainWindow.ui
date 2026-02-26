@@ -25,6 +25,14 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QComboBox{
+	color: #89D5D2;
+}
+QComboBox QAbstractItemView{
+	color: #89D5D2;
+}</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <property name="minimumSize">
     <size>

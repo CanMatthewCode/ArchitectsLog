@@ -16,6 +16,24 @@
   <property name="styleSheet">
    <string notr="true">QWidget{
 	background-color: #1E2E34;
+}
+QComboBox{
+	color: #89D5D2;
+}
+QComboBox QAbstractItemView{
+	color: #89D5D2;
+}
+QLineEdit{
+	color: #89D5D2;
+}
+QDateEdit{
+	color: #89D5D2;
+}
+QTimeEdit{
+	color: #89D5D2;
+}
+QTextEdit{
+	color: #89D5D2;
 }</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -180,7 +198,7 @@
           <date>
            <year>2024</year>
            <month>12</month>
-           <day>31</day>
+           <day>30</day>
           </date>
          </property>
          <property name="currentSection">

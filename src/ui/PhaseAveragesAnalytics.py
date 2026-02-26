@@ -25,9 +25,15 @@ class Ui_PhaseAveragesWindow(object):
     def setupUi(self, PhaseAveragesWindow):
         if not PhaseAveragesWindow.objectName():
             PhaseAveragesWindow.setObjectName(u"PhaseAveragesWindow")
-        PhaseAveragesWindow.resize(1390, 983)
+        PhaseAveragesWindow.resize(1674, 983)
         PhaseAveragesWindow.setStyleSheet(u"QWidget{\n"
 "	background-color: #1E2E34;\n"
+"}\n"
+"QComboBox{\n"
+"	color: #89D5D2;\n"
+"}\n"
+"QComboBox QAbstractItemView{\n"
+"	color: #89D5D2;\n"
 "}")
         self.verticalLayout = QVBoxLayout(PhaseAveragesWindow)
         self.verticalLayout.setObjectName(u"verticalLayout")

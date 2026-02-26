@@ -27,6 +27,24 @@ class Ui_AddTimeDialog(object):
         AddTimeDialog.resize(576, 400)
         AddTimeDialog.setStyleSheet(u"QWidget{\n"
 "	background-color: #1E2E34;\n"
+"}\n"
+"QComboBox{\n"
+"	color: #89D5D2;\n"
+"}\n"
+"QComboBox QAbstractItemView{\n"
+"	color: #89D5D2;\n"
+"}\n"
+"QLineEdit{\n"
+"	color: #89D5D2;\n"
+"}\n"
+"QDateEdit{\n"
+"	color: #89D5D2;\n"
+"}\n"
+"QTimeEdit{\n"
+"	color: #89D5D2;\n"
+"}\n"
+"QTextEdit{\n"
+"	color: #89D5D2;\n"
 "}")
         self.verticalLayout_6 = QVBoxLayout(AddTimeDialog)
         self.verticalLayout_6.setObjectName(u"verticalLayout_6")
@@ -127,7 +145,7 @@ class Ui_AddTimeDialog(object):
         sizePolicy.setHeightForWidth(self.timeStartDate.sizePolicy().hasHeightForWidth())
         self.timeStartDate.setSizePolicy(sizePolicy)
         self.timeStartDate.setMaximumDate(QDate(2100, 12, 31))
-        self.timeStartDate.setMinimumDate(QDate(2024, 12, 31))
+        self.timeStartDate.setMinimumDate(QDate(2024, 12, 30))
         self.timeStartDate.setCurrentSection(QDateTimeEdit.Section.MonthSection)
         self.timeStartDate.setCalendarPopup(True)
         self.timeStartDate.setTimeSpec(Qt.TimeSpec.LocalTime)

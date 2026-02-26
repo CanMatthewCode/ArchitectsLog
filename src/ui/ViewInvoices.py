@@ -32,6 +32,12 @@ class Ui_ViewInvoicesWindow(object):
         ViewInvoicesWindow.setSizePolicy(sizePolicy)
         ViewInvoicesWindow.setStyleSheet(u"QWidget{\n"
 "	background-color: #1E2E34;\n"
+"}\n"
+"QComboBox{\n"
+"	color: #89D5D2;\n"
+"}\n"
+"QComboBox QAbstractItemView{\n"
+"	color: #89D5D2;\n"
 "}")
         self.verticalLayout = QVBoxLayout(ViewInvoicesWindow)
         self.verticalLayout.setObjectName(u"verticalLayout")

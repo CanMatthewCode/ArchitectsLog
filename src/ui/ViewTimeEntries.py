@@ -32,6 +32,12 @@ class Ui_ViewTimeEntriesWindow(object):
         ViewTimeEntriesWindow.setMinimumSize(QSize(920, 450))
         ViewTimeEntriesWindow.setStyleSheet(u"QWidget{\n"
 "	background-color: #1E2E34;\n"
+"}\n"
+"QComboBox{\n"
+"	color: #89D5D2;\n"
+"}\n"
+"QComboBox QAbstractItemView{\n"
+"	color: #89D5D2;\n"
 "}")
         self.verticalLayout = QVBoxLayout(ViewTimeEntriesWindow)
         self.verticalLayout.setObjectName(u"verticalLayout")

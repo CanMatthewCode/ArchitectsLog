@@ -29,6 +29,7 @@ class Ui_AddArchitectDialog(object):
 "}\n"
 "QLineEdit{\n"
 "	color: #89D5D2;\n"
+"	background-color: #1E2E34;\n"
 "}")
         self.verticalLayout_3 = QVBoxLayout(AddArchitectDialog)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")

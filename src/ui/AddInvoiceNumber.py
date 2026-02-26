@@ -34,6 +34,7 @@ class Ui_AddInvoiceDialog(object):
 "}\n"
 "QLineEdit{\n"
 "	color: #89D5D2;\n"
+"	background-color: #1E2E34;\n"
 "}")
         self.verticalLayout = QVBoxLayout(AddInvoiceDialog)
         self.verticalLayout.setObjectName(u"verticalLayout")

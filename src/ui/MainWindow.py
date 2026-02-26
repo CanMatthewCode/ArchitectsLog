@@ -33,9 +33,12 @@ class Ui_MainWindow(object):
         MainWindow.setMinimumSize(QSize(900, 475))
         MainWindow.setStyleSheet(u"QComboBox{\n"
 "	color: #89D5D2;\n"
+"	background-color: #1E2E34;\n"
+"	border-radius: 6px;\n"
 "}\n"
 "QComboBox QAbstractItemView{\n"
 "	color: #89D5D2;\n"
+"	background-color: #1E2E34;\n"
 "}")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")

@@ -25,7 +25,7 @@ class Ui_PhaseHoursWindow(object):
     def setupUi(self, PhaseHoursWindow):
         if not PhaseHoursWindow.objectName():
             PhaseHoursWindow.setObjectName(u"PhaseHoursWindow")
-        PhaseHoursWindow.resize(1390, 983)
+        PhaseHoursWindow.resize(1581, 983)
         PhaseHoursWindow.setStyleSheet(u"QWidget{\n"
 "	background-color: #1E2E34;\n"
 "}\n"
@@ -34,6 +34,15 @@ class Ui_PhaseHoursWindow(object):
 "}\n"
 "QComboBox QAbstractItemView{\n"
 "	color: #89D5D2;\n"
+"}\n"
+"QCheckBox{\n"
+"	background-color: 25383F;\n"
+"}\n"
+"QCheckBox::indicator {\n"
+"    background-color: #4F5E63;\n"
+"    border-radius: 4px;\n"
+"    width: 14px;\n"
+"    height: 14px;\n"
 "}")
         self.verticalLayout = QVBoxLayout(PhaseHoursWindow)
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -58,45 +67,69 @@ class Ui_PhaseHoursWindow(object):
 
         self.verticalLayout.addWidget(self.phaseHoursFrame)
 
+        self.horizontalLayout_2 = QHBoxLayout()
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.horizontalSpacer_2 = QSpacerItem(500, 20, QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_2.addItem(self.horizontalSpacer_2)
+
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.horizontalSpacer = QSpacerItem(600, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.horizontalLayout.addItem(self.horizontalSpacer)
-
-        self.ProjectComboBox = QComboBox(PhaseHoursWindow)
-        self.ProjectComboBox.setObjectName(u"ProjectComboBox")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
-        sizePolicy1.setHorizontalStretch(200)
-        sizePolicy1.setVerticalStretch(200)
-        sizePolicy1.setHeightForWidth(self.ProjectComboBox.sizePolicy().hasHeightForWidth())
-        self.ProjectComboBox.setSizePolicy(sizePolicy1)
-        self.ProjectComboBox.setMinimumSize(QSize(300, 30))
-
-        self.horizontalLayout.addWidget(self.ProjectComboBox, 0, Qt.AlignmentFlag.AlignHCenter)
-
         self.ShowAllProjectsChkBx = QCheckBox(PhaseHoursWindow)
         self.ShowAllProjectsChkBx.setObjectName(u"ShowAllProjectsChkBx")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.ShowAllProjectsChkBx.sizePolicy().hasHeightForWidth())
+        self.ShowAllProjectsChkBx.setSizePolicy(sizePolicy1)
         self.ShowAllProjectsChkBx.setStyleSheet(u"QCheckBox{\n"
 "	color : #89D5D2;\n"
+"}\n"
+"QCheckBox::indicator {\n"
+"	background-color: #4F5E63;\n"
+"	border-radius: 4px;\n"
+"	border: 1px solid black;\n"
+"	width: 14px;\n"
+"	height: 14px;\n"
+"}\n"
+"QCheckBox::indicator::checked{\n"
+"	background-color: #008080;\n"
+"	border-radius: 4px;\n"
+"	border: 1px solid black;\n"
+"	width: 14px;\n"
+"	height: 14px;\n"
 "}")
 
         self.horizontalLayout.addWidget(self.ShowAllProjectsChkBx, 0, Qt.AlignmentFlag.AlignHCenter)
 
-        self.horizontalSpacer_2 = QSpacerItem(450, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        self.ProjectComboBox = QComboBox(PhaseHoursWindow)
+        self.ProjectComboBox.setObjectName(u"ProjectComboBox")
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        sizePolicy2.setHorizontalStretch(200)
+        sizePolicy2.setVerticalStretch(200)
+        sizePolicy2.setHeightForWidth(self.ProjectComboBox.sizePolicy().hasHeightForWidth())
+        self.ProjectComboBox.setSizePolicy(sizePolicy2)
+        self.ProjectComboBox.setMinimumSize(QSize(300, 30))
 
-        self.horizontalLayout.addItem(self.horizontalSpacer_2)
+        self.horizontalLayout.addWidget(self.ProjectComboBox, 0, Qt.AlignmentFlag.AlignHCenter)
 
 
-        self.verticalLayout.addLayout(self.horizontalLayout)
+        self.horizontalLayout_2.addLayout(self.horizontalLayout)
+
+        self.horizontalSpacer = QSpacerItem(630, 20, QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_2.addItem(self.horizontalSpacer)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout_2)
 
         self.BarsStemToPieStepBtn = QPushButton(PhaseHoursWindow)
         self.BarsStemToPieStepBtn.setObjectName(u"BarsStemToPieStepBtn")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
-        sizePolicy2.setHorizontalStretch(20)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.BarsStemToPieStepBtn.sizePolicy().hasHeightForWidth())
-        self.BarsStemToPieStepBtn.setSizePolicy(sizePolicy2)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        sizePolicy3.setHorizontalStretch(20)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.BarsStemToPieStepBtn.sizePolicy().hasHeightForWidth())
+        self.BarsStemToPieStepBtn.setSizePolicy(sizePolicy3)
         self.BarsStemToPieStepBtn.setMinimumSize(QSize(200, 40))
         font = QFont()
         font.setPointSize(18)

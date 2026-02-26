@@ -28,7 +28,14 @@ class Ui_ViewInvoiceWindow(object):
         ViewInvoiceWindow.setStyleSheet(u"QWidget{\n"
 "	background-color: #1E2E34;\n"
 "}\n"
-"")
+"QLabel{\n"
+"	background-color: #1E2E34;\n"
+"}\n"
+"QHeaderView::section {\n"
+"    color: white;\n"
+"    background-color: #1E2E34;\n"
+"    border: 1px solid black;\n"
+"}")
         self.verticalLayout = QVBoxLayout(ViewInvoiceWindow)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.invoiceNumberLayout = QHBoxLayout()
@@ -103,6 +110,13 @@ class Ui_ViewInvoiceWindow(object):
         self.invoiceTableView.setSizePolicy(sizePolicy1)
         self.invoiceTableView.setStyleSheet(u"QTableView{\n"
 "	color: #89D5D2;\n"
+"	alternate-background-color:  #25383F;\n"
+"	gridline-color: black;\n"
+"}\n"
+"QHeaderView::section {\n"
+"    color: white;\n"
+"    background-color: #1E2E34;\n"
+"    border: 1px solid black;\n"
 "}")
         self.invoiceTableView.setAlternatingRowColors(True)
         self.invoiceTableView.horizontalHeader().setStretchLastSection(True)

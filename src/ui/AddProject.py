@@ -29,15 +29,19 @@ class Ui_AddProjectDialog(object):
 "}\n"
 "QLineEdit{\n"
 "	color: #89D5D2;\n"
+"	background-color: #1E2E34;\n"
 "}\n"
 "QDateEdit{\n"
 "	color: #89D5D2;\n"
+"	background-color: #1E2E34;\n"
 "}\n"
 "QComboBox{\n"
 "	color: #89D5D2;\n"
+"	background-color: #1E2E34;\n"
 "}\n"
 "QComboBox QAbstractItemView{\n"
 "	color: #89D5D2;\n"
+"	background-color: #1E2E34;\n"
 "}")
         self.verticalLayout_3 = QVBoxLayout(AddProjectDialog)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
@@ -130,8 +134,41 @@ class Ui_AddProjectDialog(object):
 
         self.projectStartDate = QDateEdit(AddProjectDialog)
         self.projectStartDate.setObjectName(u"projectStartDate")
+        self.projectStartDate.setStyleSheet(u"QDateEdit{\n"
+"	color: #89D5D2;\n"
+"	background-color: #1E2E34;\n"
+"}\n"
+"QCalendarWidget QAbstractItemView {\n"
+"    background-color: #1E2E34;\n"
+"    color: #89D5D2;\n"
+"}\n"
+"QCalendarWidget QWidget {\n"
+"    background-color: #1E2E34;\n"
+"    color: #89D5D2;\n"
+"}\n"
+"\n"
+"QCalendarWidget QToolButton {\n"
+"    color: #89D5D2;\n"
+"    background-color: #1E2E34;\n"
+"}\n"
+"\n"
+"QCalendarWidget QAbstractItemView:enabled {\n"
+"    color: #89D5D2;\n"
+"    background-color: #1E2E34;\n"
+"    selection-background-color: #4F5E63;\n"
+"    selection-color: #89D5D2;\n"
+"}\n"
+"QCalendarWidget QHeaderView {\n"
+"    color: #89D5D2;\n"
+"    background-color: #1E2E34;\n"
+"}\n"
+"\n"
+"QCalendarWidget qt_calendar_calendarview QHeaderView::section {\n"
+"    color: #89D5D2;\n"
+"    background-color: #1E2E34;\n"
+"}")
         self.projectStartDate.setMaximumDate(QDate(2100, 12, 31))
-        self.projectStartDate.setMinimumDate(QDate(2024, 12, 29))
+        self.projectStartDate.setMinimumDate(QDate(2024, 12, 27))
         self.projectStartDate.setCurrentSection(QDateTimeEdit.Section.MonthSection)
         self.projectStartDate.setCalendarPopup(True)
         self.projectStartDate.setTimeSpec(Qt.TimeSpec.LocalTime)

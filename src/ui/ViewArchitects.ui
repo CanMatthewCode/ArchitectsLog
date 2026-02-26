@@ -28,6 +28,11 @@
   <property name="styleSheet">
    <string notr="true">QWidget{
 	background-color: #1E2E34;
+}
+QHeaderView::section {
+    color: white;
+    background-color: #1E2E34;
+    border: 1px solid black;
 }</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1">
@@ -79,7 +84,22 @@
      <property name="styleSheet">
       <string notr="true">QCheckBox{
 	color: #35B5AC;
-}</string>
+}
+QCheckBox::indicator {
+	background-color: #4F5E63;
+	border-radius: 4px;
+	border: 1px solid black;
+	width: 14px;
+	height: 14px;
+}
+QCheckBox::indicator::checked{
+	background-color: #008080;
+	border-radius: 4px;
+	border: 1px solid black;
+	width: 14px;
+	height: 14px;
+}
+</string>
      </property>
      <property name="text">
       <string>Show Inactive / Change Status</string>
@@ -106,6 +126,13 @@
      <property name="styleSheet">
       <string notr="true">QTableView{
 	color: #89D5D2;
+	alternate-background-color:  #25383F;
+	gridline-color: black;
+}
+QHeaderView::section {
+    color: white;
+    background-color: #1E2E34;
+    border: 1px solid black;
 }</string>
      </property>
      <property name="dragEnabled">

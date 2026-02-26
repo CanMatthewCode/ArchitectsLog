@@ -15,9 +15,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QDateEdit, QFrame, QGridLayout,
-    QHBoxLayout, QLabel, QSizePolicy, QSpacerItem,
-    QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QDateEdit, QDateTimeEdit, QFrame,
+    QGridLayout, QHBoxLayout, QLabel, QSizePolicy,
+    QSpacerItem, QVBoxLayout, QWidget)
 
 from architectsLog_analytics import AnalyticsChartDesigner
 
@@ -70,16 +70,79 @@ class Ui_ProjectsOverTimeWindow(object):
         self.StartDateEdit = QDateEdit(ProjectsOverTimeWindow)
         self.StartDateEdit.setObjectName(u"StartDateEdit")
         self.StartDateEdit.setStyleSheet(u"QDateEdit{\n"
-"	color : #89D5D2;\n"
+"	color: #89D5D2;\n"
+"	background-color: #1E2E34;\n"
+"}\n"
+"QCalendarWidget QAbstractItemView {\n"
+"    background-color: #1E2E34;\n"
+"    color: #89D5D2;\n"
+"}\n"
+"QCalendarWidget QWidget {\n"
+"    background-color: #1E2E34;\n"
+"    color: #89D5D2;\n"
+"}\n"
+"\n"
+"QCalendarWidget QToolButton {\n"
+"    color: #89D5D2;\n"
+"    background-color: #1E2E34;\n"
+"}\n"
+"\n"
+"QCalendarWidget QAbstractItemView:enabled {\n"
+"    color: #89D5D2;\n"
+"    background-color: #1E2E34;\n"
+"    selection-background-color: #4F5E63;\n"
+"    selection-color: #89D5D2;\n"
+"}\n"
+"QCalendarWidget QHeaderView {\n"
+"    color: #89D5D2;\n"
+"    background-color: #1E2E34;\n"
+"}\n"
+"\n"
+"QCalendarWidget qt_calendar_calendarview QHeaderView::section {\n"
+"    color: #89D5D2;\n"
+"    background-color: #1E2E34;\n"
 "}")
+        self.StartDateEdit.setCurrentSection(QDateTimeEdit.Section.MonthSection)
+        self.StartDateEdit.setCalendarPopup(True)
 
         self.horizontalLayout.addWidget(self.StartDateEdit)
 
         self.EndDateEdit = QDateEdit(ProjectsOverTimeWindow)
         self.EndDateEdit.setObjectName(u"EndDateEdit")
         self.EndDateEdit.setStyleSheet(u"QDateEdit{\n"
-"	color : #89D5D2;\n"
+"	color: #89D5D2;\n"
+"	background-color: #1E2E34;\n"
+"}\n"
+"QCalendarWidget QAbstractItemView {\n"
+"    background-color: #1E2E34;\n"
+"    color: #89D5D2;\n"
+"}\n"
+"QCalendarWidget QWidget {\n"
+"    background-color: #1E2E34;\n"
+"    color: #89D5D2;\n"
+"}\n"
+"\n"
+"QCalendarWidget QToolButton {\n"
+"    color: #89D5D2;\n"
+"    background-color: #1E2E34;\n"
+"}\n"
+"\n"
+"QCalendarWidget QAbstractItemView:enabled {\n"
+"    color: #89D5D2;\n"
+"    background-color: #1E2E34;\n"
+"    selection-background-color: #4F5E63;\n"
+"    selection-color: #89D5D2;\n"
+"}\n"
+"QCalendarWidget QHeaderView {\n"
+"    color: #89D5D2;\n"
+"    background-color: #1E2E34;\n"
+"}\n"
+"\n"
+"QCalendarWidget qt_calendar_calendarview QHeaderView::section {\n"
+"    color: #89D5D2;\n"
+"    background-color: #1E2E34;\n"
 "}")
+        self.EndDateEdit.setCalendarPopup(True)
 
         self.horizontalLayout.addWidget(self.EndDateEdit)
 

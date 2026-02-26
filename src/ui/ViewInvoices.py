@@ -38,6 +38,25 @@ class Ui_ViewInvoicesWindow(object):
 "}\n"
 "QComboBox QAbstractItemView{\n"
 "	color: #89D5D2;\n"
+"}\n"
+"QHeaderView::section {\n"
+"	color: white;\n"
+"	background-color: #1E2E34;\n"
+"	border: 1px solid black;\n"
+"}\n"
+"QCheckBox::indicator {\n"
+"	background-color: #4F5E63;\n"
+"	border-radius: 4px;\n"
+"	border: 1px solid black;\n"
+"	width: 14px;\n"
+"	height: 14px;\n"
+"}\n"
+"QCheckBox::indicator::checked{\n"
+"	background-color: #008080;\n"
+"	border-radius: 4px;\n"
+"	border: 1px solid black;\n"
+"	width: 14px;\n"
+"	height: 14px;\n"
 "}")
         self.verticalLayout = QVBoxLayout(ViewInvoicesWindow)
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -69,6 +88,13 @@ class Ui_ViewInvoicesWindow(object):
         self.invoicesTableView.setMinimumSize(QSize(620, 0))
         self.invoicesTableView.setStyleSheet(u"QTableView{\n"
 "	color: #89D5D2;\n"
+"	alternate-background-color:  #25383F;\n"
+"	gridline-color: black;\n"
+"}\n"
+"QHeaderView::section {\n"
+"    color: white;\n"
+"    background-color: #1E2E34;\n"
+"    border: 1px solid black;\n"
 "}")
         self.invoicesTableView.setAlternatingRowColors(True)
         self.invoicesTableView.horizontalHeader().setStretchLastSection(True)

@@ -30,21 +30,27 @@ class Ui_AddTimeDialog(object):
 "}\n"
 "QComboBox{\n"
 "	color: #89D5D2;\n"
+"	background-color: #1E2E34;\n"
 "}\n"
 "QComboBox QAbstractItemView{\n"
 "	color: #89D5D2;\n"
+"	background-color: #1E2E34;\n"
 "}\n"
 "QLineEdit{\n"
 "	color: #89D5D2;\n"
+"	background-color: #1E2E34;\n"
 "}\n"
 "QDateEdit{\n"
 "	color: #89D5D2;\n"
+"	background-color: #1E2E34;\n"
 "}\n"
 "QTimeEdit{\n"
 "	color: #89D5D2;\n"
+"	background-color: #1E2E34;\n"
 "}\n"
 "QTextEdit{\n"
 "	color: #89D5D2;\n"
+"	background-color: #1E2E34;\n"
 "}")
         self.verticalLayout_6 = QVBoxLayout(AddTimeDialog)
         self.verticalLayout_6.setObjectName(u"verticalLayout_6")
@@ -144,8 +150,41 @@ class Ui_AddTimeDialog(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.timeStartDate.sizePolicy().hasHeightForWidth())
         self.timeStartDate.setSizePolicy(sizePolicy)
+        self.timeStartDate.setStyleSheet(u"QDateEdit{\n"
+"	color: #89D5D2;\n"
+"	background-color: #1E2E34;\n"
+"}\n"
+"QCalendarWidget QAbstractItemView {\n"
+"    background-color: #1E2E34;\n"
+"    color: #89D5D2;\n"
+"}\n"
+"QCalendarWidget QWidget {\n"
+"    background-color: #1E2E34;\n"
+"    color: #89D5D2;\n"
+"}\n"
+"\n"
+"QCalendarWidget QToolButton {\n"
+"    color: #89D5D2;\n"
+"    background-color: #1E2E34;\n"
+"}\n"
+"\n"
+"QCalendarWidget QAbstractItemView:enabled {\n"
+"    color: #89D5D2;\n"
+"    background-color: #1E2E34;\n"
+"    selection-background-color: #4F5E63;\n"
+"    selection-color: #89D5D2;\n"
+"}\n"
+"QCalendarWidget QHeaderView {\n"
+"    color: #89D5D2;\n"
+"    background-color: #1E2E34;\n"
+"}\n"
+"\n"
+"QCalendarWidget qt_calendar_calendarview QHeaderView::section {\n"
+"    color: #89D5D2;\n"
+"    background-color: #1E2E34;\n"
+"}")
         self.timeStartDate.setMaximumDate(QDate(2100, 12, 31))
-        self.timeStartDate.setMinimumDate(QDate(2024, 12, 30))
+        self.timeStartDate.setMinimumDate(QDate(2024, 12, 27))
         self.timeStartDate.setCurrentSection(QDateTimeEdit.Section.MonthSection)
         self.timeStartDate.setCalendarPopup(True)
         self.timeStartDate.setTimeSpec(Qt.TimeSpec.LocalTime)
@@ -167,6 +206,8 @@ class Ui_AddTimeDialog(object):
 
         self.timeEdit = QTimeEdit(AddTimeDialog)
         self.timeEdit.setObjectName(u"timeEdit")
+        self.timeEdit.setCurrentSection(QDateTimeEdit.Section.HourSection)
+        self.timeEdit.setCalendarPopup(True)
 
         self.start_times_layout.addWidget(self.timeEdit)
 
@@ -185,6 +226,7 @@ class Ui_AddTimeDialog(object):
 
         self.durationLineEdit = QLineEdit(AddTimeDialog)
         self.durationLineEdit.setObjectName(u"durationLineEdit")
+        self.durationLineEdit.setStyleSheet(u"")
 
         self.duration_layout.addWidget(self.durationLineEdit)
 

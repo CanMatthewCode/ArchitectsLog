@@ -11,6 +11,7 @@ from PySide6.QtWidgets import QApplication
 
 if __name__ == "__main__":
 	app = QApplication(sys.argv)
+	app.setStyle("Fusion")
 	architectsLog_db.DB_FILE = program_loadup()
 	architectsLog_db.sqltable_initialize()
 	initialize_database(architectsLog_db.DB_FILE)

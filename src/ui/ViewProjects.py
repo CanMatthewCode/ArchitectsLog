@@ -26,6 +26,11 @@ class Ui_ViewProjectsWindow(object):
         ViewProjectsWindow.setMinimumSize(QSize(1100, 450))
         ViewProjectsWindow.setStyleSheet(u"QWidget{\n"
 "	background-color: #1E2E34;\n"
+"}\n"
+"QHeaderView::section {\n"
+"    color: white;\n"
+"    background-color: #1E2E34;\n"
+"    border: 1px solid black;\n"
 "}")
         self.verticalLayout = QVBoxLayout(ViewProjectsWindow)
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -48,6 +53,20 @@ class Ui_ViewProjectsWindow(object):
         self.showProjectCheckBox.setObjectName(u"showProjectCheckBox")
         self.showProjectCheckBox.setStyleSheet(u"QCheckBox{\n"
 "	color: #35B5AC;\n"
+"}\n"
+"QCheckBox::indicator {\n"
+"	background-color: #4F5E63;\n"
+"	border-radius: 4px;\n"
+"	border: 1px solid black;\n"
+"	width: 14px;\n"
+"	height: 14px;\n"
+"}\n"
+"QCheckBox::indicator::checked{\n"
+"	background-color: #008080;\n"
+"	border-radius: 4px;\n"
+"	border: 1px solid black;\n"
+"	width: 14px;\n"
+"	height: 14px;\n"
 "}")
 
         self.verticalLayout.addWidget(self.showProjectCheckBox, 0, Qt.AlignmentFlag.AlignRight)
@@ -62,6 +81,13 @@ class Ui_ViewProjectsWindow(object):
         self.projectsTableView.setMinimumSize(QSize(1050, 0))
         self.projectsTableView.setStyleSheet(u"QTableView{\n"
 "	color: #89D5D2;\n"
+"	alternate-background-color:  #25383F;\n"
+"	gridline-color: black;\n"
+"}\n"
+"QHeaderView::section {\n"
+"    color: white;\n"
+"    background-color: #1E2E34;\n"
+"    border: 1px solid black;\n"
 "}")
         self.projectsTableView.setAlternatingRowColors(True)
         self.projectsTableView.horizontalHeader().setStretchLastSection(True)

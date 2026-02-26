@@ -83,8 +83,44 @@
       <widget class="QDateEdit" name="StartDateEdit">
        <property name="styleSheet">
         <string notr="true">QDateEdit{
-	color : #89D5D2;
+	color: #89D5D2;
+	background-color: #1E2E34;
+}
+QCalendarWidget QAbstractItemView {
+    background-color: #1E2E34;
+    color: #89D5D2;
+}
+QCalendarWidget QWidget {
+    background-color: #1E2E34;
+    color: #89D5D2;
+}
+
+QCalendarWidget QToolButton {
+    color: #89D5D2;
+    background-color: #1E2E34;
+}
+
+QCalendarWidget QAbstractItemView:enabled {
+    color: #89D5D2;
+    background-color: #1E2E34;
+    selection-background-color: #4F5E63;
+    selection-color: #89D5D2;
+}
+QCalendarWidget QHeaderView {
+    color: #89D5D2;
+    background-color: #1E2E34;
+}
+
+QCalendarWidget qt_calendar_calendarview QHeaderView::section {
+    color: #89D5D2;
+    background-color: #1E2E34;
 }</string>
+       </property>
+       <property name="currentSection">
+        <enum>QDateTimeEdit::Section::MonthSection</enum>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -92,8 +128,44 @@
       <widget class="QDateEdit" name="EndDateEdit">
        <property name="styleSheet">
         <string notr="true">QDateEdit{
-	color : #89D5D2;
+	color: #89D5D2;
+	background-color: #1E2E34;
+}
+QCalendarWidget QAbstractItemView {
+    background-color: #1E2E34;
+    color: #89D5D2;
+}
+QCalendarWidget QWidget {
+    background-color: #1E2E34;
+    color: #89D5D2;
+}
+
+QCalendarWidget QToolButton {
+    color: #89D5D2;
+    background-color: #1E2E34;
+}
+
+QCalendarWidget QAbstractItemView:enabled {
+    color: #89D5D2;
+    background-color: #1E2E34;
+    selection-background-color: #4F5E63;
+    selection-color: #89D5D2;
+}
+QCalendarWidget QHeaderView {
+    color: #89D5D2;
+    background-color: #1E2E34;
+}
+
+QCalendarWidget qt_calendar_calendarview QHeaderView::section {
+    color: #89D5D2;
+    background-color: #1E2E34;
 }</string>
+       </property>
+       <property name="currentSection">
+        <enum>QDateTimeEdit::Section::MonthSection</enum>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

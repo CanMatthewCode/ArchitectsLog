@@ -28,9 +28,12 @@
   <property name="styleSheet">
    <string notr="true">QComboBox{
 	color: #89D5D2;
+	background-color: #1E2E34;
+	border-radius: 6px;
 }
 QComboBox QAbstractItemView{
 	color: #89D5D2;
+	background-color: #1E2E34;
 }</string>
   </property>
   <widget class="QWidget" name="centralwidget">

@@ -338,11 +338,18 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		self.ax.set_ylabel('Total Hours', color='#89D5D2')
 
 		proj_names = ["Phase Average", proj1_name]
+		self.ax.set_position([0.05, 0.1, 0.79, 0.8])
 		if data2: 
 			proj_names.append(proj2_name)
 		if data3:
 			proj_names.append(proj3_name)
-		legend = self.ax.legend(proj_names, title="Projects", facecolor='#A0E0DD',
+		legend = self.ax.legend(
+			proj_names, 
+			title="Projects",
+			loc="center left",
+			bbox_to_anchor=(1, 0, 0.5, 1),
+			prop={'size': 9}, 
+			facecolor='#A0E0DD',
 			edgecolor='#1E2E34')
 		legend.get_title().set_fontsize(12)
 		legend.get_title().set_weight('bold')

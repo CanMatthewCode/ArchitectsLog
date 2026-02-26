@@ -16,8 +16,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateEdit,
-    QFrame, QGridLayout, QHBoxLayout, QPushButton,
-    QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
+    QDateTimeEdit, QFrame, QGridLayout, QHBoxLayout,
+    QPushButton, QSizePolicy, QSpacerItem, QVBoxLayout,
+    QWidget)
 
 from architectsLog_analytics import AnalyticsChartDesigner
 
@@ -31,9 +32,34 @@ class Ui_PhaseAveragesWindow(object):
 "}\n"
 "QComboBox{\n"
 "	color: #89D5D2;\n"
+"	background-color: #1E2E34;\n"
 "}\n"
 "QComboBox QAbstractItemView{\n"
 "	color: #89D5D2;\n"
+"	background-color: #1E2E34;\n"
+"}\n"
+"QCheckBox::indicator {\n"
+"	background-color: #4F5E63;\n"
+"	border-radius: 4px;\n"
+"	border: 1px solid black;\n"
+"	width: 14px;\n"
+"	height: 14px;\n"
+"}\n"
+"QCheckBox::indicator::checked{\n"
+"	background-color: #008080;\n"
+"	border-radius: 4px;\n"
+"	border: 1px solid black;\n"
+"	width: 14px;\n"
+"	height: 14px;\n"
+"}\n"
+"QHeaderView::section {\n"
+"	color: white;\n"
+"	background-color: #1E2E34;\n"
+"	border: 1px solid black;\n"
+"}\n"
+"QTimeEdit{\n"
+"	color: #89D5D2;\n"
+"	background-color: #1E2E34;\n"
 "}")
         self.verticalLayout = QVBoxLayout(PhaseAveragesWindow)
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -60,7 +86,7 @@ class Ui_PhaseAveragesWindow(object):
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.horizontalSpacer = QSpacerItem(250, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        self.horizontalSpacer = QSpacerItem(200, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout.addItem(self.horizontalSpacer)
 
@@ -75,31 +101,34 @@ class Ui_PhaseAveragesWindow(object):
         self.ProjectComboBox = QComboBox(PhaseAveragesWindow)
         self.ProjectComboBox.setObjectName(u"ProjectComboBox")
         sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
-        sizePolicy1.setHorizontalStretch(200)
-        sizePolicy1.setVerticalStretch(200)
+        sizePolicy1.setHorizontalStretch(150)
+        sizePolicy1.setVerticalStretch(150)
         sizePolicy1.setHeightForWidth(self.ProjectComboBox.sizePolicy().hasHeightForWidth())
         self.ProjectComboBox.setSizePolicy(sizePolicy1)
-        self.ProjectComboBox.setMinimumSize(QSize(300, 30))
+        self.ProjectComboBox.setMinimumSize(QSize(250, 30))
 
         self.horizontalLayout.addWidget(self.ProjectComboBox)
 
         self.Project2ComboBox = QComboBox(PhaseAveragesWindow)
         self.Project2ComboBox.setObjectName(u"Project2ComboBox")
-        sizePolicy1.setHeightForWidth(self.Project2ComboBox.sizePolicy().hasHeightForWidth())
-        self.Project2ComboBox.setSizePolicy(sizePolicy1)
-        self.Project2ComboBox.setMinimumSize(QSize(300, 30))
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        sizePolicy2.setHorizontalStretch(150)
+        sizePolicy2.setVerticalStretch(200)
+        sizePolicy2.setHeightForWidth(self.Project2ComboBox.sizePolicy().hasHeightForWidth())
+        self.Project2ComboBox.setSizePolicy(sizePolicy2)
+        self.Project2ComboBox.setMinimumSize(QSize(250, 30))
 
         self.horizontalLayout.addWidget(self.Project2ComboBox)
 
         self.Project3ComboBox = QComboBox(PhaseAveragesWindow)
         self.Project3ComboBox.setObjectName(u"Project3ComboBox")
-        sizePolicy1.setHeightForWidth(self.Project3ComboBox.sizePolicy().hasHeightForWidth())
-        self.Project3ComboBox.setSizePolicy(sizePolicy1)
-        self.Project3ComboBox.setMinimumSize(QSize(300, 30))
+        sizePolicy2.setHeightForWidth(self.Project3ComboBox.sizePolicy().hasHeightForWidth())
+        self.Project3ComboBox.setSizePolicy(sizePolicy2)
+        self.Project3ComboBox.setMinimumSize(QSize(250, 30))
 
         self.horizontalLayout.addWidget(self.Project3ComboBox)
 
-        self.horizontalSpacer_2 = QSpacerItem(285, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        self.horizontalSpacer_2 = QSpacerItem(300, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout.addItem(self.horizontalSpacer_2)
 
@@ -130,11 +159,11 @@ class Ui_PhaseAveragesWindow(object):
 
         self.ProjectVsAveragesBtn = QPushButton(PhaseAveragesWindow)
         self.ProjectVsAveragesBtn.setObjectName(u"ProjectVsAveragesBtn")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
-        sizePolicy2.setHorizontalStretch(20)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.ProjectVsAveragesBtn.sizePolicy().hasHeightForWidth())
-        self.ProjectVsAveragesBtn.setSizePolicy(sizePolicy2)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        sizePolicy3.setHorizontalStretch(20)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.ProjectVsAveragesBtn.sizePolicy().hasHeightForWidth())
+        self.ProjectVsAveragesBtn.setSizePolicy(sizePolicy3)
         self.ProjectVsAveragesBtn.setMinimumSize(QSize(200, 40))
         font = QFont()
         font.setPointSize(18)
@@ -162,8 +191,8 @@ class Ui_PhaseAveragesWindow(object):
 
         self.PieToBarBtn = QPushButton(PhaseAveragesWindow)
         self.PieToBarBtn.setObjectName(u"PieToBarBtn")
-        sizePolicy2.setHeightForWidth(self.PieToBarBtn.sizePolicy().hasHeightForWidth())
-        self.PieToBarBtn.setSizePolicy(sizePolicy2)
+        sizePolicy3.setHeightForWidth(self.PieToBarBtn.sizePolicy().hasHeightForWidth())
+        self.PieToBarBtn.setSizePolicy(sizePolicy3)
         self.PieToBarBtn.setMinimumSize(QSize(200, 40))
         self.PieToBarBtn.setFont(font)
         self.PieToBarBtn.setStyleSheet(u"QPushButton{\n"
@@ -206,27 +235,85 @@ class Ui_PhaseAveragesWindow(object):
 
         self.StartDateEdit = QDateEdit(PhaseAveragesWindow)
         self.StartDateEdit.setObjectName(u"StartDateEdit")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
-        sizePolicy3.setHorizontalStretch(30)
-        sizePolicy3.setVerticalStretch(0)
-        sizePolicy3.setHeightForWidth(self.StartDateEdit.sizePolicy().hasHeightForWidth())
-        self.StartDateEdit.setSizePolicy(sizePolicy3)
+        sizePolicy4 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        sizePolicy4.setHorizontalStretch(30)
+        sizePolicy4.setVerticalStretch(0)
+        sizePolicy4.setHeightForWidth(self.StartDateEdit.sizePolicy().hasHeightForWidth())
+        self.StartDateEdit.setSizePolicy(sizePolicy4)
         self.StartDateEdit.setStyleSheet(u"QDateEdit{\n"
-"	color : #89D5D2;\n"
+"	color: #89D5D2;\n"
+"	background-color: #1E2E34;\n"
+"}\n"
+"QCalendarWidget QAbstractItemView {\n"
+"    background-color: #1E2E34;\n"
+"    color: #89D5D2;\n"
+"}\n"
+"QCalendarWidget QWidget {\n"
+"    background-color: #1E2E34;\n"
+"    color: #89D5D2;\n"
+"}\n"
+"\n"
+"QCalendarWidget QToolButton {\n"
+"    color: #89D5D2;\n"
+"    background-color: #1E2E34;\n"
+"}\n"
+"\n"
+"QCalendarWidget QAbstractItemView:enabled {\n"
+"    color: #89D5D2;\n"
+"    background-color: #1E2E34;\n"
+"    selection-background-color: #4F5E63;\n"
+"    selection-color: #89D5D2;\n"
+"}\n"
+"QCalendarWidget QHeaderView {\n"
+"    color: #89D5D2;\n"
+"    background-color: #1E2E34;\n"
+"}\n"
+"\n"
+"QCalendarWidget qt_calendar_calendarview QHeaderView::section {\n"
+"    color: #89D5D2;\n"
+"    background-color: #1E2E34;\n"
 "}")
+        self.StartDateEdit.setCurrentSection(QDateTimeEdit.Section.MonthSection)
         self.StartDateEdit.setCalendarPopup(True)
 
         self.horizontalLayout_3.addWidget(self.StartDateEdit)
 
         self.EndDateEdit = QDateEdit(PhaseAveragesWindow)
         self.EndDateEdit.setObjectName(u"EndDateEdit")
-        sizePolicy4 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
-        sizePolicy4.setHorizontalStretch(20)
-        sizePolicy4.setVerticalStretch(0)
-        sizePolicy4.setHeightForWidth(self.EndDateEdit.sizePolicy().hasHeightForWidth())
-        self.EndDateEdit.setSizePolicy(sizePolicy4)
+        sizePolicy3.setHeightForWidth(self.EndDateEdit.sizePolicy().hasHeightForWidth())
+        self.EndDateEdit.setSizePolicy(sizePolicy3)
         self.EndDateEdit.setStyleSheet(u"QDateEdit{\n"
-"	color : #89D5D2;\n"
+"	color: #89D5D2;\n"
+"	background-color: #1E2E34;\n"
+"}\n"
+"QCalendarWidget QAbstractItemView {\n"
+"    background-color: #1E2E34;\n"
+"    color: #89D5D2;\n"
+"}\n"
+"QCalendarWidget QWidget {\n"
+"    background-color: #1E2E34;\n"
+"    color: #89D5D2;\n"
+"}\n"
+"\n"
+"QCalendarWidget QToolButton {\n"
+"    color: #89D5D2;\n"
+"    background-color: #1E2E34;\n"
+"}\n"
+"\n"
+"QCalendarWidget QAbstractItemView:enabled {\n"
+"    color: #89D5D2;\n"
+"    background-color: #1E2E34;\n"
+"    selection-background-color: #4F5E63;\n"
+"    selection-color: #89D5D2;\n"
+"}\n"
+"QCalendarWidget QHeaderView {\n"
+"    color: #89D5D2;\n"
+"    background-color: #1E2E34;\n"
+"}\n"
+"\n"
+"QCalendarWidget qt_calendar_calendarview QHeaderView::section {\n"
+"    color: #89D5D2;\n"
+"    background-color: #1E2E34;\n"
 "}")
         self.EndDateEdit.setCalendarPopup(True)
 
@@ -248,7 +335,7 @@ class Ui_PhaseAveragesWindow(object):
 
         self.horizontalLayout_3.addWidget(self.NonBillableTimesChkBx)
 
-        self.horizontalSpacer_7 = QSpacerItem(550, 20, QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Minimum)
+        self.horizontalSpacer_7 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_3.addItem(self.horizontalSpacer_7)
 

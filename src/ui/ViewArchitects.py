@@ -32,6 +32,11 @@ class Ui_ViewArchitectsWindow(object):
         ViewArchitectsWindow.setMinimumSize(QSize(830, 450))
         ViewArchitectsWindow.setStyleSheet(u"QWidget{\n"
 "	background-color: #1E2E34;\n"
+"}\n"
+"QHeaderView::section {\n"
+"    color: white;\n"
+"    background-color: #1E2E34;\n"
+"    border: 1px solid black;\n"
 "}")
         self.verticalLayout = QVBoxLayout(ViewArchitectsWindow)
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -65,7 +70,22 @@ class Ui_ViewArchitectsWindow(object):
         self.showArchitectCheckBox.setSizePolicy(sizePolicy2)
         self.showArchitectCheckBox.setStyleSheet(u"QCheckBox{\n"
 "	color: #35B5AC;\n"
-"}")
+"}\n"
+"QCheckBox::indicator {\n"
+"	background-color: #4F5E63;\n"
+"	border-radius: 4px;\n"
+"	border: 1px solid black;\n"
+"	width: 14px;\n"
+"	height: 14px;\n"
+"}\n"
+"QCheckBox::indicator::checked{\n"
+"	background-color: #008080;\n"
+"	border-radius: 4px;\n"
+"	border: 1px solid black;\n"
+"	width: 14px;\n"
+"	height: 14px;\n"
+"}\n"
+"")
 
         self.verticalLayout.addWidget(self.showArchitectCheckBox, 0, Qt.AlignmentFlag.AlignRight)
 
@@ -80,6 +100,13 @@ class Ui_ViewArchitectsWindow(object):
         self.architectsTableView.setMinimumSize(QSize(850, 0))
         self.architectsTableView.setStyleSheet(u"QTableView{\n"
 "	color: #89D5D2;\n"
+"	alternate-background-color:  #25383F;\n"
+"	gridline-color: black;\n"
+"}\n"
+"QHeaderView::section {\n"
+"    color: white;\n"
+"    background-color: #1E2E34;\n"
+"    border: 1px solid black;\n"
 "}")
         self.architectsTableView.setDragEnabled(False)
         self.architectsTableView.setAlternatingRowColors(True)

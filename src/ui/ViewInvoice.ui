@@ -23,7 +23,14 @@
    <string notr="true">QWidget{
 	background-color: #1E2E34;
 }
-</string>
+QLabel{
+	background-color: #1E2E34;
+}
+QHeaderView::section {
+    color: white;
+    background-color: #1E2E34;
+    border: 1px solid black;
+}</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -165,6 +172,13 @@
      <property name="styleSheet">
       <string notr="true">QTableView{
 	color: #89D5D2;
+	alternate-background-color:  #25383F;
+	gridline-color: black;
+}
+QHeaderView::section {
+    color: white;
+    background-color: #1E2E34;
+    border: 1px solid black;
 }</string>
      </property>
      <property name="alternatingRowColors">

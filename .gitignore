@@ -26,3 +26,6 @@ test_*.db
 
 # OS
 .DS_Store
+
+# Designer
+*.ui

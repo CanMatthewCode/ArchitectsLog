@@ -1,4 +1,4 @@
-#Testing for architectsLog_PySide.py
+# Testing for architectsLog_PySide.py
 
 import pytest
 from architectsLog_PySide import validateDuration

@@ -1,13 +1,13 @@
+# Test for architectsLog_analytics_db.py
+
 import pytest
-import sqlite3
 from datetime import datetime
 
-from architectsLog_classes import Architect, Project, Invoice, TimeEntry
+from architectsLog_classes import Architect, Project, TimeEntry
 
 from architectsLog_db import (create_architect_table, create_project_table,
 	create_phases_table, create_invoices_table, create_time_entries_table,
-	initialize_phases, initialize_projects, initialize_invoices, 
-	add_architect, add_project, add_invoice, add_time_entry,)
+	initialize_phases, add_architect, add_project, add_time_entry,)
 
 from architectsLog_analytics_db import (phase_duration_by_project, 
 	phase_duration_by_project_with_name, phase_time_entries_by_project, 

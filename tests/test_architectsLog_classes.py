@@ -1,5 +1,6 @@
+# Test for architectsLog_classes.py
+
 from architectsLog_classes import Architect, Project, Invoice, TimeEntry
-import time
 from datetime import datetime
 
 #	~CLASS CREATION AND INITIALIZATION TESTS~~~
@@ -9,13 +10,13 @@ def test_architect_initialization():
 	"""Test if the Architect class instance is created and __init__() initializes correctly"""
 	testArchitect = Architect("Name", "LicenseNumber01", "123-456-7890", "email@domain.com", "MyCompany")
 
-	assert testArchitect.name ==  "Name"
+	assert testArchitect.name == "Name"
 	assert testArchitect.license_number == "LicenseNumber01"
 	assert testArchitect.phone_number == "123-456-7890"
-	assert testArchitect.email =="email@domain.com"
+	assert testArchitect.email == "email@domain.com"
 	assert testArchitect.company_name == "MyCompany"
 	assert testArchitect.status == "Active"
-	assert testArchitect.architect_id == None
+	assert testArchitect.architect_id is None
 
 #test if the Project class instance is initialized correctly
 def test_project_initialization():
@@ -28,7 +29,7 @@ def test_project_initialization():
 	assert testProject.start_date == "01-01-2025"
 	assert testProject.current_phase_id == 1
 	assert testProject.status == "Active"
-	assert testProject.project_id == None
+	assert testProject.project_id is None
 
 #test if the Invoice class instance is initialized correctly
 def test_invoice_initialization():
@@ -43,7 +44,7 @@ def test_invoice_initialization():
 	assert testInvoice.created_date == int_date
 	assert testInvoice.project_id == test_project_id
 	assert testInvoice.status == "Draft"
-	assert testInvoice.invoice_id == None
+	assert testInvoice.invoice_id is None
 
 #test if the TimeEntry class instance is initialized correctly
 def test_time_entry_initialization():
@@ -63,4 +64,4 @@ def test_time_entry_initialization():
 	assert testTimeEntry.phase_id == 1
 	assert testTimeEntry.notes == "Note"
 	assert testTimeEntry.invoice_id == 1
-	assert testTimeEntry.time_entry_id == None
+	assert testTimeEntry.time_entry_id is None

@@ -1,15 +1,14 @@
 #testing for acrchitectsLog_db.py
 
 import pytest
-import os
 import sqlite3
 
 from datetime import datetime
 
-from architectsLog_db import (get_connection, create_architect_table, 
-	create_project_table, create_phases_table, create_invoices_table, 
-	create_time_entries_table, initialize_phases, initialize_projects, 
-	initialize_invoices, add_architect, add_project, add_invoice, add_time_entry,
+from architectsLog_db import (create_architect_table, create_project_table,
+	create_phases_table, create_invoices_table, create_time_entries_table,
+	initialize_phases, initialize_projects, initialize_invoices,
+	add_architect, add_project, add_invoice, add_time_entry,
  	load_architect, load_project, get_most_recent_archid_and_projid, 
  	get_most_recent_project_phase, load_invoice_ids_no_time_entries, update_project,
  	update_time_entry, delete_invoice, delete_time_entry)
@@ -335,7 +334,7 @@ def test_initialize_phases(test_conn, table_initialize):
 	assert rows[0] == (1, "Schematic Design")
 	assert rows[1] == (2, "Design Development")
 	assert rows[2] == (3, "Construction Documents")
-	assert rows[3] == (4, "Bidding Negotiation" )
+	assert rows[3] == (4, "Bidding Negotiation")
 	assert rows[4] == (5, "Construction Administration")
 	assert rows[5] == (6, "Interior Design")
 	assert rows[6] == (7, "Add Service")
@@ -516,10 +515,10 @@ def test_load_architect(test_conn, table_initialize):
 	testArchitect = load_architect(1, cur)
 
 	#test if all columns were correctly loaded into Architect object
-	assert testArchitect.name ==  "Name"
+	assert testArchitect.name == "Name"
 	assert testArchitect.license_number == "LicenseNumber01"
 	assert testArchitect.phone_number == "123-456-7890"
-	assert testArchitect.email =="email@domain.com"
+	assert testArchitect.email == "email@domain.com"
 	assert testArchitect.company_name == "MyCompany"
 	assert testArchitect.status == "Active"
 	assert testArchitect.architect_id == 1
@@ -605,7 +604,7 @@ def test_load_invoice_ids_no_time_entries(test_conn, table_initialize):
 	invoice_date = datetime.strptime(date, "%m-%d-%Y")
 	int_date = int(invoice_date.timestamp())
 	testInvoice2 = Invoice(1, int_date, project_id)
-	invoice_id = add_invoice(testInvoice2, cur)
+	add_invoice(testInvoice2, cur)
 
 	no_time_entries_invoice = load_invoice_ids_no_time_entries(cur)
 
@@ -622,12 +621,12 @@ def test_update_project(test_conn, table_initialize):
 	project_id = table_initialize['project_id']
 
 	#update all columns in the projects table with new values
-	project = update_project('project_name', project_id, "NewProject2", cur)
-	project = update_project('client_name', project_id, "NewClient2", cur)
-	project = update_project('client_address', project_id, "345ClientStreet", cur)
-	project = update_project('start_date', project_id, "02-02-2025", cur)
-	project = update_project('current_phase_id', project_id, 2, cur)
-	project = update_project('status', project_id, 'Completed', cur)
+	update_project('project_name', project_id, "NewProject2", cur)
+	update_project('client_name', project_id, "NewClient2", cur)
+	update_project('client_address', project_id, "345ClientStreet", cur)
+	update_project('start_date', project_id, "02-02-2025", cur)
+	update_project('current_phase_id', project_id, 2, cur)
+	update_project('status', project_id, 'Completed', cur)
 	test_conn.commit()
 
 	#test if all column values were correctly updated
@@ -670,14 +669,14 @@ def test_update_time_entry(test_conn, table_initialize):
 	test_conn.commit()
 
 	#update all columns in the time_entries table with new values
-	time_entry = update_time_entry('project_id', time_entry_id, 2, cur)
-	time_entry = update_time_entry('architect_id', time_entry_id, 2, cur)
-	time_entry = update_time_entry('phase_id', time_entry_id, 2, cur)
-	time_entry = update_time_entry('start_time', time_entry_id, 
+	update_time_entry('project_id', time_entry_id, 2, cur)
+	update_time_entry('architect_id', time_entry_id, 2, cur)
+	update_time_entry('phase_id', time_entry_id, 2, cur)
+	update_time_entry('start_time', time_entry_id, 
 		'02-02-2025 1:00:00', cur)
-	time_entry = update_time_entry('duration_minutes', time_entry_id, 60, cur)
-	time_entry = update_time_entry('notes', time_entry_id, 'New Note', cur)
-	time_entry = update_time_entry('invoice_id', time_entry_id, 1, cur)
+	update_time_entry('duration_minutes', time_entry_id, 60, cur)
+	update_time_entry('notes', time_entry_id, 'New Note', cur)
+	update_time_entry('invoice_id', time_entry_id, 1, cur)
 	test_conn.commit()
 
 	#test if all column values were correctly updated

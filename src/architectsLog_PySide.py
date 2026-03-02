@@ -2434,6 +2434,8 @@ class TimeEntriesRelationalTableModel(QSqlRelationalTableModel):
 		if field_name == "duration_minutes":
 			try:
 				value = validateDuration(value)
+				if not value:
+					return False
 			except ValueError:
 				return False
 
@@ -2598,7 +2600,7 @@ class DurationDelegate(QStyledItemDelegate):
 	total minutes or hour:minutes input"""
 	def createEditor(self, parent, options, index) -> QLineEdit:
 		editor = QLineEdit(parent)
-		regex = QRegularExpression(r"^(\d+)?((:\d{2})|((.\d{1})|(.\d{2})))?$")
+		regex = QRegularExpression(r"^(\d+)?((:\d{2})|(([.]\d{1})|([.]\d{2})))?$")
 		validator = QRegularExpressionValidator(regex, editor)
 		editor.setValidator(validator)
 

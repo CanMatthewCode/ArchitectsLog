@@ -17,8 +17,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractButton, QApplication, QComboBox, QDateEdit,
     QDateTimeEdit, QDialog, QDialogButtonBox, QHBoxLayout,
-    QLabel, QLineEdit, QSizePolicy, QSpacerItem,
-    QTextEdit, QTimeEdit, QVBoxLayout, QWidget)
+    QLabel, QSizePolicy, QSpacerItem, QTextEdit,
+    QTimeEdit, QVBoxLayout, QWidget)
 
 class Ui_AddTimeDialog(object):
     def setupUi(self, AddTimeDialog):
@@ -184,7 +184,7 @@ class Ui_AddTimeDialog(object):
 "    background-color: #1E2E34;\n"
 "}")
         self.timeStartDate.setMaximumDate(QDate(2100, 12, 31))
-        self.timeStartDate.setMinimumDate(QDate(2024, 12, 27))
+        self.timeStartDate.setMinimumDate(QDate(2024, 12, 26))
         self.timeStartDate.setCurrentSection(QDateTimeEdit.Section.MonthSection)
         self.timeStartDate.setCalendarPopup(True)
         self.timeStartDate.setTimeSpec(Qt.TimeSpec.LocalTime)
@@ -204,34 +204,34 @@ class Ui_AddTimeDialog(object):
 
         self.start_times_layout.addWidget(self.startTimeLabel, 0, Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignVCenter)
 
-        self.timeEdit = QTimeEdit(AddTimeDialog)
-        self.timeEdit.setObjectName(u"timeEdit")
-        self.timeEdit.setCurrentSection(QDateTimeEdit.Section.HourSection)
-        self.timeEdit.setCalendarPopup(True)
+        self.timeStartEdit = QTimeEdit(AddTimeDialog)
+        self.timeStartEdit.setObjectName(u"timeStartEdit")
+        self.timeStartEdit.setCurrentSection(QDateTimeEdit.Section.HourSection)
+        self.timeStartEdit.setCalendarPopup(True)
 
-        self.start_times_layout.addWidget(self.timeEdit)
+        self.start_times_layout.addWidget(self.timeStartEdit)
 
 
         self.horizontalLayout.addLayout(self.start_times_layout)
 
-        self.duration_layout = QVBoxLayout()
-        self.duration_layout.setObjectName(u"duration_layout")
-        self.durationLabel = QLabel(AddTimeDialog)
-        self.durationLabel.setObjectName(u"durationLabel")
-        self.durationLabel.setStyleSheet(u"QLabel{\n"
+        self.end_times_layout = QVBoxLayout()
+        self.end_times_layout.setObjectName(u"end_times_layout")
+        self.endTimeLabel = QLabel(AddTimeDialog)
+        self.endTimeLabel.setObjectName(u"endTimeLabel")
+        self.endTimeLabel.setStyleSheet(u"QLabel{\n"
 "	color: #35B5AC;\n"
 "}")
 
-        self.duration_layout.addWidget(self.durationLabel, 0, Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignVCenter)
+        self.end_times_layout.addWidget(self.endTimeLabel, 0, Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignVCenter)
 
-        self.durationLineEdit = QLineEdit(AddTimeDialog)
-        self.durationLineEdit.setObjectName(u"durationLineEdit")
-        self.durationLineEdit.setStyleSheet(u"")
+        self.timeEndEdit = QTimeEdit(AddTimeDialog)
+        self.timeEndEdit.setObjectName(u"timeEndEdit")
+        self.timeEndEdit.setCalendarPopup(True)
 
-        self.duration_layout.addWidget(self.durationLineEdit)
+        self.end_times_layout.addWidget(self.timeEndEdit)
 
 
-        self.horizontalLayout.addLayout(self.duration_layout)
+        self.horizontalLayout.addLayout(self.end_times_layout)
 
         self.timeLayoutSpacer = QSpacerItem(100, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
 
@@ -315,7 +315,7 @@ class Ui_AddTimeDialog(object):
         self.startDate.setText(QCoreApplication.translate("AddTimeDialog", u"Start Date:", None))
         self.timeStartDate.setDisplayFormat(QCoreApplication.translate("AddTimeDialog", u"MM/dd/yy", None))
         self.startTimeLabel.setText(QCoreApplication.translate("AddTimeDialog", u"Start Time:", None))
-        self.durationLabel.setText(QCoreApplication.translate("AddTimeDialog", u"Duration:", None))
+        self.endTimeLabel.setText(QCoreApplication.translate("AddTimeDialog", u"End Time", None))
         self.notesLabel.setText(QCoreApplication.translate("AddTimeDialog", u"Notes:", None))
     # retranslateUi
 

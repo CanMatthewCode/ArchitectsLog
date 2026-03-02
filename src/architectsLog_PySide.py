@@ -337,15 +337,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 			# Get start date and time and turn into a timestamp int for database
 			start_date = manual_log_time.timeStartDate.date()
-			start_time = manual_log_time.timeEdit.time()
-			qDatetime = QDateTime(start_date, start_time)
-			pyDatetime = qDatetime.toPython()
-			time_log_start_time = int(pyDatetime.timestamp())
+			start_time = manual_log_time.timeStartEdit.time()
+			end_time = manual_log_time.timeEndEdit.time()
+			
+			qDatetimeStart = QDateTime(start_date, start_time)
+			pyDatetimeStart = qDatetimeStart.toPython()
+			time_log_start_time = int(pyDatetimeStart.timestamp())
+
+			qDatetimeEnd = QDateTime(start_date, end_time)
+			pyDateTimeEnd = qDatetimeEnd.toPython()
 
 			# Get duration input and validate it with validation function
-			duration = manual_log_time.durationLineEdit.text()
-			if not duration:
-				return
+			duration = pyDateTimeEnd - pyDatetimeStart
+			duration = duration.total_seconds() / 60
 			total_duration = validateDuration(duration)
 
 			new_time_entry = TimeEntry(start_time = time_log_start_time,
@@ -691,7 +695,7 @@ class ViewProjects(QWidget, Ui_ViewProjectsWindow):
 			self.main_window.PhasesComboBox.blockSignals(True)
 			self.main_window.PhasesComboBox.setCurrentIndex(phase_matches[0].row())
 			self.main_window.PhasesComboBox.blockSignals(False)
-
+		self.main_window.PhasesComboBox.setEnabled(True)
 
 	def showCompletedProjects(self, signal) -> None:
 		"""Create filter to hide completed projects and status column"""
@@ -2224,13 +2228,9 @@ class ManualTimeLogger(QDialog, Ui_AddTimeDialog):
 		# Set current date onto the calendar drop down
 		self.timeStartDate.setDate(QDate.currentDate())
 
-		# Set current time onto the time edit drop down
-		self.timeEdit.setTime(QTime.currentTime())
-
-		# Set validator on duration input
-		duration_regex = QRegularExpression(r"^(\d+)?((:|.)\d{0,2})?$")
-		validator = QRegularExpressionValidator(duration_regex, self.durationLineEdit)
-		self.durationLineEdit.setValidator(validator)
+		# Set current time onto the time edit drop downs
+		self.timeStartEdit.setTime(QTime.currentTime())
+		self.timeEndEdit.setTime(QTime.currentTime())
 
 	def projectChanged(self) -> None:
 		"""Method to set phase combo box to phase attached to project"""
@@ -2266,12 +2266,12 @@ class ManualTimeLogger(QDialog, Ui_AddTimeDialog):
 
 	def accept(self) -> None:
 		"""Method to verify all forms were entered with correct syntax"""
-		duration_patter = re.compile(r"^(\d+)?((:|.)\d{0,2})?$")
-		duration_result = duration_patter.search(self.durationLineEdit.text())
+		time_start = self.timeStartEdit.time()
+		end_time = self.timeEndEdit.time()
 		
-		if not duration_result:
-			QMessageBox.warning(self, "Invalid Time Duration", 
-				"Please Add Event Duration")
+		if end_time <= time_start:
+			QMessageBox.warning(self, "Invalid Duration", 
+				"Please ensure End Time is later than Start Time")
 			return
 
 		super().accept()
@@ -2598,7 +2598,7 @@ class DurationDelegate(QStyledItemDelegate):
 	total minutes or hour:minutes input"""
 	def createEditor(self, parent, options, index) -> QLineEdit:
 		editor = QLineEdit(parent)
-		regex = QRegularExpression(r"^(\d+)?((:|.)\d{2})?$")
+		regex = QRegularExpression(r"^(\d+)?((:\d{2})|((.\d{1})|(.\d{2})))?$")
 		validator = QRegularExpressionValidator(regex, editor)
 		editor.setValidator(validator)
 
@@ -2750,8 +2750,11 @@ def validateDuration(duration: str) -> int:
 			minutes = 60 * float(duration)
 		else:
 			hours, percent_minutes = duration.split(".")
+			if len(percent_minutes) == 1:
+				percent_minutes += "0"
 			hours = int(hours)
 			minutes = 60 * (int(percent_minutes) / 100)
+
 	else:
 		minutes = int(duration)
 	quarter_hours = minutes // 15

@@ -661,10 +661,37 @@ class ViewProjects(QWidget, Ui_ViewProjectsWindow):
 		# topLeft.column() will read 5 & 0 instead of just 5 because .dataChanged 
 		# fires twice -> once for the RelationalTableModel and once for the relation 
 		# table. The if only picks up the 2nd which is 0 due to the combo box display 
-		if topLeft.column() == 0:
-			self.main_window.ProjectsComboBox.model().select()
-			setCrossComboBox(self.main_window.ProjectsComboBox, 
-				self.main_window.PhasesComboBox, 5)
+		if topLeft.column() != 0:
+			return
+
+		proj_index = self.main_window.ProjectsComboBox.currentIndex()
+		proj_id = self.main_window.project_model.data(
+			self.main_window.project_model.index(proj_index, 0))
+
+		self.main_window.ProjectsComboBox.model().select()
+
+		# block and reset the correct project after .select() so it doesn't reset to 0
+		self.main_window.ProjectsComboBox.blockSignals(True)
+		self.main_window.ProjectsComboBox.setCurrentIndex(proj_index)
+		self.main_window.ProjectsComboBox.blockSignals(False)
+
+		with get_db_connection() as conn:
+			cur = conn.cursor()
+			cur.execute("SELECT current_phase_id FROM projects WHERE project_id = ?",
+				(proj_id,))
+			result = cur.fetchone()
+		if not result:
+			return
+
+		new_phase_id = result[0]
+		phase_matches = self.main_window.phase_model.match(
+			self.main_window.phase_model.index(0,0),
+			Qt.EditRole, new_phase_id, 1, Qt.MatchFlags(Qt.MatchExactly))
+		if phase_matches:
+			self.main_window.PhasesComboBox.blockSignals(True)
+			self.main_window.PhasesComboBox.setCurrentIndex(phase_matches[0].row())
+			self.main_window.PhasesComboBox.blockSignals(False)
+
 
 	def showCompletedProjects(self, signal) -> None:
 		"""Create filter to hide completed projects and status column"""
@@ -2201,7 +2228,7 @@ class ManualTimeLogger(QDialog, Ui_AddTimeDialog):
 		self.timeEdit.setTime(QTime.currentTime())
 
 		# Set validator on duration input
-		duration_regex = QRegularExpression(r"^(\d+)?(:\d{0,2})?$")
+		duration_regex = QRegularExpression(r"^(\d+)?((:|.)\d{0,2})?$")
 		validator = QRegularExpressionValidator(duration_regex, self.durationLineEdit)
 		self.durationLineEdit.setValidator(validator)
 
@@ -2239,7 +2266,7 @@ class ManualTimeLogger(QDialog, Ui_AddTimeDialog):
 
 	def accept(self) -> None:
 		"""Method to verify all forms were entered with correct syntax"""
-		duration_patter = re.compile(r"^(\d+)?(:\d{0,2})?$")
+		duration_patter = re.compile(r"^(\d+)?((:|.)\d{0,2})?$")
 		duration_result = duration_patter.search(self.durationLineEdit.text())
 		
 		if not duration_result:
@@ -2571,7 +2598,7 @@ class DurationDelegate(QStyledItemDelegate):
 	total minutes or hour:minutes input"""
 	def createEditor(self, parent, options, index) -> QLineEdit:
 		editor = QLineEdit(parent)
-		regex = QRegularExpression(r"^(\d+)?(:\d{2})?$")
+		regex = QRegularExpression(r"^(\d+)?((:|.)\d{2})?$")
 		validator = QRegularExpressionValidator(regex, editor)
 		editor.setValidator(validator)
 
@@ -2716,6 +2743,15 @@ def validateDuration(duration: str) -> int:
 			hours, minutes = duration.split(":")
 			hours = int(hours)
 			minutes = int(minutes)
+	elif isinstance(duration, str) and "." in duration:
+		if duration.count(".") != 1:
+			raise ValueError
+		if duration[0] == ".":
+			minutes = 60 * float(duration)
+		else:
+			hours, percent_minutes = duration.split(".")
+			hours = int(hours)
+			minutes = 60 * (int(percent_minutes) / 100)
 	else:
 		minutes = int(duration)
 	quarter_hours = minutes // 15

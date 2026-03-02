@@ -302,24 +302,28 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		width = .75 / (num_projects + 1)
 		x_positions = all_phases
 
+		fontsize = 7
+		if len(all_phases) <= 4:
+			fontsize = 10
+
 		phase_name = [self.PHASE_NAMES[phase_id - 1] for phase_id in all_phases]
 		bars = self.ax.bar(all_phases, avg_y, width, color=self.PHASE_COLORS[7])
 		self.ax.bar_label(bars, label_type='edge', 
-			color = '#A0E0DD', fontsize=6)
+			color = '#A0E0DD', fontsize=fontsize)
 		bars2 = self.ax.bar([x - width for x in x1], y1, width, 
 			color=self.PHASE_COLORS[5])
 		self.ax.bar_label(bars2, label_type='edge', 
-			color = '#A0E0DD', fontsize=6)
+			color = '#A0E0DD', fontsize=fontsize)
 		if data2:
 			bars3 = self.ax.bar([x - 2 * width for x in x2], y2, width, 
 				color=self.PHASE_COLORS[3])
 			self.ax.bar_label(bars3, label_type='edge', 
-				color = '#A0E0DD', fontsize=6)
+				color = '#A0E0DD', fontsize=fontsize)
 		if data3:
 			bars4 = self.ax.bar([x - 3 * width for x in x3], y3, width, 
 				color=self.PHASE_COLORS[2])
 			self.ax.bar_label(bars4, label_type='edge', 
-				color = '#A0E0DD', fontsize=6)
+				color = '#A0E0DD', fontsize=fontsize)
 
 		self.ax.set_facecolor('#2A3F45')  # Plot area
 		self.ax.spines['bottom'].set_color('#4A6F75')

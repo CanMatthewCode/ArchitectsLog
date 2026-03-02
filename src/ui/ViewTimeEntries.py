@@ -57,6 +57,9 @@ class Ui_ViewTimeEntriesWindow(object):
 "	color: white;\n"
 "	background-color: #1E2E34;\n"
 "	border: 1px solid black;\n"
+"}\n"
+"QLineEdit{\n"
+"	color: #89D5D2;\n"
 "}")
         self.verticalLayout = QVBoxLayout(ViewTimeEntriesWindow)
         self.verticalLayout.setObjectName(u"verticalLayout")

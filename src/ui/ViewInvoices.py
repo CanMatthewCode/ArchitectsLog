@@ -57,6 +57,9 @@ class Ui_ViewInvoicesWindow(object):
 "	border: 1px solid black;\n"
 "	width: 14px;\n"
 "	height: 14px;\n"
+"}\n"
+"QLineEdit{\n"
+"	color: #89D5D2;\n"
 "}")
         self.verticalLayout = QVBoxLayout(ViewInvoicesWindow)
         self.verticalLayout.setObjectName(u"verticalLayout")

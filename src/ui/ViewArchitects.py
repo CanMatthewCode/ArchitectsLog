@@ -37,6 +37,15 @@ class Ui_ViewArchitectsWindow(object):
 "    color: white;\n"
 "    background-color: #1E2E34;\n"
 "    border: 1px solid black;\n"
+"}\n"
+"QLineEdit{\n"
+"	color: #89D5D2;\n"
+"}\n"
+"QComboBox{\n"
+"	color: #89D5D2;\n"
+"}\n"
+"QComboBox QAbstractItemView{\n"
+"	color: #89D5D2;\n"
 "}")
         self.verticalLayout = QVBoxLayout(ViewArchitectsWindow)
         self.verticalLayout.setObjectName(u"verticalLayout")

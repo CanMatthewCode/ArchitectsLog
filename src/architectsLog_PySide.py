@@ -6,7 +6,7 @@ import random
 from typing import Optional
 
 from PySide6.QtWidgets import (QMainWindow, QApplication, QDialog, QMessageBox,
-	QStyledItemDelegate, QLineEdit, QDateTimeEdit, QDateEdit, QComboBox, QWidget,
+	QStyledItemDelegate, QDateTimeEdit, QDateEdit, QComboBox, QWidget,
 	QLCDNumber, QStyleOptionButton, QStyle, QAbstractItemView, QHeaderView)
 from PySide6.QtSql import (QSqlDatabase, QSqlTableModel, QSqlRelationalTableModel, 
 	QSqlRelation, QSqlRelationalDelegate, QSqlQuery)
@@ -336,7 +336,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 				proj_id = proj_model.data(proj_model.index(proj_index, 0))
 
 			# Get start date and time and turn into a timestamp int for database
-			#start_date = manual_log_time.timeStartDate.date()
 			start_time = manual_log_time.timeStartEdit.dateTime()
 			end_time = manual_log_time.timeEndEdit.dateTime()
 			
@@ -346,11 +345,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 			qDatetimeEnd = QDateTime(end_time)
 			pyDateTimeEnd = qDatetimeEnd.toPython()
-			time_log_end_time = int(pyDatetimeEnd.timestamp())
+			time_log_end_time = int(pyDateTimeEnd.timestamp())
 
 			# Get duration input and validate it with validation function
-			duration = pyDateTimeEnd - pyDatetimeStart
-			duration = duration.total_seconds() / 60
+			duration = time_log_end_time - time_log_start_time
+			duration = duration / 60
 			total_duration = validateDuration(duration)
 
 			new_time_entry = TimeEntry(start_time = time_log_start_time,
@@ -1298,9 +1297,6 @@ class ViewInvoice(Ui_ViewInvoiceWindow, QWidget):
 		project_relation = QSqlRelation("projects", "project_id", "project_name")
 		self.model.setRelation(self.model.fieldIndex("project_id"), project_relation)
 
-		phase_relation = QSqlRelation("phases", "phase_id", "project_phase")
-		self.model.setRelation(self.model.fieldIndex("phase_id"), phase_relation)
-
 		with get_db_connection() as conn:
 			cur = conn.cursor()
 			sql = "SELECT invoice_number FROM invoices WHERE invoice_id = ?"
@@ -1313,7 +1309,6 @@ class ViewInvoice(Ui_ViewInvoiceWindow, QWidget):
 		self.setWindowTitle(f"Invoice #{invoice_name}")
 
 		column_titles = {
-			"project_phase" : "Project Phase",
 			"start_time" : "Start Time",
 			"end_time" : "End Time",
 			"duration_minutes" : "Duration",
@@ -1329,7 +1324,7 @@ class ViewInvoice(Ui_ViewInvoiceWindow, QWidget):
 		self.invoiceTableView.setColumnWidth(4, 152)
 		self.invoiceTableView.setColumnWidth(5, 152)
 		self.invoiceTableView.setColumnWidth(6, 100)
-		self.invoiceTableView.setColumnWidth(7, 200)
+		self.invoiceTableView.setColumnWidth(7, 100)
 
 		# Hide unused columns
 		self.invoiceTableView.setColumnHidden(
@@ -1340,6 +1335,8 @@ class ViewInvoice(Ui_ViewInvoiceWindow, QWidget):
 			self.model.fieldIndex("architect_id"), True)
 		self.invoiceTableView.setColumnHidden(
 			self.model.fieldIndex("project_name"), True)
+		self.invoiceTableView.setColumnHidden(
+			self.model.fieldIndex("phase_id"), True)
 
 		self.model.select()
 
@@ -1350,6 +1347,10 @@ class ViewInvoice(Ui_ViewInvoiceWindow, QWidget):
 				WHERE invoice_id = ?"
 			cur.execute(sql, (invoice_number,))
 			self.total_time = cur.fetchone()
+			sql = "SELECT phase_id FROM time_entries WHERE invoice_id = ?"
+			cur.execute(sql, (invoice_number,))
+			invoice_phase_id = cur.fetchone()[0]
+			invoice_phase = PHASES[invoice_phase_id]
 
 		hours = self.total_time[0] // 60
 		minutes = self.total_time[0] % 60
@@ -1359,6 +1360,7 @@ class ViewInvoice(Ui_ViewInvoiceWindow, QWidget):
 
 		self.project_name = self.model.data(self.model.index(0, 1))
 		self.projectNameLabel.setText(self.project_name)
+		self.projectPhaseLabel.setText(f"Phase: {invoice_phase}")
 
 		self.saveToPDFBtn.clicked.connect(self.makePDF)
 
@@ -2237,7 +2239,6 @@ class ManualTimeLogger(QDialog, Ui_AddTimeDialog):
 		# Set current time onto the time edit drop downs
 		self.timeStartEdit.setDateTime(QDateTime.currentDateTime())
 		self.timeEndEdit.setDateTime(QDateTime.currentDateTime())
-		#self.timeEndEdit.setDate(QTime.currentTime())
 
 	def projectChanged(self) -> None:
 		"""Method to set phase combo box to phase attached to project"""

@@ -15,16 +15,16 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractButton, QApplication, QComboBox, QDateEdit,
-    QDateTimeEdit, QDialog, QDialogButtonBox, QHBoxLayout,
-    QLabel, QSizePolicy, QSpacerItem, QTextEdit,
-    QTimeEdit, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractButton, QApplication, QComboBox, QDateTimeEdit,
+    QDialog, QDialogButtonBox, QHBoxLayout, QLabel,
+    QSizePolicy, QSpacerItem, QTextEdit, QVBoxLayout,
+    QWidget)
 
 class Ui_AddTimeDialog(object):
     def setupUi(self, AddTimeDialog):
         if not AddTimeDialog.objectName():
             AddTimeDialog.setObjectName(u"AddTimeDialog")
-        AddTimeDialog.resize(576, 400)
+        AddTimeDialog.resize(606, 400)
         AddTimeDialog.setStyleSheet(u"QWidget{\n"
 "	background-color: #1E2E34;\n"
 "}\n"
@@ -45,6 +45,10 @@ class Ui_AddTimeDialog(object):
 "	background-color: #1E2E34;\n"
 "}\n"
 "QTimeEdit{\n"
+"	color: #89D5D2;\n"
+"	background-color: #1E2E34;\n"
+"}\n"
+"QDateTimeEdit{\n"
 "	color: #89D5D2;\n"
 "	background-color: #1E2E34;\n"
 "}\n"
@@ -128,71 +132,9 @@ class Ui_AddTimeDialog(object):
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.timeLayoutLeftSpacer = QSpacerItem(100, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
+        self.timeLayoutLeftSpacer = QSpacerItem(150, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout.addItem(self.timeLayoutLeftSpacer)
-
-        self.start_date_layout = QVBoxLayout()
-        self.start_date_layout.setSpacing(1)
-        self.start_date_layout.setObjectName(u"start_date_layout")
-        self.startDate = QLabel(AddTimeDialog)
-        self.startDate.setObjectName(u"startDate")
-        self.startDate.setStyleSheet(u"QLabel{\n"
-"	color: #35B5AC;\n"
-"}")
-
-        self.start_date_layout.addWidget(self.startDate, 0, Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignTop)
-
-        self.timeStartDate = QDateEdit(AddTimeDialog)
-        self.timeStartDate.setObjectName(u"timeStartDate")
-        sizePolicy = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
-        sizePolicy.setHorizontalStretch(200)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.timeStartDate.sizePolicy().hasHeightForWidth())
-        self.timeStartDate.setSizePolicy(sizePolicy)
-        self.timeStartDate.setStyleSheet(u"QDateEdit{\n"
-"	color: #89D5D2;\n"
-"	background-color: #1E2E34;\n"
-"}\n"
-"QCalendarWidget QAbstractItemView {\n"
-"    background-color: #1E2E34;\n"
-"    color: #89D5D2;\n"
-"}\n"
-"QCalendarWidget QWidget {\n"
-"    background-color: #1E2E34;\n"
-"    color: #89D5D2;\n"
-"}\n"
-"\n"
-"QCalendarWidget QToolButton {\n"
-"    color: #89D5D2;\n"
-"    background-color: #1E2E34;\n"
-"}\n"
-"\n"
-"QCalendarWidget QAbstractItemView:enabled {\n"
-"    color: #89D5D2;\n"
-"    background-color: #1E2E34;\n"
-"    selection-background-color: #4F5E63;\n"
-"    selection-color: #89D5D2;\n"
-"}\n"
-"QCalendarWidget QHeaderView {\n"
-"    color: #89D5D2;\n"
-"    background-color: #1E2E34;\n"
-"}\n"
-"\n"
-"QCalendarWidget qt_calendar_calendarview QHeaderView::section {\n"
-"    color: #89D5D2;\n"
-"    background-color: #1E2E34;\n"
-"}")
-        self.timeStartDate.setMaximumDate(QDate(2100, 12, 31))
-        self.timeStartDate.setMinimumDate(QDate(2024, 12, 26))
-        self.timeStartDate.setCurrentSection(QDateTimeEdit.Section.MonthSection)
-        self.timeStartDate.setCalendarPopup(True)
-        self.timeStartDate.setTimeSpec(Qt.TimeSpec.LocalTime)
-
-        self.start_date_layout.addWidget(self.timeStartDate, 0, Qt.AlignmentFlag.AlignRight)
-
-
-        self.horizontalLayout.addLayout(self.start_date_layout)
 
         self.start_times_layout = QVBoxLayout()
         self.start_times_layout.setObjectName(u"start_times_layout")
@@ -204,7 +146,7 @@ class Ui_AddTimeDialog(object):
 
         self.start_times_layout.addWidget(self.startTimeLabel, 0, Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignVCenter)
 
-        self.timeStartEdit = QTimeEdit(AddTimeDialog)
+        self.timeStartEdit = QDateTimeEdit(AddTimeDialog)
         self.timeStartEdit.setObjectName(u"timeStartEdit")
         self.timeStartEdit.setCurrentSection(QDateTimeEdit.Section.HourSection)
         self.timeStartEdit.setCalendarPopup(True)
@@ -224,8 +166,9 @@ class Ui_AddTimeDialog(object):
 
         self.end_times_layout.addWidget(self.endTimeLabel, 0, Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignVCenter)
 
-        self.timeEndEdit = QTimeEdit(AddTimeDialog)
+        self.timeEndEdit = QDateTimeEdit(AddTimeDialog)
         self.timeEndEdit.setObjectName(u"timeEndEdit")
+        self.timeEndEdit.setCurrentSection(QDateTimeEdit.Section.HourSection)
         self.timeEndEdit.setCalendarPopup(True)
 
         self.end_times_layout.addWidget(self.timeEndEdit)
@@ -233,7 +176,7 @@ class Ui_AddTimeDialog(object):
 
         self.horizontalLayout.addLayout(self.end_times_layout)
 
-        self.timeLayoutSpacer = QSpacerItem(100, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
+        self.timeLayoutSpacer = QSpacerItem(150, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout.addItem(self.timeLayoutSpacer)
 
@@ -244,32 +187,32 @@ class Ui_AddTimeDialog(object):
 
         self.verticalLayout_6.addItem(self.verticalSpacer_3)
 
-        self.verticalLayout_5 = QVBoxLayout()
-        self.verticalLayout_5.setObjectName(u"verticalLayout_5")
+        self.notes_layout = QVBoxLayout()
+        self.notes_layout.setObjectName(u"notes_layout")
         self.notesLabel = QLabel(AddTimeDialog)
         self.notesLabel.setObjectName(u"notesLabel")
         self.notesLabel.setStyleSheet(u"QLabel{\n"
 "	color: #35B5AC;\n"
 "}")
 
-        self.verticalLayout_5.addWidget(self.notesLabel)
+        self.notes_layout.addWidget(self.notesLabel)
 
         self.notesTextEdit = QTextEdit(AddTimeDialog)
         self.notesTextEdit.setObjectName(u"notesTextEdit")
 
-        self.verticalLayout_5.addWidget(self.notesTextEdit)
+        self.notes_layout.addWidget(self.notesTextEdit)
 
 
-        self.verticalLayout_6.addLayout(self.verticalLayout_5)
+        self.verticalLayout_6.addLayout(self.notes_layout)
 
         self.addTimeButtonBox = QDialogButtonBox(AddTimeDialog)
         self.addTimeButtonBox.setObjectName(u"addTimeButtonBox")
         self.addTimeButtonBox.setEnabled(True)
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.addTimeButtonBox.sizePolicy().hasHeightForWidth())
-        self.addTimeButtonBox.setSizePolicy(sizePolicy1)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.addTimeButtonBox.sizePolicy().hasHeightForWidth())
+        self.addTimeButtonBox.setSizePolicy(sizePolicy)
         self.addTimeButtonBox.setMinimumSize(QSize(150, 40))
         self.addTimeButtonBox.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.addTimeButtonBox.setStyleSheet(u"QDialogButtonBox QPushButton {\n"
@@ -312,8 +255,6 @@ class Ui_AddTimeDialog(object):
         self.architectLabel.setText(QCoreApplication.translate("AddTimeDialog", u"Architect", None))
         self.projectLabel.setText(QCoreApplication.translate("AddTimeDialog", u"Project", None))
         self.phaseLabel.setText(QCoreApplication.translate("AddTimeDialog", u"Phase", None))
-        self.startDate.setText(QCoreApplication.translate("AddTimeDialog", u"Start Date:", None))
-        self.timeStartDate.setDisplayFormat(QCoreApplication.translate("AddTimeDialog", u"MM/dd/yy", None))
         self.startTimeLabel.setText(QCoreApplication.translate("AddTimeDialog", u"Start Time:", None))
         self.endTimeLabel.setText(QCoreApplication.translate("AddTimeDialog", u"End Time", None))
         self.notesLabel.setText(QCoreApplication.translate("AddTimeDialog", u"Notes:", None))

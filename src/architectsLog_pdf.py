@@ -78,8 +78,9 @@ def generate_invoice_pdf(invoice_id: int, cur: sqlite3.Cursor) -> None:
 
 	pdf.cell(0, 5, project.client_name, align="L", new_x="LMARGIN", new_y="NEXT")
 	client_address = project.client_address.split(",", 1)
-	pdf.cell(0, 5, f"{client_address[0]},", new_x="LMARGIN", new_y="NEXT")
-	pdf.cell(0, 5, client_address[1].strip(), new_x="LMARGIN", new_y="NEXT")
+	pdf.cell(0, 5, f"{client_address[0]}", new_x="LMARGIN", new_y="NEXT")
+	if len(client_address) > 1:
+		pdf.cell(0, 5, client_address[1].strip(), new_x="LMARGIN", new_y="NEXT")
 
 	pdf.set_font("helvetica", style="B", size=12)
 	label_width = pdf.get_string_width("Invoice Number: ")

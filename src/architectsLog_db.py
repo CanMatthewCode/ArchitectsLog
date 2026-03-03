@@ -100,6 +100,7 @@ def create_time_entries_table(cur: sqlite3.Cursor) -> None:
 			architect_id INTEGER NOT NULL,
 			phase_id INTEGER NOT NULL,
 			start_time INTEGER NOT NULL,
+			end_time INTEGER NOT NULL,
 			duration_minutes INTEGER NOT NULL,
 			notes TEXT,
 			invoice_id INTEGER DEFAULT 0,
@@ -210,11 +211,11 @@ def add_project(project: Project, cur: sqlite3.Cursor) -> int:
 def add_time_entry(time_entry: TimeEntry, cur: sqlite3.Cursor) -> int:
 	"""Add a TimeEntry object to the time_entries table, return newly added time_entry_id"""
 	sql = "INSERT INTO time_entries (project_id, architect_id, phase_id, start_time, \
-		duration_minutes, notes, invoice_id) VALUES (?, ?, ?, ?, ?, ?, ?)"
+		end_time, duration_minutes, notes, invoice_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
 	project_id = time_entry.project_id if time_entry.project_id else None
 	time_entry_values = (project_id, time_entry.architect_id,
-		time_entry.phase_id, time_entry.start_time, time_entry.duration_minutes, 
-		time_entry.notes, time_entry.invoice_id)
+		time_entry.phase_id, time_entry.start_time, time_entry.end_time, 
+		time_entry.duration_minutes, time_entry.notes, time_entry.invoice_id)
 
 	cur.execute(sql, time_entry_values)
 	time_entry_id = cur.lastrowid

@@ -23,8 +23,8 @@ class Ui_ViewInvoiceWindow(object):
     def setupUi(self, ViewInvoiceWindow):
         if not ViewInvoiceWindow.objectName():
             ViewInvoiceWindow.setObjectName(u"ViewInvoiceWindow")
-        ViewInvoiceWindow.resize(1020, 466)
-        ViewInvoiceWindow.setMinimumSize(QSize(900, 400))
+        ViewInvoiceWindow.resize(866, 467)
+        ViewInvoiceWindow.setMinimumSize(QSize(400, 400))
         ViewInvoiceWindow.setStyleSheet(u"QWidget{\n"
 "	background-color: #1E2E34;\n"
 "}\n"
@@ -80,6 +80,12 @@ class Ui_ViewInvoiceWindow(object):
 
         self.verticalLayout.addItem(self.verticalSpacer_2)
 
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.horizontalSpacer_5 = QSpacerItem(20, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout.addItem(self.horizontalSpacer_5)
+
         self.projectNameLabel = QLabel(ViewInvoiceWindow)
         self.projectNameLabel.setObjectName(u"projectNameLabel")
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
@@ -95,7 +101,30 @@ class Ui_ViewInvoiceWindow(object):
 "	color: #35B5AC;\n"
 "}")
 
-        self.verticalLayout.addWidget(self.projectNameLabel, 0, Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
+        self.horizontalLayout.addWidget(self.projectNameLabel)
+
+        self.horizontalSpacer_4 = QSpacerItem(100, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout.addItem(self.horizontalSpacer_4)
+
+        self.projectPhaseLabel = QLabel(ViewInvoiceWindow)
+        self.projectPhaseLabel.setObjectName(u"projectPhaseLabel")
+        sizePolicy.setHeightForWidth(self.projectPhaseLabel.sizePolicy().hasHeightForWidth())
+        self.projectPhaseLabel.setSizePolicy(sizePolicy)
+        self.projectPhaseLabel.setFont(font2)
+        self.projectPhaseLabel.setStyleSheet(u"QLabel{\n"
+"	color: #35B5AC;\n"
+"}")
+        self.projectPhaseLabel.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
+
+        self.horizontalLayout.addWidget(self.projectPhaseLabel)
+
+        self.horizontalSpacer_6 = QSpacerItem(20, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout.addItem(self.horizontalSpacer_6)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout)
 
         self.verticalSpacer = QSpacerItem(10, 15, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
 
@@ -203,6 +232,7 @@ class Ui_ViewInvoiceWindow(object):
         self.invoiceNumberLabel.setText(QCoreApplication.translate("ViewInvoiceWindow", u"Invoice Number:", None))
         self.addInvoiceNumberLabel.setText("")
         self.projectNameLabel.setText("")
+        self.projectPhaseLabel.setText("")
         self.saveToPDFBtn.setText(QCoreApplication.translate("ViewInvoiceWindow", u"Save To PDF", None))
         self.totalHoursLabel.setText(QCoreApplication.translate("ViewInvoiceWindow", u"Total Time: ", None))
         self.addTotalHoursLabel.setText("")

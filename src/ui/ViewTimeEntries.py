@@ -60,6 +60,18 @@ class Ui_ViewTimeEntriesWindow(object):
 "}\n"
 "QLineEdit{\n"
 "	color: #89D5D2;\n"
+"}\n"
+"QCalendarWidget QToolButton{\n"
+"	color: #89D5D2;\n"
+"	background-color: #1E2E34;\n"
+"}\n"
+"QDateTimeEdit{\n"
+"	color: #89D5D2;\n"
+"	background-color: #1E2E34;\n"
+"}\n"
+"QDateTimeEdit QAbstractItemView{\n"
+"	color: #89D5D2;\n"
+"	background-color: #1E2E34;\n"
 "}")
         self.verticalLayout = QVBoxLayout(ViewTimeEntriesWindow)
         self.verticalLayout.setObjectName(u"verticalLayout")

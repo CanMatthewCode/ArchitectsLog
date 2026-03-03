@@ -40,6 +40,14 @@ class Ui_ViewProjectsWindow(object):
 "}\n"
 "QLineEdit{\n"
 "	color: #89D5D2;\n"
+"}\n"
+"QDateEdit{\n"
+"	color: #89D5D2;\n"
+"	background-color: #1E2E34;\n"
+"}\n"
+"QCalendarWidget QToolButton{\n"
+"	color: #89D5D2;\n"
+"	background-color: #1E2E34;\n"
 "}")
         self.verticalLayout = QVBoxLayout(ViewProjectsWindow)
         self.verticalLayout.setObjectName(u"verticalLayout")

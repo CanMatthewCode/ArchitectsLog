@@ -24,7 +24,7 @@ class Ui_AddTimeDialog(object):
     def setupUi(self, AddTimeDialog):
         if not AddTimeDialog.objectName():
             AddTimeDialog.setObjectName(u"AddTimeDialog")
-        AddTimeDialog.resize(606, 400)
+        AddTimeDialog.resize(694, 400)
         AddTimeDialog.setStyleSheet(u"QWidget{\n"
 "	background-color: #1E2E34;\n"
 "}\n"
@@ -40,11 +40,7 @@ class Ui_AddTimeDialog(object):
 "	color: #89D5D2;\n"
 "	background-color: #1E2E34;\n"
 "}\n"
-"QDateEdit{\n"
-"	color: #89D5D2;\n"
-"	background-color: #1E2E34;\n"
-"}\n"
-"QTimeEdit{\n"
+"QDateTimeEdit QAbstractItemView{\n"
 "	color: #89D5D2;\n"
 "	background-color: #1E2E34;\n"
 "}\n"
@@ -55,6 +51,17 @@ class Ui_AddTimeDialog(object):
 "QTextEdit{\n"
 "	color: #89D5D2;\n"
 "	background-color: #1E2E34;\n"
+"}\n"
+"QCalendarWidget QToolButton{\n"
+"	color: #89D5D2;\n"
+"	background-color: #1E2E34;\n"
+"}\n"
+"QCalendarWidget QHeaderView {\n"
+"    background-color: #1E2E34;\n"
+"}\n"
+"QCalendarWidget QHeaderView::section {\n"
+"    color: #89D5D2;\n"
+"    background-color: #1E2E34;\n"
 "}")
         self.verticalLayout_6 = QVBoxLayout(AddTimeDialog)
         self.verticalLayout_6.setObjectName(u"verticalLayout_6")
@@ -148,6 +155,7 @@ class Ui_AddTimeDialog(object):
 
         self.timeStartEdit = QDateTimeEdit(AddTimeDialog)
         self.timeStartEdit.setObjectName(u"timeStartEdit")
+        self.timeStartEdit.setAutoFillBackground(True)
         self.timeStartEdit.setCurrentSection(QDateTimeEdit.Section.HourSection)
         self.timeStartEdit.setCalendarPopup(True)
 
@@ -168,6 +176,7 @@ class Ui_AddTimeDialog(object):
 
         self.timeEndEdit = QDateTimeEdit(AddTimeDialog)
         self.timeEndEdit.setObjectName(u"timeEndEdit")
+        self.timeEndEdit.setAutoFillBackground(True)
         self.timeEndEdit.setCurrentSection(QDateTimeEdit.Section.HourSection)
         self.timeEndEdit.setCalendarPopup(True)
 

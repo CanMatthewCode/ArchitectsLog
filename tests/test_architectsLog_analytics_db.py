@@ -55,41 +55,57 @@ def analytics_table_initialize(test_conn):
 
 	#	~~~TIME ENTRIES~~~
 	#project 1, phase 1
-	time_entry1_datetime = int(datetime.strptime("01-15-2025 09:00:00", 
+	time_entry1_start = int(datetime.strptime("01-15-2025 09:00:00", 
 		"%m-%d-%Y %I:%M:%S").timestamp())
-	time_entry1 = TimeEntry(time_entry1_datetime, 60, project1_id, architect_id)
+	time_entry1_end = int(datetime.strptime("01-15-2025 10:00:00", 
+		"%m-%d-%Y %I:%M:%S").timestamp())
+	time_entry1 = TimeEntry(time_entry1_start, time_entry1_end, 60, project1_id, 
+		architect_id)
 	add_time_entry(time_entry1, cur)
 
 	#project 1, phase 1 - outside date range
-	time_entry2_datetime = int(datetime.strptime("02-15-2024 09:00:00",
+	time_entry2_start = int(datetime.strptime("02-15-2024 09:00:00",
 		"%m-%d-%Y %I:%M:%S").timestamp())
-	time_entry2 = TimeEntry(time_entry2_datetime, 120, project1_id, architect_id)
+	time_entry2_end = int(datetime.strptime("02-15-2024 11:00:00", 
+		"%m-%d-%Y %I:%M:%S").timestamp())
+	time_entry2 = TimeEntry(time_entry2_start, time_entry2_end, 120,
+		project1_id, architect_id)
 	add_time_entry(time_entry2, cur)
 
 	#project 1, phase 2
-	time_entry3_datetime = int(datetime.strptime("03-15-2025 09:00:00", 
+	time_entry3_start = int(datetime.strptime("03-15-2025 09:00:00", 
 		"%m-%d-%Y %I:%M:%S").timestamp())
-	time_entry3 = TimeEntry(time_entry3_datetime, 90, project1_id, architect_id, 
-		phase_id=2)
+	time_entry3_end = int(datetime.strptime("03-15-2025 10:30:00", 
+		"%m-%d-%Y %I:%M:%S").timestamp())
+	time_entry3 = TimeEntry(time_entry3_start, time_entry3_end, 90, 
+		project1_id, architect_id, phase_id=2)
 	add_time_entry(time_entry3, cur)
 
 	#project 2, phase 1
-	time_entry4_datetime = int(datetime.strptime("04-15-2025 09:00:00", 
+	time_entry4_start = int(datetime.strptime("04-15-2025 09:00:00", 
 		"%m-%d-%Y %I:%M:%S").timestamp())
-	time_entry4 = TimeEntry(time_entry4_datetime, 60, project2_id, architect_id)
+	time_entry4_end = int(datetime.strptime("04-15-2025 10:00:00", 
+		"%m-%d-%Y %I:%M:%S").timestamp())
+	time_entry4 = TimeEntry(time_entry4_start, time_entry4_end, 60, project2_id,
+		architect_id)
 	add_time_entry(time_entry4, cur)
 
 	#project 2, phase 3 - outside date range
-	time_entry5_datetime = int(datetime.strptime("05-15-2024 09:00:00", 
+	time_entry5_start = int(datetime.strptime("05-15-2024 09:00:00", 
 		"%m-%d-%Y %I:%M:%S").timestamp())
-	time_entry5 = TimeEntry(time_entry5_datetime, 45, project2_id, architect_id, 
-		phase_id=3)
+	time_entry5_end = int(datetime.strptime("05-15-2024 09:45:00", 
+		"%m-%d-%Y %I:%M:%S").timestamp())
+	time_entry5 = TimeEntry(time_entry5_start, time_entry5_end, 45, project2_id, 
+		architect_id, phase_id=3)
 	add_time_entry(time_entry5, cur)
 
 	#project 3, phase 1 - outside date range
-	time_entry6_datetime = int(datetime.strptime("06-15-2023 09:00:00", 
+	time_entry6_start = int(datetime.strptime("06-15-2023 09:00:00", 
 		"%m-%d-%Y %I:%M:%S").timestamp())
-	time_entry6 = TimeEntry(time_entry6_datetime, 120, project3_id, architect_id)
+	time_entry6_end = int(datetime.strptime("06-15-2023 11:00:00", 
+		"%m-%d-%Y %I:%M:%S").timestamp())
+	time_entry6 = TimeEntry(time_entry6_start, time_entry6_end, 120, project3_id, 
+		architect_id)
 	add_time_entry(time_entry6, cur)
 
 	test_conn.commit()

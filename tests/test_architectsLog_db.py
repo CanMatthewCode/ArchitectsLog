@@ -56,10 +56,13 @@ def table_initialize(test_conn):
 
 	#create a test time entry with testProject and testArchitect and add it to the 
 	#time_entries table
-	date_time = "01-01-2025 12:00:00"
-	time_entry_date_time = datetime.strptime(date_time, "%m-%d-%Y %I:%M:%S")
-	int_date_time = int(time_entry_date_time.timestamp())
-	testTimeEntry = TimeEntry(int_date_time, 30, testProject.project_id, 
+	start_time = "01-01-2025 12:00:00"
+	time_entry_date_time = datetime.strptime(start_time, "%m-%d-%Y %I:%M:%S")
+	int_date_start = int(time_entry_date_time.timestamp())
+	end_time = "01-01-2025 12:30:00"
+	time_entry_date_time = datetime.strptime(end_time, "%m-%d-%Y %I:%M:%S")
+	int_date_end = int(time_entry_date_time.timestamp())
+	testTimeEntry = TimeEntry(int_date_start, int_date_end, 30, testProject.project_id,
 		testArchitect.architect_id, notes= "Note", invoice_id= 1)
 	time_entry_id = add_time_entry(testTimeEntry, cur)
 
@@ -292,6 +295,7 @@ def test_create_time_entries_table_names(table_info):
 	assert 'architect_id' in column_names
 	assert 'phase_id' in column_names
 	assert 'start_time' in column_names
+	assert 'end_time' in column_names
 	assert 'duration_minutes' in column_names
 	assert 'notes' in column_names
 	assert 'invoice_id' in column_names
@@ -306,6 +310,7 @@ def test_create_time_entries_table_types(table_info):
 	assert column_types['architect_id'] == 'INTEGER'
 	assert column_types['phase_id'] == 'INTEGER'
 	assert column_types['start_time'] == 'INTEGER'
+	assert column_types['end_time'] == 'INTEGER'
 	assert column_types['duration_minutes'] == 'INTEGER'
 	assert column_types['notes'] == 'TEXT'
 	assert column_types['invoice_id'] == 'INTEGER'
@@ -482,12 +487,15 @@ def test_add_time_entries(test_conn, table_initialize):
 	cur.execute(sql, (table_initialize['time_entry_id'],))
 	row = cur.fetchone()
 
-	(time_entry_id, project_id, architect_id, phase_id, start_time, duration_minutes,
-		notes, invoice_id) = row
+	(time_entry_id, project_id, architect_id, phase_id, start_time, end_time, 
+		duration_minutes, notes, invoice_id) = row
 
-	date_time = "01-01-2025 12:00:00"
-	time_entry_date_time = datetime.strptime(date_time, "%m-%d-%Y %I:%M:%S")
-	int_date_time = int(time_entry_date_time.timestamp())
+	test_start_time = "01-01-2025 12:00:00"
+	time_entry_start_time = datetime.strptime(test_start_time, "%m-%d-%Y %I:%M:%S")
+	int_start_time = int(time_entry_start_time.timestamp())
+	test_end_time = "01-01-2025 12:30:00"
+	time_entry_start_time = datetime.strptime(test_end_time, "%m-%d-%Y %I:%M:%S")
+	int_end_time = int(time_entry_start_time.timestamp())
 	#test if row was created - validate the add_time_entry function's return value
 	assert row is not None
 
@@ -496,7 +504,8 @@ def test_add_time_entries(test_conn, table_initialize):
 	assert project_id == table_initialize['project'].project_id
 	assert architect_id == table_initialize['architect'].architect_id
 	assert phase_id == table_initialize['project'].current_phase_id
-	assert start_time == int_date_time
+	assert start_time == int_start_time
+	assert end_time == int_end_time
 	assert duration_minutes == 30
 	assert notes == "Note"
 	assert invoice_id == 1
@@ -556,10 +565,13 @@ def test_get_most_recent_archid_and_projid(test_conn, table_initialize):
 	int_date = int(project_date.timestamp())
 	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", int_date)
 	add_project(second_project, cur)
-	date2 = "03-03-2025"
-	time_entry_date2 = datetime.strptime(date2, "%m-%d-%Y")
-	int_date2 = int(time_entry_date2.timestamp())
-	testTimeEntry2 = TimeEntry(int_date2, 45, second_project.project_id, 
+	start_time = "03-03-2025 12:00:00"
+	end_time = "03-03-2025 12:45:00"
+	time_entry_start = datetime.strptime(start_time, "%m-%d-%Y %I:%M:%S")
+	time_entry_end = datetime.strptime(end_time, "%m-%d-%Y %I:%M:%S")
+	int_start2 = int(time_entry_start.timestamp())
+	int_end2 = int(time_entry_end.timestamp())
+	testTimeEntry2 = TimeEntry(int_start2, int_end2, 45, second_project.project_id, 
 		second_architect.architect_id, 4)
 	add_time_entry(testTimeEntry2, cur)
 	test_conn.commit()
@@ -581,10 +593,13 @@ def test_get_most_recent_project_phase(test_conn, table_initialize):
 	int_date = int(project_date.timestamp())
 	second_project = Project("NewProject2", "NewClient2", "345ClientStreet", int_date)
 	add_project(second_project, cur)
-	date2 = "03-03-2025"
-	time_entry_date2 = datetime.strptime(date2, "%m-%d-%Y")
-	int_date2 = int(time_entry_date2.timestamp())
-	testTimeEntry2 = TimeEntry(int_date2, 45, second_project.project_id, 
+	start_time = "03-03-2025 12:00:00"
+	end_time = "03-03-2025 12:45:00"
+	time_entry_start = datetime.strptime(start_time, "%m-%d-%Y %I:%M:%S")
+	time_entry_end = datetime.strptime(end_time, "%m-%d-%Y %I:%M:%S")
+	int_start2 = int(time_entry_start.timestamp())
+	int_end2 = int(time_entry_end.timestamp())
+	testTimeEntry2 = TimeEntry(int_start2, int_end2, 45, second_project.project_id, 
 		second_architect.architect_id, 4)
 	add_time_entry(testTimeEntry2, cur)
 	test_conn.commit()
@@ -686,7 +701,7 @@ def test_update_time_entry(test_conn, table_initialize):
 
 	#unpack row for readability
 	time_entry_id, project_id, architect_id, phase_id, start_time, \
-		duration_minutes, notes, invoice_id = row
+		end_time, duration_minutes, notes, invoice_id = row
 
 	assert project_id == 2
 	assert architect_id == 2
@@ -750,12 +765,16 @@ def test_delete_time_entry(test_conn, table_initialize):
 	cur = test_conn.cursor()
 	architect = table_initialize['architect']
 	project = table_initialize['project']
-	testTimeEntry2 = TimeEntry("01-01-2025 1:00:00", 45, project.project_id, 
+	time_entry_start = int(datetime.strptime("01-15-2025 09:00:00", 
+		"%m-%d-%Y %I:%M:%S").timestamp())
+	time_entry_end = int(datetime.strptime("01-15-2025 9:45:00", 
+		"%m-%d-%Y %I:%M:%S").timestamp())
+	testTimeEntry2 = TimeEntry(time_entry_start, time_entry_end, 45, project.project_id, 
 		architect.architect_id, phase_id = 8)
 	add_time_entry(testTimeEntry2, cur)
 	test_conn.commit()
-	sql = "SELECT time_entry_id, start_time, duration_minutes, projects.project_name, \
-		architects.name FROM time_entries \
+	sql = "SELECT time_entry_id, start_time, end_time, duration_minutes, \
+		projects.project_name, architects.name FROM time_entries \
 		LEFT JOIN projects ON time_entries.project_id = projects.project_id \
 		INNER JOIN architects ON time_entries.architect_id = architects.architect_id \
 		ORDER BY project_name IS NULL, project_name ASC, name ASC"
@@ -774,7 +793,8 @@ def test_delete_time_entry(test_conn, table_initialize):
 
 	#test the correct time_entry was deleted
 	assert post_delete_time_entries[0][0] == 2
-	assert post_delete_time_entries[0][1] == "01-01-2025 1:00:00"
-	assert post_delete_time_entries[0][2] == 45
-	assert post_delete_time_entries[0][3] == "NewProject"
-	assert post_delete_time_entries[0][4] == "Name"
+	assert post_delete_time_entries[0][1] == time_entry_start
+	assert post_delete_time_entries[0][2] == time_entry_end
+	assert post_delete_time_entries[0][3] == 45
+	assert post_delete_time_entries[0][4] == "NewProject"
+	assert post_delete_time_entries[0][5] == "Name"

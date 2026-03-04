@@ -7,8 +7,10 @@ from datetime import datetime
 
 #test if the Architect class instance is initialized correctly
 def test_architect_initialization():
-	"""Test if the Architect class instance is created and __init__() initializes correctly"""
-	testArchitect = Architect("Name", "LicenseNumber01", "123-456-7890", "email@domain.com", "MyCompany")
+	"""Test if the Architect class instance is created and __init__() 
+	initializes correctly"""
+	testArchitect = Architect("Name", "LicenseNumber01", "123-456-7890", 
+		"email@domain.com", "MyCompany")
 
 	assert testArchitect.name == "Name"
 	assert testArchitect.license_number == "LicenseNumber01"
@@ -20,7 +22,8 @@ def test_architect_initialization():
 
 #test if the Project class instance is initialized correctly
 def test_project_initialization():
-	"""Test if the Project class instance is created and __init__() initializes correctly"""
+	"""Test if the Project class instance is created and __init__() 
+	initializes correctly"""
 	testProject = Project("NewProject", "NewClient", "123ClientStreet", "01-01-2025")
 
 	assert testProject.project_name == "NewProject"
@@ -49,15 +52,21 @@ def test_invoice_initialization():
 #test if the TimeEntry class instance is initialized correctly
 def test_time_entry_initialization():
 	"""Test if the TimeEntry class is created and __init__() initializes correctly"""
-	start_time = "01-01-2025 12:00:00"
-	duration = 30
+	time_entry1_start = int(datetime.strptime("01-15-2025 09:00:00", 
+		"%m-%d-%Y %I:%M:%S").timestamp())
+	time_entry1_end = int(datetime.strptime("01-15-2025 10:00:00", 
+		"%m-%d-%Y %I:%M:%S").timestamp())
+	duration = 60
 
-	testArchitect = Architect("Name", "LicenseNumber01", "123-456-7890", "email@domain.com", "MyCompany")
+	testArchitect = Architect("Name", "LicenseNumber01", "123-456-7890", 
+		"email@domain.com", "MyCompany")
 	testProject = Project("NewProject", "NewClient", "123ClientStreet", "01-01-2025")
-	testTimeEntry = TimeEntry(start_time, duration, testProject.project_id, testArchitect.architect_id, 
-		notes = "Note", invoice_id = 1)
+	testTimeEntry = TimeEntry(time_entry1_start, time_entry1_end, duration, 
+		testProject.project_id, testArchitect.architect_id, notes = "Note", 
+		invoice_id = 1)
 
-	assert testTimeEntry.start_time == start_time
+	assert testTimeEntry.start_time == time_entry1_start
+	assert testTimeEntry.end_time == time_entry1_end
 	assert testTimeEntry.duration_minutes == duration
 	assert testTimeEntry.project_id == testProject.project_id
 	assert testTimeEntry.architect_id == testArchitect.architect_id

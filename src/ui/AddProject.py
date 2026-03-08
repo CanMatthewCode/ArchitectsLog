@@ -168,7 +168,7 @@ class Ui_AddProjectDialog(object):
 "    background-color: #1E2E34;\n"
 "}")
         self.projectStartDate.setMaximumDate(QDate(2100, 12, 31))
-        self.projectStartDate.setMinimumDate(QDate(2024, 12, 27))
+        self.projectStartDate.setMinimumDate(QDate(2000, 1, 1))
         self.projectStartDate.setCurrentSection(QDateTimeEdit.Section.MonthSection)
         self.projectStartDate.setCalendarPopup(True)
         self.projectStartDate.setTimeSpec(Qt.TimeSpec.LocalTime)

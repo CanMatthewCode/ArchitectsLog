@@ -156,6 +156,8 @@ class Ui_AddTimeDialog(object):
         self.timeStartEdit = QDateTimeEdit(AddTimeDialog)
         self.timeStartEdit.setObjectName(u"timeStartEdit")
         self.timeStartEdit.setAutoFillBackground(True)
+        self.timeStartEdit.setDate(QDate(2000, 1, 1))
+        self.timeStartEdit.setMinimumDate(QDate(2000, 1, 1))
         self.timeStartEdit.setCurrentSection(QDateTimeEdit.Section.HourSection)
         self.timeStartEdit.setCalendarPopup(True)
 
@@ -177,6 +179,8 @@ class Ui_AddTimeDialog(object):
         self.timeEndEdit = QDateTimeEdit(AddTimeDialog)
         self.timeEndEdit.setObjectName(u"timeEndEdit")
         self.timeEndEdit.setAutoFillBackground(True)
+        self.timeEndEdit.setDate(QDate(2000, 1, 1))
+        self.timeEndEdit.setMinimumDate(QDate(2000, 1, 1))
         self.timeEndEdit.setCurrentSection(QDateTimeEdit.Section.HourSection)
         self.timeEndEdit.setCalendarPopup(True)
 

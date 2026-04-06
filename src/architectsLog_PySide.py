@@ -1379,6 +1379,12 @@ class ViewAnalytics(QWidget, Ui_AnalyticsWindow):
 		super(ViewAnalytics, self).__init__()
 		self.setupUi(self)
 
+		# Resize window to fit smaller than 2000x1200 windows if needbe
+		windowSize = QApplication.primaryScreen().availableGeometry()
+		if windowSize.width() < 2000 or windowSize.height() < 1200:
+			self.resize(int(windowSize.width() * 0.85), int(windowSize.height() * 0.85))
+			self.move(windowSize.center() - self.rect().center())
+			
 		self.setWindowTitle("Analytics")
 
 		with get_db_connection() as conn:

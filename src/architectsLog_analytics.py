@@ -370,40 +370,44 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 		self.fig.clear()
 		self.ax = self.fig.add_subplot(111)
 		
-		projects_by_phase_list = []
-		for i in range(len(self.PHASE_NAMES)):
-			projects_by_phase_list.append([])
+		# Create empty lists for every possible phase
+		projects_by_phase_list = [[] for _ in range(len(self.PHASE_NAMES))]
 
 		phase_ids = []
-		phase_num = 1
-		j = 0
-		for i in range(len(projects_phase_data)):
-			while phase_num - 1 < len(self.PHASE_NAMES):
-				if j >= len(projects_phase_data[i]):
-					projects_by_phase_list[phase_num - 1].append(0)
-				elif projects_phase_data[i][j][0] == phase_num:
-					projects_by_phase_list[phase_num - 1].append(
-						projects_phase_data[i][j][1])
-					phase_ids.append(phase_num)
-				elif projects_phase_data[i][j][0] > phase_num:
-					projects_by_phase_list[phase_num - 1].append(0)
-					j -= 1
-				phase_num += 1
-				j += 1
-			phase_num = 1
-			j = 0
+		current_phase = 1
+		project_phase_index = 0
+		for project_index in range(len(projects_phase_data)):
+			while current_phase - 1 < len(self.PHASE_NAMES):
+				# Current project's phases have been exhausted, add 0s
+				if project_phase_index >= len(projects_phase_data[project_index]):
+					projects_by_phase_list[current_phase - 1].append(0)
+				# Current project's phase matches phase being examined, add data
+				elif (projects_phase_data[project_index][project_phase_index][0] 
+					== current_phase):
+					projects_by_phase_list[current_phase - 1].append(
+						projects_phase_data[project_index][project_phase_index][1])
+					phase_ids.append(current_phase)
+				# Project's next phase is past current phase being checked, add 0 and
+				#	reduce project_phase_index by 1 so as to not skip that phase
+				elif (projects_phase_data[project_index][project_phase_index][0] 
+						> current_phase):
+					projects_by_phase_list[current_phase - 1].append(0)
+					project_phase_index -= 1
+				current_phase += 1
+				project_phase_index += 1
+			current_phase = 1
+			project_phase_index = 0
 
-		bottoms = []
-		for i in range(len(projects_phase_data)):
-			bottoms.append(0)
+		# Add 0s for all projects as the baseline for bar graphs
+		bottoms = [0] * len(projects_phase_data)
 
 		x_positions = range(len(projects_phase_data))
 
-		for i in range(len(self.PHASE_NAMES)):
-			self.ax.bar(x_positions, projects_by_phase_list[i], bottom = bottoms, 
-				color=self.PHASE_COLORS[i])
+		for phase in range(len(self.PHASE_NAMES)):
+			self.ax.bar(x_positions, projects_by_phase_list[phase], bottom = bottoms,
+				color=self.PHASE_COLORS[phase])
 			bottoms = [bottom + phase_hours for bottom, phase_hours in 
-				zip(bottoms, projects_by_phase_list[i])]
+				zip(bottoms, projects_by_phase_list[phase])]
 
 		fontsize = 6
 		if len(x_positions) <= 8:

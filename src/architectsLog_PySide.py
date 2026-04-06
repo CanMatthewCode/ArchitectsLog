@@ -1378,7 +1378,7 @@ class ViewAnalytics(QWidget, Ui_AnalyticsWindow):
 	def __init__(self) -> None:
 		super(ViewAnalytics, self).__init__()
 		self.setupUi(self)
-		self.setFixedSize(self.size())
+
 		self.setWindowTitle("Analytics")
 
 		with get_db_connection() as conn:
@@ -1475,7 +1475,7 @@ class ViewProjectPhases(QWidget, Ui_PhaseHoursWindow):
 		self.original_row = 0
 
 		end_date = datetime.now()
-		start_date = end_date - timedelta(weeks=102)
+		start_date = end_date - timedelta(weeks=104)
 		self.start_date_int = int(start_date.timestamp())
 
 		self.project_model = QSqlTableModel()
@@ -1610,7 +1610,7 @@ class ViewProjectAverages(QWidget, Ui_PhaseAveragesWindow):
 
 		# ComboBoxes Model setup
 		end_date = datetime.now()
-		start_date = end_date - timedelta(weeks=102)
+		start_date = end_date - timedelta(weeks=104)
 		self.start_date_int = int(start_date.timestamp())
 		self.project_model = QSqlTableModel()
 		self.project_model.setTable("projects")
@@ -2108,13 +2108,15 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 			self.close()
 			return
 		self.timer.timer.stop()
-		self.time_log.end_time = datetime.now()
+		#self.time_log.end_time = datetime.now()
 		total_time = 0
 		if self.time_log.timer_state == "running":
 			self.time_log.timer_state = "paused"
-		total_time = ((self.time_log.end_time - 
+		total_time = ((self.time_log.now() - 
 			self.time_log.start_time).total_seconds() - 
 			self.time_log.total_pause_duration)
+		self.time_log.end_time = (self.time_log.start_time + 
+			timedelta(seconds=total_time))
 		start_time = int(self.time_log.start_time.timestamp())
 		end_time = int(self.time_log.end_time.timestamp())
 		
@@ -2615,7 +2617,7 @@ class TimeDelegate(QStyledItemDelegate):
 
 	def setModelData(self, editor, model, index) -> None:
 		dateTime = editor.dateTime()
-		# set this on db as int 
+		# Set this on db as int 
 		pyDatetime = dateTime.toPython()
 		time_log_int = int(pyDatetime.timestamp())
 		model.setData(index, time_log_int, Qt.EditRole)

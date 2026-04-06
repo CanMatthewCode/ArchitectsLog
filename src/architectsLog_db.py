@@ -152,14 +152,14 @@ def initialize_projects(cur: sqlite3.Cursor) -> None:
 	#return if these already exist in database table
 	if cur.fetchone()[0] > 0:
 		return
-	# add Business Development as id -1
+	# add Administration as id -1
 	start_date_str = "01-01-1900"
 	project_date = datetime.strptime(start_date_str, "%m-%d-%Y")
 	int_date = int(project_date.timestamp())
 	cur.execute("""INSERT INTO projects (project_id, project_name, client_name,
 		client_address, start_date, current_phase_id)
 		VALUES(-1, ?, ?, ?, ?, 8)""", ("Administration", "Internal", "N/A", int_date,))
-	# add Administration as id -2
+	# add Business Development as id -2
 	cur.execute("""INSERT INTO projects (project_id, project_name, client_name,
 		client_address, start_date, current_phase_id)
 		VALUES(-2, ?, ?, ?, ?, 9)""", ("Business Development", "Internal", "N/A2", int_date,))

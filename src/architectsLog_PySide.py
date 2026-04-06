@@ -1384,7 +1384,7 @@ class ViewAnalytics(QWidget, Ui_AnalyticsWindow):
 		if windowSize.width() < 2000 or windowSize.height() < 1200:
 			self.resize(int(windowSize.width() * 0.85), int(windowSize.height() * 0.85))
 			self.move(windowSize.center() - self.rect().center())
-			
+
 		self.setWindowTitle("Analytics")
 
 		with get_db_connection() as conn:
@@ -1405,7 +1405,7 @@ class ViewAnalytics(QWidget, Ui_AnalyticsWindow):
 
 		end_date = datetime.now()
 		end_date_int = int(end_date.timestamp())
-		start_date = end_date - timedelta(weeks=104)
+		start_date = end_date - timedelta(weeks=208)
 		start_date_int = int(start_date.timestamp())
 
 		with get_db_connection() as conn:
@@ -1480,14 +1480,10 @@ class ViewProjectPhases(QWidget, Ui_PhaseHoursWindow):
 		self.phase_data = []
 		self.original_row = 0
 
-		end_date = datetime.now()
-		start_date = end_date - timedelta(weeks=104)
-		self.start_date_int = int(start_date.timestamp())
-
 		self.project_model = QSqlTableModel()
 		self.project_model.setTable("projects")
 		self.project_model.setFilter(
-			f"project_id > 0 AND start_date > {self.start_date_int}")
+			f"project_id > 0 AND status = 'Active'")
 		self.project_model.select()
 		self.ProjectComboBox.setModel(self.project_model)
 		self.ProjectComboBox.setModelColumn(1)
@@ -1574,7 +1570,7 @@ class ViewProjectPhases(QWidget, Ui_PhaseHoursWindow):
 			self.project_model.setFilter("project_id > 0")
 		else:
 			self.project_model.setFilter(
-				f"project_id > 0 AND start_date > {self.start_date_int}")
+				f"project_id > 0 AND status = 'Active'")
 		proj_match = self.project_model.match(self.project_model.index(0,0),
 			Qt.EditRole, current_proj_id, 1, Qt.MatchFlags(Qt.MatchExactly))
 		if proj_match:
@@ -1615,13 +1611,10 @@ class ViewProjectAverages(QWidget, Ui_PhaseAveragesWindow):
 		self.EndDateEdit.hide()
 
 		# ComboBoxes Model setup
-		end_date = datetime.now()
-		start_date = end_date - timedelta(weeks=104)
-		self.start_date_int = int(start_date.timestamp())
 		self.project_model = QSqlTableModel()
 		self.project_model.setTable("projects")
 		self.project_model.setFilter(
-			f"project_id > 0 AND start_date > {self.start_date_int}")
+			f"project_id > 0 AND status = 'Active'")
 		self.project_model.select()
 		self.ProjectComboBox.setModel(self.project_model)
 		self.ProjectComboBox.setModelColumn(1)
@@ -1881,7 +1874,7 @@ class ViewProjectAverages(QWidget, Ui_PhaseAveragesWindow):
 			self.project_model.setFilter("project_id > 0")
 		else:
 			self.project_model.setFilter(
-				f"project_id > 0 AND start_date > {self.start_date_int}")
+				f"project_id > 0 AND status = 'Active'")
 		
 		proj1_match = self.project_model.match(self.project_model.index(0,0),
 			Qt.EditRole, current_proj1_id, 1, Qt.MatchFlags(Qt.MatchExactly))

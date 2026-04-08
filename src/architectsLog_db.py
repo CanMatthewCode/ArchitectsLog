@@ -19,10 +19,9 @@ def get_connection(db_file: str | None = None) -> sqlite3.Connection:
 	conn.execute('PRAGMA foreign_keys = ON;')
 	return conn
 
-#database connection function for production code
 @contextmanager
 def get_db_connection(db_file: str | None = None) -> sqlite3.Connection:
-	"""Context manager for database connections"""
+	"""Context manager for database connections for production code"""
 	if db_file is None:
 		db_file = DB_FILE
 	conn = sqlite3.connect(db_file)

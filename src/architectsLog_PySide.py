@@ -984,6 +984,8 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 				date = datetime.now()
 				start_date = int(date.timestamp())
 
+				# Inline sql functionality to avoid lockout from PySide's persistant connection 
+				#	interfering with contextmanager
 				db = QSqlDatabase.database()
 				db.transaction()
 
@@ -2111,7 +2113,7 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 		total_time = 0
 		if self.time_log.timer_state == "running":
 			self.time_log.timer_state = "paused"
-		total_time = ((self.time_log.now() - 
+		total_time = ((datetime.now() - 
 			self.time_log.start_time).total_seconds() - 
 			self.time_log.total_pause_duration)
 		self.time_log.end_time = (self.time_log.start_time + 
@@ -2352,8 +2354,8 @@ class ArchitectsTableModel(QSqlTableModel):
 					r'^[a-zA-Z0-9_.+-]+@[a-zA-z0-9-]+\.[a-zA-Z0-9-.]+$')
 				email_result = email_pattern.search(value)
 				if not email_result:
-					QMessageBox.warning(None, "Invalid Email", "Invalid Email, \
-						Please Correct")
+					QMessageBox.warning(None, "Invalid Email", 
+						"Invalid Email, \nPlease Correct")
 					return False
 
 		return super().setData(index, value, role)

@@ -148,12 +148,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		load_database_action = QAction("Load Existing Database", self)
 		load_database_action.triggered.connect(self.loadDatabase)
 
-
 		close_window_action = QAction("Close Window", self)
 		close_window_action.triggered.connect(self.closeActiveWindow)
 		close_window_action.setShortcut(QKeySequence.StandardKey.Close)
 		close_window_action.setShortcutContext(Qt.ShortcutContext.ApplicationShortcut)
 		self.addAction(close_window_action)
+
+		minimize_window_action = QAction("Minimize Window", self)
+		minimize_window_action.triggered.connect(self.minimizeActiveWindow)
+		# Mac specific due to differences in OS
+		minimize_window_action.setShortcut(QKeySequence("Ctrl+M"))
+		minimize_window_action.setShortcutContext(Qt.ShortcutContext.ApplicationShortcut)
+		self.addAction(minimize_window_action)
 
 		menu = self.menuBar()
 		file_menu = menu.addMenu("File")
@@ -367,6 +373,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		window = QApplication.activeWindow()
 		if window:
 			window.close()
+
+	def minimizeActiveWindow(self) -> None:
+		window = QApplication.activeWindow()
+		if window:
+			window.showMinimized()
 
 	def newDatabase(self) -> None:
 		create_new_database = CreateNewDatabase()
@@ -970,17 +981,17 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 			 		f"{project_name} Cannot Be Invoiced")
 					self.cancelInvoice()
 					return
+
 				# Pop up invoice number dialog
-				add_invoice_number = AddInvoiceNumber()
-				add_invoice_number.exec()
 				invoice_number = None
 				while not invoice_number:
+					add_invoice_number = AddInvoiceNumber()
+					add_invoice_number.exec()
 					invoice_number = add_invoice_number.addInvoiceLineEdit.text().strip()
 					if not invoice_number:
 						QMessageBox.warning(self, "Invalid Invoice Number",
 			 				"Must Add An Invoice Number")
-						add_invoice_number = AddInvoiceNumber()
-						add_invoice_number.exec()
+
 				date = datetime.now()
 				start_date = int(date.timestamp())
 

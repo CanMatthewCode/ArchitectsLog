@@ -23,7 +23,7 @@ class Ui_ViewArchitectsWindow(object):
     def setupUi(self, ViewArchitectsWindow):
         if not ViewArchitectsWindow.objectName():
             ViewArchitectsWindow.setObjectName(u"ViewArchitectsWindow")
-        ViewArchitectsWindow.resize(850, 450)
+        ViewArchitectsWindow.resize(874, 450)
         sizePolicy = QSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)

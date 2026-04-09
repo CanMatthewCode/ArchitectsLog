@@ -1085,7 +1085,7 @@ class ViewTimeEntries(QWidget, Ui_ViewTimeEntriesWindow):
 		self.timeEntriesTableView.setColumnWidth(4, 152)
 		self.timeEntriesTableView.setColumnWidth(5, 152)
 		self.timeEntriesTableView.setColumnWidth(6, 80)
-		self.timeEntriesTableView.setColumnWidth(7, 360)
+		self.timeEntriesTableView.setColumnWidth(7, 340)
 		self.timeEntriesTableView.setColumnWidth(8, 100)
 
 	def eventFilter(self, obj, event) -> bool:

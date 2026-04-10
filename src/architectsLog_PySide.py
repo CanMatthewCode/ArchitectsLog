@@ -259,6 +259,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 				add_architect(new_architect, cur)
 			self.architect_model.select()
 
+		if self.view_arch_window is not None:
+			self.view_arch_window.model.select()
+
 	def addProject(self) -> None:
 		"""Method to open new projects dialog, store results as a new Project
 		object, then store that object in the projects table of the database"""
@@ -282,6 +285,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 				cur = conn.cursor()
 				add_project(new_project, cur)
 			self.project_model.select()
+
+		if self.view_proj_window is not None:
+			self.view_proj_window.model.select()
 
 	def viewArchitects(self) -> None:
 		"""Method to view all architects in database table, click button to

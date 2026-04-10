@@ -16,8 +16,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QDateEdit, QDateTimeEdit, QFrame,
-    QGridLayout, QHBoxLayout, QLabel, QLineEdit,
-    QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
+    QGridLayout, QHBoxLayout, QLabel, QSizePolicy,
+    QSpacerItem, QVBoxLayout, QWidget)
 
 from architectsLog_analytics import AnalyticsChartDesigner
 
@@ -69,20 +69,18 @@ class Ui_ProjectsOverTimeWindow(object):
 
         self.totalTimeLayout.addWidget(self.totalTimeLabel, 0, Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
 
-        self.totalTimeLineEdit = QLineEdit(ProjectsOverTimeWindow)
-        self.totalTimeLineEdit.setObjectName(u"totalTimeLineEdit")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Fixed)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.totalTimeLineEdit.sizePolicy().hasHeightForWidth())
-        self.totalTimeLineEdit.setSizePolicy(sizePolicy1)
-        self.totalTimeLineEdit.setFont(font)
-        self.totalTimeLineEdit.setStyleSheet(u"QLineEdit{\n"
+        self.totalTimeValueLabel = QLabel(ProjectsOverTimeWindow)
+        self.totalTimeValueLabel.setObjectName(u"totalTimeValueLabel")
+        self.totalTimeValueLabel.setFont(font)
+        self.totalTimeValueLabel.setStyleSheet(u"QLabel{\n"
 "	color : #89D5D2;\n"
 "}")
-        self.totalTimeLineEdit.setFrame(False)
 
-        self.totalTimeLayout.addWidget(self.totalTimeLineEdit, 0, Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
+        self.totalTimeLayout.addWidget(self.totalTimeValueLabel, 0, Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
+
+        self.horizontalSpacer_4 = QSpacerItem(20, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
+
+        self.totalTimeLayout.addItem(self.horizontalSpacer_4)
 
 
         self.verticalLayout.addLayout(self.totalTimeLayout)
@@ -198,6 +196,7 @@ class Ui_ProjectsOverTimeWindow(object):
     def retranslateUi(self, ProjectsOverTimeWindow):
         ProjectsOverTimeWindow.setWindowTitle(QCoreApplication.translate("ProjectsOverTimeWindow", u"Form", None))
         self.totalTimeLabel.setText(QCoreApplication.translate("ProjectsOverTimeWindow", u"Total Time: ", None))
+        self.totalTimeValueLabel.setText("")
         self.selectDateRangeLabel.setText(QCoreApplication.translate("ProjectsOverTimeWindow", u"Select Date Range", None))
     # retranslateUi
 

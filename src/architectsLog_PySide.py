@@ -1992,7 +1992,7 @@ class ViewProjectsOverTime(QWidget, Ui_ProjectsOverTimeWindow):
 			times += sum([item[1] for item in lists])
 		hours = int(times // 1)
 		mins = int((times % 1) * 60)
-		self.totalTimeLineEdit.setText(f"{hours:02d}:{mins:02d}")
+		self.totalTimeValueLabel.setText(f"{hours:02d}:{mins:02d}")
 
 	def selectDateRange(self) -> None:
 		start_date = self.StartDateEdit.date()

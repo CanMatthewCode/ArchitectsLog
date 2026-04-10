@@ -16,8 +16,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QDateEdit, QDateTimeEdit, QFrame,
-    QGridLayout, QHBoxLayout, QLabel, QSizePolicy,
-    QSpacerItem, QVBoxLayout, QWidget)
+    QGridLayout, QHBoxLayout, QLabel, QLineEdit,
+    QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
 
 from architectsLog_analytics import AnalyticsChartDesigner
 
@@ -52,11 +52,46 @@ class Ui_ProjectsOverTimeWindow(object):
 
         self.verticalLayout.addWidget(self.projectsOverTimeFrame)
 
-        self.horizontalLayout = QHBoxLayout()
-        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.totalTimeLayout = QHBoxLayout()
+        self.totalTimeLayout.setObjectName(u"totalTimeLayout")
+        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.totalTimeLayout.addItem(self.horizontalSpacer_3)
+
+        self.totalTimeLabel = QLabel(ProjectsOverTimeWindow)
+        self.totalTimeLabel.setObjectName(u"totalTimeLabel")
+        font = QFont()
+        font.setPointSize(18)
+        self.totalTimeLabel.setFont(font)
+        self.totalTimeLabel.setStyleSheet(u"QLabel{\n"
+"	color : #89D5D2;\n"
+"}")
+
+        self.totalTimeLayout.addWidget(self.totalTimeLabel, 0, Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
+
+        self.totalTimeLineEdit = QLineEdit(ProjectsOverTimeWindow)
+        self.totalTimeLineEdit.setObjectName(u"totalTimeLineEdit")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Fixed)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.totalTimeLineEdit.sizePolicy().hasHeightForWidth())
+        self.totalTimeLineEdit.setSizePolicy(sizePolicy1)
+        self.totalTimeLineEdit.setFont(font)
+        self.totalTimeLineEdit.setStyleSheet(u"QLineEdit{\n"
+"	color : #89D5D2;\n"
+"}")
+        self.totalTimeLineEdit.setFrame(False)
+
+        self.totalTimeLayout.addWidget(self.totalTimeLineEdit, 0, Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
+
+
+        self.verticalLayout.addLayout(self.totalTimeLayout)
+
+        self.dateRangeLayout = QHBoxLayout()
+        self.dateRangeLayout.setObjectName(u"dateRangeLayout")
         self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
-        self.horizontalLayout.addItem(self.horizontalSpacer)
+        self.dateRangeLayout.addItem(self.horizontalSpacer)
 
         self.selectDateRangeLabel = QLabel(ProjectsOverTimeWindow)
         self.selectDateRangeLabel.setObjectName(u"selectDateRangeLabel")
@@ -65,7 +100,7 @@ class Ui_ProjectsOverTimeWindow(object):
 "	color : #89D5D2;\n"
 "}")
 
-        self.horizontalLayout.addWidget(self.selectDateRangeLabel, 0, Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignVCenter)
+        self.dateRangeLayout.addWidget(self.selectDateRangeLabel, 0, Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignVCenter)
 
         self.StartDateEdit = QDateEdit(ProjectsOverTimeWindow)
         self.StartDateEdit.setObjectName(u"StartDateEdit")
@@ -105,7 +140,7 @@ class Ui_ProjectsOverTimeWindow(object):
         self.StartDateEdit.setCurrentSection(QDateTimeEdit.Section.MonthSection)
         self.StartDateEdit.setCalendarPopup(True)
 
-        self.horizontalLayout.addWidget(self.StartDateEdit)
+        self.dateRangeLayout.addWidget(self.StartDateEdit)
 
         self.EndDateEdit = QDateEdit(ProjectsOverTimeWindow)
         self.EndDateEdit.setObjectName(u"EndDateEdit")
@@ -142,16 +177,17 @@ class Ui_ProjectsOverTimeWindow(object):
 "    color: #89D5D2;\n"
 "    background-color: #1E2E34;\n"
 "}")
+        self.EndDateEdit.setCurrentSection(QDateTimeEdit.Section.MonthSection)
         self.EndDateEdit.setCalendarPopup(True)
 
-        self.horizontalLayout.addWidget(self.EndDateEdit)
+        self.dateRangeLayout.addWidget(self.EndDateEdit)
 
         self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
-        self.horizontalLayout.addItem(self.horizontalSpacer_2)
+        self.dateRangeLayout.addItem(self.horizontalSpacer_2)
 
 
-        self.verticalLayout.addLayout(self.horizontalLayout)
+        self.verticalLayout.addLayout(self.dateRangeLayout)
 
 
         self.retranslateUi(ProjectsOverTimeWindow)
@@ -161,6 +197,7 @@ class Ui_ProjectsOverTimeWindow(object):
 
     def retranslateUi(self, ProjectsOverTimeWindow):
         ProjectsOverTimeWindow.setWindowTitle(QCoreApplication.translate("ProjectsOverTimeWindow", u"Form", None))
+        self.totalTimeLabel.setText(QCoreApplication.translate("ProjectsOverTimeWindow", u"Total Time: ", None))
         self.selectDateRangeLabel.setText(QCoreApplication.translate("ProjectsOverTimeWindow", u"Select Date Range", None))
     # retranslateUi
 

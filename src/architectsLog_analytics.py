@@ -458,7 +458,7 @@ class AnalyticsChartDesigner(FigureCanvasQTAgg):
 	def no_data_message(self, title="No Data Available") -> None:
 		self.fig.clear()
 		self.ax = self.fig.add_subplot(111)
-		self.fig.suptitle(title, color='#89D5D2', fontsize=12, y=0.97)
+		self.fig.suptitle(title, color='#89D5D2', fontsize=14, y=0.97)
 		self.ax.text(0.5, 0.5, 'No Data For Selected Range',
 			ha='center', va='center', fontsize=18, color='#89D5D2')
 		self.ax.set_facecolor('#2A3F45')

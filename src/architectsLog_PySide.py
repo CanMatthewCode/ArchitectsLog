@@ -1981,6 +1981,13 @@ class ViewProjectsOverTime(QWidget, Ui_ProjectsOverTimeWindow):
 			self.shifted_projs_over_time = self.projs_over_time_list
 			self.shifted_names_over_time = self.projs_over_time_names
 
+		times = 0
+		for lists in self.shifted_projs_over_time:
+			times += sum([item[1] for item in lists])
+		hours = int(times // 1)
+		mins = int((times % 1) * 60)
+		self.totalTimeLineEdit.setText(f"{hours:02d}:{mins:02d}")
+
 	def selectDateRange(self) -> None:
 		start_date = self.StartDateEdit.date()
 		end_date = self.EndDateEdit.date()
@@ -2119,8 +2126,8 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 			self.main_window.showNormal()
 			self.close()
 			return
+
 		self.timer.timer.stop()
-		#self.time_log.end_time = datetime.now()
 		total_time = 0
 		if self.time_log.timer_state == "running":
 			self.time_log.timer_state = "paused"

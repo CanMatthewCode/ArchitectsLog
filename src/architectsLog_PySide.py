@@ -2140,8 +2140,9 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 
 		self.timer.timer.stop()
 		total_time = 0
-		if self.time_log.timer_state == "running":
-			self.time_log.timer_state = "paused"
+		if self.time_log.timer_state == "paused":
+			self.time_log.total_pause_duration += (datetime.now() -
+				self.time_log.pause_start_time).total_seconds()
 		total_time = ((datetime.now() - 
 			self.time_log.start_time).total_seconds() - 
 			self.time_log.total_pause_duration)

@@ -619,6 +619,11 @@ class ViewProjects(QWidget, Ui_ViewProjectsWindow):
 		relation = QSqlRelation("phases", "phase_id", "project_phase")
 		self.model.setRelation(self.model.fieldIndex("current_phase_id"), relation)
 
+		phase_column = self.model.fieldIndex("current_phase_id")
+		phase_relation_model =self.model.relationModel(phase_column)
+		phase_relation_model.setFilter(f"phase_id < {ADMIN}")
+		phase_relation_model.select()
+
 		self.projectsTableView.setItemDelegate(QSqlRelationalDelegate(
 			self.projectsTableView))
 
@@ -647,7 +652,7 @@ class ViewProjects(QWidget, Ui_ViewProjectsWindow):
 		self.projectsTableView.setColumnHidden(
 			self.model.fieldIndex("project_id"), True)
 
-		self.model.setFilter("status != 'Completed' and project_id > 0")
+		self.model.setFilter("status != 'Completed' AND project_id > 0")
 		self.model.select()
 		self.projectsTableView.setColumnHidden(self.model.fieldIndex("status"), 
 			True)

@@ -23,7 +23,7 @@ class Ui_ProgramStartupDialog(object):
     def setupUi(self, ProgramStartupDialog):
         if not ProgramStartupDialog.objectName():
             ProgramStartupDialog.setObjectName(u"ProgramStartupDialog")
-        ProgramStartupDialog.resize(915, 712)
+        ProgramStartupDialog.resize(915, 714)
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -126,21 +126,21 @@ class Ui_ProgramStartupDialog(object):
                         "by phase, over a chosen time range. </p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Then, when you are ready, simply go to File-&gt;Create New Database to get a clean, empty database from which to log  your own work.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Then, when you are ready, simply go to File-&gt;Create New Database to get a clean, empty database from which to log your own work.</p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-rig"
-                        "ht:0px; -qt-block-indent:0; text-indent:0px;\">Once in your new personal database, add an Architect, add some Projects, and either log your times with the help of an on-screen timer (LOG TIME) or by manually inputting your past times (ADD TIME). </p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-righ"
+                        "t:0px; -qt-block-indent:0; text-indent:0px;\">Once in your new personal database, add an Architect, add some Projects, and either log your times with the help of an on-screen timer (LOG TIME) or by manually inputting your past times (ADD TIME). </p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">To create an invoice enter the View Time Logs section and click 'Create Invoice', at which point you can select which logs from the same project and phase you would like to group together. Hit 'Generate Invoice', enter an invoice number, and have it saved to the View Invoices section of the program. </p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
-"<p style=\" margi"
-                        "n-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">You can view all your invoices from View Invoices or see the time logs associated with any one Invoice by clicking the View Invoice button, at which point you can click  Save to PDF to get a clean printout of that invoice's logged times and total duration.</p>\n"
+"<p style=\" margin"
+                        "-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">You can view all your invoices from View Invoices or see the time logs associated with any one Invoice by clicking the View Invoice button, at which point you can click  Save to PDF to get a clean printout of that invoice's logged times and total duration.</p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Over time your logs will fill the Analytics section giving you a better understanding of your work history - the time spent per phase and per project.  <br /></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-to"
-                        "p:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top"
+                        ":0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
 "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Enjoy</p></body></html>", None))
     # retranslateUi

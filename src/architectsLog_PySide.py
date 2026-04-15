@@ -72,6 +72,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 		self.architect_model = QSqlTableModel()
 		self.architect_model.setTable("architects")
+		self.architect_model.setFilter("status = 'Active'")
 		self.architect_model.select()
 		self.ArchitectsComboBox.setModel(self.architect_model)
 		self.ArchitectsComboBox.setModelColumn(1)				# Index 1 is arch name
@@ -292,7 +293,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 	def viewArchitects(self) -> None:
 		"""Method to view all architects in database table, click button to
 		hide inactive architects"""
-		self.view_arch_window = ViewArchitects()
+		self.view_arch_window = ViewArchitects(self)
 
 	def viewProjects(self) -> None:
 		"""Method to view all projects in database table, click button to
@@ -503,8 +504,9 @@ class ProjectWindow(QDialog, Ui_AddProjectDialog):
 #		~~~Table View Windows~~~
 
 class ViewArchitects(QWidget, Ui_ViewArchitectsWindow):
-	def __init__(self) -> None:
+	def __init__(self, main_window) -> None:
 		super(ViewArchitects, self).__init__()
+		self.main_window = main_window
 		self.setupUi(self)
 		self.setMinimumSize(self.size())
 		header = self.architectsTableView.horizontalHeader()
@@ -569,6 +571,9 @@ class ViewArchitects(QWidget, Ui_ViewArchitectsWindow):
 		
 		# Set checkbox button to hide inactive architects
 		self.showArchitectCheckBox.stateChanged.connect(self.showInactiveArchitects)
+
+		# Set the main window combo box when user changes architect status
+		self.model.dataChanged.connect(self.dataChanged)
 		
 		self.show()
 
@@ -596,6 +601,12 @@ class ViewArchitects(QWidget, Ui_ViewArchitectsWindow):
 			self.architectsTableView.setColumnWidth(3, 135)
 			self.architectsTableView.setColumnWidth(4, 215)
 			self.architectsTableView.setColumnWidth(5, 170)
+
+	def dataChanged(self, topLeft: QModelIndex, bottomRight: QModelIndex, 
+		roles: list = None) -> None:
+		"""Method to refresh the main window's architects combobox on 
+		an architect status change"""
+		self.main_window.ArchitectsComboBox.model().select()
 
 
 class ViewProjects(QWidget, Ui_ViewProjectsWindow):

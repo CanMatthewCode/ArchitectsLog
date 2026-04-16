@@ -30,9 +30,9 @@ Pre-built standalone desktop applications are available for all major platforms:
 
 | Platform | Download |
 |----------|----------|
-| macOS | [Download for Mac](https://github.com/CanMatthewCode/ArchitectsLog/releases/download/v1.0.2/ArchitectsLog-mac.zip) |
-| Windows | [Download for PC](https://github.com/CanMatthewCode/ArchitectsLog/releases/download/v1.0.2/ArchitectsLog.exe) |
-| Linux | [Download for Linux](https://github.com/CanMatthewCode/ArchitectsLog/releases/download/v1.0.2/ArchitectsLog-Linux) |
+| macOS | [Download for Mac](https://github.com/CanMatthewCode/ArchitectsLog/releases/download/v1.0.3/ArchitectsLog-mac.zip) |
+| Windows | [Download for PC](https://github.com/CanMatthewCode/ArchitectsLog/releases/download/v1.0.3/ArchitectsLog.exe) |
+| Linux | [Download for Linux](https://github.com/CanMatthewCode/ArchitectsLog/releases/download/v1.0.3/ArchitectsLog-Linux) |
 
 When you first run the program you may encounter an OS warning due to system securities and the lack of a developer certificate. 
 

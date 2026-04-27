@@ -56,6 +56,14 @@ def initialize_database(db_file: str) -> None:
 	if not db.open():
 		raise Exception("Failed to open database")
 
+def close_database() -> None:
+	"""Method to close and remove the persistant QT connection to the database
+	NOTE: Qt may warn that 'qt_sql_default_connection' is still in use due to internal
+	queries on the combo box models. This is cosmetic and should be ignored"""
+	QSqlDatabase.database().close()
+	QSqlDatabase.removeDatabase(QSqlDatabase.defaultConnection)
+
+
 class MainWindow(QMainWindow, Ui_MainWindow):
 	def __init__(self) -> None:
 		super(MainWindow, self).__init__()
@@ -386,16 +394,44 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		if window:
 			window.showMinimized()
 
+	def release_all_models(self) -> None:
+		"""Method to remove the main window models from their combo boxes and
+		the open view windows for calls to create new / load database"""
+		for window_attribute in ('view_arch_window', 'view_proj_window', 
+			'view_time_entries_window', 'view_invoices_window', 
+			'analytics_window'):
+			# Close all open table view windows
+			window = getattr(self, window_attribute, None)
+			if window:
+				window.close()
+				setattr(self, window_attribute, None)
+
+		# Delete the models themselves - run deleteLater() to ensure correct timing
+		self.architect_model.deleteLater()
+		self.project_model.deleteLater()
+		self.phase_model.deleteLater()
+		# Set attributes to None to remove references
+		self.architect_model = None
+		self.project_model = None
+		self.phase_model = None
+
+		# Process any pending events, allow deleteLater() to run
+		QApplication.processEvents()
+
 	def newDatabase(self) -> None:
 		create_new_database = CreateNewDatabase()
 		result = create_new_database.exec()
 		if result == QDialog.Accepted:
+			self.release_all_models()
+			close_database()
 			new_database()
 
 	def loadDatabase(self) -> None:
 		load_old_database = LoadOldDatabase()
 		result = load_old_database.exec()
 		if result == QDialog.Accepted:
+			self.release_all_models()
+			close_database()
 			load_database()
 
 class ArchitectWindow(QDialog, Ui_AddArchitectDialog):

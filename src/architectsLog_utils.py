@@ -1,6 +1,7 @@
 # program load, new database, load database functionality
 
 import os
+import subprocess
 import sys
 import shutil
 import json
@@ -47,23 +48,19 @@ def new_database() -> None:
 	dirs = PlatformDirs("ArchitectsLog", ensure_exists=True)
 	settings_path = dirs.user_config_path / "settings.json"
 	data_dir = dirs.user_data_path
+	# Save old database for reuse later if old database is a user database
 	if os.path.basename(architectsLog_db.DB_FILE) == 'architectsLog.db':
-		YYYYMMDD = datetime.now().strftime('%Y%m%d')
-		os.rename(architectsLog_db.DB_FILE, os.path.join(
-			data_dir, "architectsLog_old_" + YYYYMMDD + ".db"))
-		architectsLog_db.DB_FILE = os.path.join(data_dir, "architectsLog.db")
-		architectsLog_db.sqltable_initialize()
+		date_time = datetime.now().strftime('%Y%m%d%H%M')
+		shutil.move(architectsLog_db.DB_FILE, os.path.join(
+			data_dir, "architectsLog_old_" + date_time + ".db"))
 	else:
+		# Remove demo_database
 		os.remove(architectsLog_db.DB_FILE)
 		settings_dict = {"db_name" : "architectsLog.db"}
 		with open(settings_path, "w") as file:
 			json.dump(settings_dict, file)
-		architectsLog_db.DB_FILE = os.path.join(data_dir, "architectsLog.db")
-		architectsLog_db.sqltable_initialize()
-	if getattr(sys, "frozen", False):
-		os.execv(sys.executable, [sys.executable])
-	else:
-		os.execv(sys.executable, [sys.executable] + sys.argv)
+
+	restart_app()
 
 def load_database() -> None:
 	"""Function to load an existing user database that has been archived, 
@@ -77,14 +74,13 @@ def load_database() -> None:
 			"demo_ArchitectsLog.db"):
 			return
 		else:
-			YYYYMMDD = datetime.now().strftime('%Y%m%d')
+			# Save existing database as old, then rename loaded database to current name
+			date_time = datetime.now().strftime('%Y%m%d%H%M')
 			os.rename(architectsLog_db.DB_FILE, os.path.join(
-				data_dir, "architectsLog_old_" + YYYYMMDD + ".db"))
+				data_dir, "architectsLog_old_" + date_time + ".db"))
 			os.rename(returned_database, os.path.join(data_dir, "architectsLog.db"))
-			if getattr(sys, "frozen", False):
-				os.execv(sys.executable, [sys.executable])
-			else:
-				os.execv(sys.executable, [sys.executable] + sys.argv)
+
+			restart_app()
 
 class WelcomeSign(QDialog, Ui_ProgramStartupDialog):
 	def __init__(self) -> None:
@@ -92,3 +88,12 @@ class WelcomeSign(QDialog, Ui_ProgramStartupDialog):
 		self.setupUi(self)
 		self.setFixedSize(self.size())
 		self.setWindowTitle("Welcome")
+
+def restart_app() -> None:
+	"""Funciton to restart the program on load or new database creation.
+	Creates new subprocess with executable and exits the old"""
+	if getattr(sys, "frozen", False):
+		subprocess.Popen([sys.executable])
+	else:
+		subprocess.Popen([sys.executable] + sys.argv)
+	sys.exit(0)

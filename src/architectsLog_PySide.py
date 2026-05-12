@@ -2199,10 +2199,8 @@ class TimeLogger(QWidget, Ui_TimeLoggerWindow):
 		end_time = int(self.time_log.end_time.timestamp())
 		
 		total_minutes = total_time // 60
-		quarter_hours = total_minutes // 15
-		if total_minutes % 15 > 0:
-			quarter_hours += 1
-		total_time_logged = quarter_hours * 15
+		
+		total_time_logged = validateDuration(total_minutes)
 
 		if total_time_logged == 0:
 			self.main_window.showNormal()
@@ -2827,37 +2825,14 @@ def validateDuration(duration: str) -> int:
 	rounded up to the next 15 minute increment"""
 	if not duration:
 		return
-	minutes = 0
-	hours = 0
-	if isinstance(duration, str) and ":" in duration:
-		if duration.count(":") != 1:
-			raise ValueError
-		if duration[0] == ":":
-			minutes = int(duration[1:])
-		else:
-			hours, minutes = duration.split(":")
-			hours = int(hours)
-			minutes = int(minutes)
-	elif isinstance(duration, str) and "." in duration:
-		if duration.count(".") != 1:
-			raise ValueError
-		if duration[0] == ".":
-			minutes = 60 * float(duration)
-		else:
-			hours, percent_minutes = duration.split(".")
-			if len(percent_minutes) == 1:
-				percent_minutes += "0"
-			hours = int(hours)
-			minutes = 60 * (int(percent_minutes) / 100)
 
-	else:
-		minutes = int(duration)
+	minutes = int(duration)
 	quarter_hours = minutes // 15
-	if minutes % 15:
+	if (minutes % 15) > 5:
 		quarter_hours += 1
 	minutes = quarter_hours * 15
 
-	return hours * 60 + minutes
+	return minutes
 
 def deleteEmptyInvoices() -> None:
 	"""Delete invoices with no time_entry logs attached"""

@@ -86,6 +86,8 @@ jobs:
             --name "ArchitectsLog" `
             --icon "${{ matrix.icon }}" `
             --paths "src" `
+            --hidden-import "unicodedata" `
+            --hidden-import "matplotlib.backends.backend_qtagg" `
             --add-data "assets;assets" `
             --add-data "src/demo_ArchitectsLog.db;." `
             src/architectsLog_main.py

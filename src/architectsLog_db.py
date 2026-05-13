@@ -152,7 +152,7 @@ def initialize_projects(cur: sqlite3.Cursor) -> None:
 	if cur.fetchone()[0] > 0:
 		return
 	# add Administration as id -1
-	start_date_str = "01-01-1900"
+	start_date_str = "01-01-2000"
 	project_date = datetime.strptime(start_date_str, "%m-%d-%Y")
 	int_date = int(project_date.timestamp())
 	cur.execute("""INSERT INTO projects (project_id, project_name, client_name,
